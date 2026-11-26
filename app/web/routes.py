@@ -16,6 +16,8 @@ from nparity.config import load_thresholds
 from nparity.models import Run
 
 TEMPLATES = Jinja2Templates(directory=Path(__file__).parent / "templates")
+TEMPLATES.env.filters["run_name"] = views.run_name
+TEMPLATES.env.filters["backend_label"] = views.backend_label
 router = APIRouter()
 jobs = RunJobs()
 
