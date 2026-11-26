@@ -182,3 +182,9 @@ def test_static_and_404(setup):
     assert client.get("/static/nparity.css").status_code == 200
     assert client.get("/runs/nope").status_code == 404
     assert client.get(f"/runs/{run.id}/findings/f-999").status_code == 404
+
+
+def test_run_name_and_backend_label():
+    assert views.run_name("2026-11-26T124642-petstore-4676e543c67a") == "petstore"
+    assert views.run_name("demo") == "demo"
+    assert views.backend_label("fake") == "Fake" and views.backend_label("gemini-2.5-flash") == "Flash"
