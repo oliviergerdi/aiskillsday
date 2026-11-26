@@ -72,6 +72,13 @@ Set `UV_NATIVE_TLS=1` only if a corporate proxy breaks TLS.
 deliberate: there is no importable `aiskillsday` package, so the project itself must not
 be built/installed.
 
+**7-day dependency cooldown.** `[tool.uv] exclude-newer = "7 days"` makes uv ignore releases
+newer than 7 days (the same rule as the machine-wide `/etc/uv/uv.toml`). Both lock files must
+pin the same versions, so Poetry is held to the cooldown too: after `uv lock`, align Poetry by
+temporarily pinning the differing packages to the `uv.lock` versions, run `poetry lock`, restore
+`pyproject.toml`, and run `poetry lock` again. `tests/test_project_config.py` fails if the two
+locks drift.
+
 Poetry equivalents (Poetry 2.x still works):
 
 | uv | Poetry |

@@ -15,6 +15,7 @@ Changes:
 - Commit `uv.lock`. Keep `poetry.lock` during the transition.
 - Update README and `docs/nparity-design.md` to put `uv sync` / `uv run` first, with Poetry equivalents.
 - Remove the "no `.venv/` in the project" guidance from the README.
+- Apply the 7-day dependency cooldown (`/etc/uv/uv.toml` sets `exclude-newer = "7 days"`) to both tools: declare `[tool.uv] exclude-newer = "7 days"`, pin `openai` to `==3.55.1`, lower `pydantic` to `>=2.14.3` and `pyyaml` to `>=6.0.3`, and make `poetry.lock` pin the same versions as `uv.lock`.
 
 ## Acceptance Criteria
 
@@ -24,4 +25,5 @@ Changes:
 - `poetry check --lock` and `poetry install --no-interaction` pass, and `poetry run pytest -q` passes.
 - README documents `uv sync` and `uv run` first, with a short Poetry equivalents table, and no longer says there is no `.venv/` in the project.
 - `docs/nparity-design.md` references to `poetry run pytest` are updated to `uv run pytest`.
+- `uv.lock` and `poetry.lock` pin the same package versions, and `pyproject.toml` declares `[tool.uv] exclude-newer = "7 days"`.
 - ADR 0001 status is changed to Accepted after both tools are verified.

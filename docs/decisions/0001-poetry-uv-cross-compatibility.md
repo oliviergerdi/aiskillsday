@@ -1,7 +1,7 @@
 # 0001 — Keep pyproject.toml usable by both Poetry and uv
 
 **Date:** 2026-11-26
-**Status:** Proposed
+**Status:** Accepted
 
 ## Context
 
@@ -23,6 +23,8 @@ Make `pyproject.toml` the shared source of truth and support both tools during a
 - Keep `[tool.poetry] package-mode = false`. Add `[tool.uv] package = false`. Each tool then ignores the other's table.
 - Remove `[build-system]`. It is not needed for a non-package project, and it is what makes uv try to build.
 - Commit `uv.lock` as the authoritative lock. Keep `poetry.lock` only until the transition ends, then delete it.
+- Apply the 7-day dependency cooldown to both tools. The machine-wide `/etc/uv/uv.toml` sets `exclude-newer = "7 days"`, so uv cannot see releases newer than 7 days. Declare the same rule in the repo with `[tool.uv] exclude-newer = "7 days"`. Poetry has no such setting, so `poetry.lock` must be aligned to `uv.lock`: pin the differing packages to the `uv.lock` versions in a temporary `pyproject.toml`, run `poetry lock`, restore `pyproject.toml`, and run `poetry lock` again (it keeps locked versions that still satisfy the ranges). Dependency lower bounds must not require a release newer than the cooldown (`openai==3.55.1`, `pydantic>=2.14.3`, `pyyaml>=6.0.3`).
+- `tests/test_project_config.py` fails if `uv.lock` and `poetry.lock` pin different versions or the cooldown is not declared.
 - CI runs `uv lock --check` and fails on drift. CI also runs `poetry check --lock` while `poetry.lock` exists. When a dependency changes, update both locks in the same commit.
 - README documents `uv sync` / `uv run` first, with Poetry equivalents in one short table.
 - Set an end date for Poetry support. After it, delete `poetry.lock` and `[tool.poetry]`, and drop the fallback docs.
@@ -39,9 +41,14 @@ Make `pyproject.toml` the shared source of truth and support both tools during a
 - Easier: either tool installs from the same `pyproject.toml`. Contributors can move to uv at their own pace.
 - Harder: two locks must stay in sync until the transition ends. Resolvers can pick different versions, so "works on my machine" differences are possible. The CI checks above are required, not optional.
 - uv creates `.venv/` in the project by default, while Poetry keeps its venv in a cache. The README line "No `.venv/` in the project" must change. `.venv/` is already in `.gitignore`.
-- `poetry.toml` stays in `.gitignore` until Poetry is dropped.
+- `poetry.toml` was removed from `.gitignore`. Add it back if someone needs a local Poetry config.
+- A dependency released in the last 7 days cannot be locked. A new bound or pin must wait until the release is 7 days old. Bounds in this change were lowered for this reason.
+- Aligning `poetry.lock` takes the extra steps above. Dropping Poetry removes them.
 
 ## Verification status
 
-- uv: it parsed the modified `pyproject.toml` (`requires-python = ">=3.14"` plus `[tool.uv] package = false`) and started resolving. Resolution failed on a TLS certificate error (`invalid peer certificate: UnknownIssuer`) in this environment, so `uv lock` and `uv sync` have not been run to completion.
-- Poetry: not installed here. Not verified that Poetry 2.5.1 accepts the modified file without `[build-system]`. Run `poetry check --lock` and `poetry install` before accepting this ADR.
+Verified on 2026-11-26 in the UV-1 worktree, with `UV_NATIVE_TLS=1` for uv and a CA bundle plus a small `sitecustomize` shim that turns off Python's strict X.509 check for the Zscaler root CA for Poetry:
+
+- uv: `uv lock --check`, `uv sync` and `uv run pytest -q` pass.
+- Poetry 2.5.1: `poetry check --lock`, `poetry install --no-interaction` and `poetry run pytest -q` pass.
+- `uv.lock` and `poetry.lock` pin identical versions.
