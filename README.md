@@ -8,8 +8,9 @@ custom `base_url`). Results feed the nParity evaluator specs in `docs/`.
 ```
 .
 ├── .tool-versions          python 3.14.0 — read by mise AND asdf
-├── pyproject.toml          deps + requires-python ^3.14 (poetry, package-mode = false)
-├── poetry.lock             locked dependency set — commit this
+├── pyproject.toml          deps + requires-python >=3.14 (uv + poetry, no package)
+├── uv.lock                 locked dependency set (uv) — commit this
+├── poetry.lock             kept during the uv transition
 ├── proto/
 │   ├── logprobs_test.py    the one script: 16 experiments (E0–E15)
 │   ├── raw/                57 raw API responses, one file per recorded call
@@ -17,14 +18,15 @@ custom `base_url`). Results feed the nParity evaluator specs in `docs/`.
 └── docs/                   specs + writeup (build, evaluator, llm layer, results report)
 ```
 
-**`pyproject.toml` + `poetry.lock` are the source of truth** for dependencies.
+**`pyproject.toml` + `uv.lock` are the source of truth** for dependencies.
 
 ## Prerequisites
 
 | Tool | Version | Notes |
 |---|---|---|
 | Python | **3.14.x** | pinned in `.tool-versions`; install via **mise or asdf** (either works) |
-| Poetry | **2.x** (tested on 2.5.1) | manages the virtualenv + dependencies |
+| uv | recent | manages the virtualenv + dependencies |
+| Poetry | **2.x** (tested on 2.5.1) | supported fallback |
 | Fireworks key | — | `FIREWORKS_API_KEY`, never committed |
 
 ## Setup
@@ -56,26 +58,26 @@ Sanity check from inside the repo — this must print 3.14.x:
 python --version
 ```
 
-### 2. Dependencies via poetry
+### 2. Dependencies via uv
 
 ```bash
-poetry install
+uv sync
 ```
 
-That's it. Poetry resolves Python from `PATH` (so it picks up the mise/asdf 3.14), creates
-a virtualenv **outside the repo** by default
-(`~/Library/Caches/pypoetry/virtualenvs/aiskillsday-*-py3.14` on macOS) and installs
-`openai` from the lock file. No `.venv/` in the project — keep it that way.
+That's it. uv resolves Python from `PATH` (so it picks up the mise/asdf 3.14), creates
+a `.venv/` in the project (gitignored) and installs dependencies from `uv.lock`.
+Set `UV_NATIVE_TLS=1` only if a corporate proxy breaks TLS.
 
-Prefer a local `.venv/` anyway? Then opt in per-checkout (creates `poetry.toml`):
+`[tool.uv] package = false` (and `package-mode = false` for Poetry) in `pyproject.toml` is
+deliberate: there is no importable `aiskillsday` package, so the project itself must not
+be built/installed.
 
-```bash
-poetry config virtualenvs.in-project true --local
-rm -rf "$(poetry env info --path)" && poetry install
-```
+Poetry equivalents (Poetry 2.x still works):
 
-`package-mode = false` in `pyproject.toml` is deliberate: there is no importable
-`aiskillsday` package, so poetry must not try to build/install the project itself.
+| uv | Poetry |
+|---|---|
+| `uv sync` | `poetry install` |
+| `uv run X` | `poetry run X` |
 
 ### 3. API key
 
@@ -88,9 +90,9 @@ Shell-profile export or a secret manager both fine — the script only reads the
 ## Running
 
 ```bash
-poetry run python proto/logprobs_test.py                      # all 16 experiments, ~30 s, ~$0.005
-poetry run python proto/logprobs_test.py --exp E4 E7          # subset
-poetry run python proto/logprobs_test.py --model <fireworks-model-id>
+uv run python proto/logprobs_test.py                      # all 16 experiments, ~30 s, ~$0.005
+uv run python proto/logprobs_test.py --exp E4 E7          # subset
+uv run python proto/logprobs_test.py --model <fireworks-model-id>
 ```
 
 Writes to its own directory: `proto/raw/<EXP>_<n>.json` and `proto/results.json`
@@ -99,9 +101,9 @@ Writes to its own directory: `proto/raw/<EXP>_<n>.json` and `proto/results.json`
 ## Running nParity
 
 ```bash
-poetry run pytest -q                                   # everything, key-free (FakeBackend)
-poetry run pytest -m live -v                           # Fireworks checks, needs FIREWORKS_API_KEY
-poetry run uvicorn app.main:app --reload               # toys at /v1 and /v2, web UI at /
+uv run pytest -q                                   # everything, key-free (FakeBackend)
+uv run pytest -m live -v                           # Fireworks checks, needs FIREWORKS_API_KEY
+uv run uvicorn app.main:app --reload               # toys at /v1 and /v2, web UI at /
 ```
 
 Design and plan: `docs/nparity-design.md`, `docs/nparity-plan.md`. UI mockup: `docs/mockups/web-ui.html`.
@@ -113,14 +115,12 @@ Design and plan: `docs/nparity-design.md`, `docs/nparity-plan.md`. UI mockup: `d
 | `mise ERROR No version is set for python` | You're outside the repo (no `.tool-versions` applies). `cd` in, or set a default: `mise use -g python@3.14.0` |
 | `asdf: No preset version installed for command python` | `asdf install` in the repo root |
 | `asdf: No plugin named python` | `asdf plugin add python https://github.com/asdf-community/asdf-python.git` |
-| Poetry used the wrong Python | `poetry env use "$(mise which python)"` (or `asdf where python`), then `poetry install` |
-| `The current project could not be installed: No file/folder found for package aiskillsday` | Ensure `[tool.poetry] package-mode = false` is in `pyproject.toml` |
-| `poetry install` warns about a foreign virtualenv | A hand-made `.venv/` shadows poetry's. Delete it and re-run `poetry install` |
+| uv used the wrong Python | `uv sync --python "$(mise which python)"` (or `asdf where python`) |
 | Wrong Python version in a fresh shell | Both managers installed — disable one. For mise: remove `asdf` from the oh-my-zsh `plugins` list; for asdf: drop `eval "$(mise activate zsh)"` |
 
 ## Notes
 
-- `.tool-versions` (`python 3.14.0`) and `requires-python` (`^3.14`) are meant to stay in
+- `.tool-versions` (`python 3.14.0`) and `requires-python` (`>=3.14`) are meant to stay in
   sync — bump both when moving Python.
 - `docs/logprobs_report.md` records its results section as run in the original session
   (Python 3.12.10, 66 calls). Findings are version-independent; commands were updated to

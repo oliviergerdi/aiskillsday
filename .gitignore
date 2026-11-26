@@ -3,12 +3,9 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 
-# Environments (poetry keeps its venv in the cache; this is for the opt-in local kind)
+# Environments
 .venv/
 venv/
-
-# Local poetry config (only created by `poetry config ... --local`)
-poetry.toml
 
 # Secrets — FIREWORKS_API_KEY lives in the environment, never in the repo
 .env

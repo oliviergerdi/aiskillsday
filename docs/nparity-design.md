@@ -34,7 +34,7 @@ Show a **working prototype** on Friday: point nParity at an old and a new HTTP s
 
 ## Constraints
 
-- Python 3.14 via mise/asdf, Poetry 2.x, `package-mode = false` (README). The build spec's "3.12" is stale.
+- Python 3.14 via mise/asdf, uv (Poetry 2.x also supported), `package-mode = false` / `[tool.uv] package = false` (README). The build spec's "3.12" is stale.
 - Build Thu 26 Nov 09:15–17:00, demo Fri 27 Nov 10:00. Toy services only: no docfox code, data or credentials.
 - Claude can't run the code. Claude writes code + pytest tests; Gerdi runs them and reports back. Tests must be deterministic and key-free by default.
 - Storage is **YAML** throughout (runs, cache, fixtures, config).
@@ -266,7 +266,7 @@ proto/                 existing logprobs probe, untouched
 
 ## Testing
 
-- `poetry run pytest` runs everything against `FakeBackend` and the toy apps in-process. No key, no network, deterministic.
+- `uv run pytest` runs everything against `FakeBackend` and the toy apps in-process. No key, no network, deterministic.
 - Unit tests per step (generate, map rules, normalise, diff, type checks, grouping, scoring, retry, logprob parsing from the recorded `proto/raw/E4_1.json`).
 - One end-to-end test: full pipeline on the toy services with `FakeBackend` → expects 10/10 on the answer key.
 - Web smoke tests: each page returns 200 and contains key strings.
