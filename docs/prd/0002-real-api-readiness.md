@@ -15,7 +15,7 @@ The prototype is proven on two toy services and the public Petstore. A backend e
 
 1. Run against an authenticated API with no secrets stored in run files.
 2. Common noise removed by default, with a report of what was masked and why.
-3. Request generation covers bodies and pagination from the OpenAPI schema plus seeds.
+3. Request generation covers bodies and pagination from the OpenAPI schema plus seeds. Seed generation and per-endpoint coverage are specified in PRD 0008.
 4. A real run can be scored against a small answer key the user writes.
 
 ## Requirements
