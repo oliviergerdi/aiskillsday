@@ -69,4 +69,4 @@ Judges score nine things (see the scoring sheet). Slide that carries each: probl
 ## Checks before you go on
 - Toy APIs and Petstore both run once this morning. Save the output.
 - Deck: `docs/pitch/nparity-pitch.html`, 1280x768 or larger.
-- Chips ("in progress" (slide 6) and "not yet timed" (appendix)): say "in progress" out loud, do not hide them.
+- Chips ("estimate" (slide 4), "not yet timed" (appendix) and "verify" (appendix)): say "in progress" out loud, do not hide them.
