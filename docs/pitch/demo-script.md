@@ -55,7 +55,7 @@ Judges score nine things (see the scoring sheet). The slide that carries each on
 
 **Slide 14 (Temba, 0:25).** "What if we are wrong? Accuracy: the unsure bucket and no automatic dismissal. No probabilities on the model route: run the CLI on any model that has them. Model price: cache or switch engine. Data: redact before any model call. One-off demand: test a higher price."
 
-**Slide 15 (Stephen, 0:30).** "Know what changed. Know what broke. Know before you build. The same engine runs before, during and after the migration, on whichever model your company has approved. Our ask: a pilot on one real migration, with two engineers, next quarter."
+**Slide 15 (Stephen, 0:30).** "Know what changed. Know what broke. Know before you build. The same engine runs before and during the migration, on whichever model your company has approved. Our ask: a pilot on one real migration, with two engineers, next quarter."
 
 ## If you run long (cut in this order)
 0. Slide 10: drop it to one sentence, or skip it (20 s).

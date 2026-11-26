@@ -1,6 +1,6 @@
 # PRD 0006: Spec optional, static comparison
 
-**Status:** Draft · **Priority:** P0 · **Pitch promise:** "Same engine, before, during and after", "tells you where the differences are and where to focus"
+**Status:** Draft · **Priority:** P0 · **Pitch promise:** "Same engine, before and during", "tells you where the differences are and where to focus"
 
 ## Problem
 

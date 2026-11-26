@@ -4,7 +4,7 @@
 
 ## Problem
 
-The pitch names three moments: before, during, after. The product serves during and after. In the before stage there is no intent note yet, and the engineer needs to see differences first and write the note from them. Today `triage` requires an intent note, and an empty note makes every difference a regression. The run also assumes a mapped, mostly finished new API.
+The pitch names two moments: before and during. The product serves during. In the before stage there is no intent note yet, and the engineer needs to see differences first and write the note from them. Today `triage` requires an intent note, and an empty note makes every difference a regression. The run also assumes a mapped, mostly finished new API.
 
 ## Goals
 
