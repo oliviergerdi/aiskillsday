@@ -11,7 +11,9 @@
 
 - Saved = (manual hours - 1 h) x passes x US$40. Labour only: incidents, customer impact and a regression caught early (4 / 12 / 24 h, US$160 / 480 / 960) are not counted.
 - The prototype and CLI work without the build. The lean build (PRDs 0005 to 0007) is an upper bound for internal use; PRD 0007 (hosted service) is needed only if the tool is offered outside the company.
-- Risks: model price 10x = US$33 a migration; vote sampling about US$11; client data reaching a model host (use an approved model, redaction specified not built); manual baseline untimed.
+- Cost to run: no licences or per-seat fee (MIT); model US$3.30 and compute and storage US$1.10 a migration; about US$3 a month idle if hosted internally. At one migration a month that is about US$8 a month.
+- Time to repay (ASSUMED one migration a quarter, not measured): base case 6 migrations is about 18 months.
+- Risks: low adoption (no sign-up, start with one migration team, manual checks remain the fallback); model price 10x = US$33 a migration; vote sampling about US$11; client data reaching a model host (use an approved model, redaction specified not built); manual baseline untimed.
 
 # Reference: external sale (not recommended)
 

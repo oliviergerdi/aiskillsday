@@ -588,15 +588,15 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
       <div class="card">
         <span class="k">Why it holds</span>
         <ul class="ticks">
-          <li><span>An internal tool. No price, no sale.</span></li>
+          <li><span>No licences or seat fees. About US$3 a month hosting.</span></li>
           <li><span>Cautious case (10 h, 3 passes) still saves <strong>US$1,080</strong>.</span></li>
           <li><span>Model price ten times higher: US$33 a migration.</span></li>
-          <li><span>Not counted: incidents, customer impact, a regression caught early (12 h, US$480).</span></li>
+          <li><span>Not counted: incidents, customer impact.</span></li>
         </ul>
       </div>
     </div>
     <p class="callout push">The number to firm up is the manual baseline. We have not timed it yet.</p>
-    <p class="source push">Model price: US$0.45 in, US$1.80 out per million tokens, list price for deepseek-v4p1-flash-1017-us on Fireworks (getmaxim.ai Bifrost cost calculator, third party, not billed). Tokens measured on 111 calls. US$40/h and 1 h a pass are our assumptions.</p>
+    <p class="source push">Model price: US$0.45 in, US$1.80 out per million tokens, list price for deepseek-v4p1-flash-1017-us on Fireworks (getmaxim.ai Bifrost calculator, third party, not billed). Tokens measured. US$40/h and 1 h a pass assumed.</p>
     <aside class="notes">The case is internal: engineer time saved, not revenue. A manual parity pass is about 20 h (illustrative: 200 endpoints x 3 samples x 2 minutes). With nParity about 1 h (assumed). Five passes per migration (assumed) at US$40/h loaded senior cost (assumed): 95 h, US$3,800. Cost to run: model US$3.30 (10 runs of 1,000 findings at list price, tokens measured on 111 Flash calls), compute US$0.10, storage US$1 (assumed). The manual baseline has not been timed. Scenarios and the build payback are in the appendix. Model: docs/costing/business_case.py</aside>
   </section>
   <section class="slide s-compact" id="s9" aria-label="Risks">
@@ -611,6 +611,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
           <tr><td>No logprobs on the model route</td><td>No real probability. Vote sampling, about US$11 a migration</td><td>Run the CLI on any logprobs model. Label votes as uncalibrated.</td></tr>
           <tr><td>Model price ten times higher</td><td>US$33 a migration, under 1% of the saving</td><td>Cache repeat questions, switch engine.</td></tr>
           <tr><td>Client data reaches a model host</td><td>Compliance refuses it</td><td>Use an approved model. Redaction before model calls is specified, not built.</td></tr>
+          <tr><td>Low adoption</td><td>The saving never appears</td><td>No sign-up: runs on a laptop. Start with one migration team. Fallback: manual checks continue.</td></tr>
           <tr><td>Saving smaller than estimated</td><td>The manual baseline is untimed</td><td>Time one manual pass. At 10 h and 3 passes it still saves about US$1,100.</td></tr>
         </tbody>
       </table>
@@ -732,8 +733,8 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
         </ul>
       </div>
     </div>
-    <p class="callout push">The number to firm up is the manual baseline. We have not timed it yet.</p>
-    <aside class="notes">Saved per migration is (manual hours - 1) x passes x US$40. Migrations to repay the lean build (US$19,200) are rounded up: 18, 6 and 2. The full build (US$57,600) takes 54, 16 and 5. The lean build covers PRDs 0005 to 0007 and is an upper bound for internal use, since the hosted service (PRD 0007) is only needed if the tool is offered outside the company. The base case is also the case on slide 11. Model: docs/costing/business_case.py</aside>
+    <p class="callout push">At one migration a quarter (assumed), the base case repays the lean build in about 18 months.</p>
+    <aside class="notes">At one migration a quarter (assumed rate; we have not measured how often migrations happen) 6 migrations take 18 months. Saved per migration is (manual hours - 1) x passes x US$40. Migrations to repay the lean build (US$19,200) are rounded up: 18, 6 and 2. The full build (US$57,600) takes 54, 16 and 5. The lean build covers PRDs 0005 to 0007 and is an upper bound for internal use, since the hosted service (PRD 0007) is only needed if the tool is offered outside the company. The base case is also the case on slide 11. Model: docs/costing/business_case.py</aside>
   </section>
   <section class="slide" id="s15" aria-label="Before and during">
     <span class="lot">LOT 15</span>
