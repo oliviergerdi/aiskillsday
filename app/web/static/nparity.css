@@ -83,6 +83,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .source-panel label, .run-field label { display: block; margin: 8px 0 4px; font-weight: 600; }
 .comparison-form input:not([type="checkbox"]), .comparison-form select { width: 100%; min-width: 0;
   background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; font: inherit; }
+.comparison-form > .run-field { width: 100%; }
 .comparison-form textarea { width: 100%; min-width: 0; box-sizing: border-box; resize: vertical;
   background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; font: inherit; }
 .comparison-form small { display: block; margin-top: 4px; }
