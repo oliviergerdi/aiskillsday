@@ -110,6 +110,74 @@ def test_no_dead_controls(setup):
         assert "disabled" not in client.get(f"/runs/{run.id}/findings/{f.id}").text
 
 
+def _finding(i, status):
+    return Finding(id=f"f-{i}", endpoint="GET /x", path=f"$.f{i}", kind="changed", source="diff", status=status)
+
+
+def _table(page):
+    """Return (headers, rows) of the runs table; each row is a list of raw <td> html."""
+    tags = lambda s: re.sub(r"<[^>]+>", "", s).strip()
+    heads = [tags(h) for h in re.findall(r"<th[^>]*>(.*?)</th>", page, re.S)]
+    body = page.split("<tbody>", 1)[1]
+    rows = [re.findall(r"<td[^>]*>.*?</td>", r, re.S) for r in body.split("<tr")[1:]]
+    return heads, rows
+
+
+@pytest.fixture
+def one_run(tmp_path):
+    before = app.state.runs_dir
+    app.state.runs_dir = tmp_path
+    findings = [_finding(i, "shown") for i in range(40)] + [_finding(40 + i, "unsure") for i in range(11)]
+    run = Run(id="run-abc123xyz", started_at=datetime(2026, 3, 14, 9, 30, tzinfo=timezone.utc), findings=findings,
+              config={"old": "http://a", "new": "http://b", "backend": "fake", "requests": 0, "endpoints": 0})
+    store.save(run, tmp_path)
+    yield TestClient(app), run
+    app.state.runs_dir = before
+
+
+def test_runs_page_needs_review(one_run):
+    client, _ = one_run
+    heads, rows = _table(client.get("/").text)
+    assert "Needs review" in heads
+    cell = rows[0][heads.index("Needs review")]
+    assert ">51<" in re.sub(r"\s+", "", cell)
+
+
+def test_runs_page_zero_counts_muted(one_run):
+    client, run = one_run
+    run.findings += [_finding(100, "accepted"), _finding(101, "accepted")]
+    store.save(run, app.state.runs_dir)
+    heads, rows = _table(client.get("/").text)
+    cells = dict(zip(heads, rows[0]))
+    has_zero = lambda c: re.search(r'class="[^"]*\bzero\b', c) is not None
+    assert has_zero(cells["Noise"]) and has_zero(cells["Errors"])
+    assert not has_zero(cells["Intended"])            # 2 intended
+    assert not has_zero(cells["Needs review"])        # 51
+
+
+def test_runs_page_run_column(one_run):
+    client, run = one_run
+    page = client.get("/").text
+    heads, rows = _table(page)
+    link = re.search(rf'<a[^>]*href="/runs/{run.id}"[^>]*>(.*?)</a>', rows[0][0], re.S)
+    assert link and link.group(1).strip() != run.id and link.group(1).strip()
+    assert f'title="{run.id}"' in rows[0][0]
+    backend = rows[0][heads.index("Backend")]
+    assert "Fake" in backend and 'title="fake"' in backend
+    assert "Time" not in heads and "Cost" not in heads
+
+
+def test_nav_labels_and_brand_link(setup):
+    client, run = setup
+    nav = lambda p: re.findall(r"<a[^>]*>(.*?)</a>", re.search(r"<nav.*?</nav>", p, re.S).group(0), re.S)
+    home = client.get("/").text
+    assert re.search(r'<a[^>]*href="/"[^>]*>\s*nParity', home)
+    assert nav(home) == ["Runs", "New run"]
+    inside = nav(client.get(f"/runs/{run.id}").text)
+    assert inside == ["Runs", "New run", "Findings", "Mapping"]
+    assert "Run" not in inside
+
+
 def _grouped_run(run_id, specs):
     """specs: (endpoint, new_endpoint, status, p) per finding; ids are f-1, f-2, ... in order."""
     findings = [Finding(id=f"f-{i}", endpoint=ep, new_endpoint=new, path=f"$.x{i}", kind="changed", source="diff",
@@ -220,3 +288,9 @@ def test_static_and_404(setup):
     assert client.get("/static/nparity.css").status_code == 200
     assert client.get("/runs/nope").status_code == 404
     assert client.get(f"/runs/{run.id}/findings/f-999").status_code == 404
+
+
+def test_run_name_and_backend_label():
+    assert views.run_name("2026-11-26T124642-petstore-4676e543c67a") == "petstore"
+    assert views.run_name("demo") == "demo"
+    assert views.backend_label("fake") == "Fake" and views.backend_label("gemini-2.5-flash") == "Flash"

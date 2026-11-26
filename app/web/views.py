@@ -154,6 +154,17 @@ def verdict(c: dict[str, int]) -> tuple[str, str]:
     return "No regressions found", "int"
 
 
+def run_name(run_id: str) -> str:
+    """'2026-11-26T124642-petstore-4676e543c67a' -> 'petstore'; other ids are shown as-is."""
+    m = re.fullmatch(r"\d{4}-\d\d-\d\dT\d{6}-(.+)-[0-9a-f]{12}", run_id)
+    return m.group(1) if m else run_id
+
+
+def backend_label(backend: str) -> str:
+    # ponytail: only "flash" gets a special short name; anything else is just capitalised
+    return "Flash" if "flash" in backend.lower() else backend.capitalize()
+
+
 def declared_types(run: Run) -> dict[tuple[str, str], str]:
     return {(f.endpoint, f.path): f.type_info["declared"] for f in run.findings if "declared" in f.type_info}
 
