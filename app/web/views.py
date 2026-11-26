@@ -48,6 +48,27 @@ class FindingView:
     body_html: str = ""
 
 
+@dataclass
+class Group:
+    endpoint: str
+    new_endpoint: str | None
+    items: list
+    count: int
+    min_p: float | None
+
+
+def group_findings(views: list) -> list[Group]:
+    """Group finding views by (endpoint, new_endpoint); lowest p first, then bigger groups, unknown p last."""
+    by_key: dict[tuple, list] = {}
+    for v in views:
+        by_key.setdefault((v.f.endpoint, v.f.new_endpoint), []).append(v)
+    groups = []
+    for (ep, new), items in by_key.items():
+        ps = [v.f.p for v in items if v.f.p is not None]
+        groups.append(Group(ep, new, items, len(items), min(ps) if ps else None))
+    return sorted(groups, key=lambda g: (g.min_p is None, g.min_p or 0, -g.count))
+
+
 def request_line(s: Sample, side: str) -> str:
     req = s.old_request if side == "old" else s.new_request
     if req is None:

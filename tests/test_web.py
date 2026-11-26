@@ -1,5 +1,6 @@
 import html
 import re
+from types import SimpleNamespace
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -175,6 +176,111 @@ def test_nav_labels_and_brand_link(setup):
     inside = nav(client.get(f"/runs/{run.id}").text)
     assert inside == ["Runs", "New run", "Findings", "Mapping"]
     assert "Run" not in inside
+
+
+def _grouped_run(run_id, specs):
+    """specs: (endpoint, new_endpoint, status, p) per finding; ids are f-1, f-2, ... in order."""
+    findings = [Finding(id=f"f-{i}", endpoint=ep, new_endpoint=new, path=f"$.x{i}", kind="changed", source="diff",
+                        label="regression", p=p, status=st)
+                for i, (ep, new, st, p) in enumerate(specs, 1)]
+    run = Run(id=run_id, started_at=datetime.now(timezone.utc), findings=findings,
+              config={"old": "http://a", "new": "http://b", "backend": "x", "requests": 1, "endpoints": 2})
+    store.save(run, app.state.runs_dir)
+    return run
+
+
+def _section(page, title):
+    """HTML of the section whose h2 contains `title`, up to the next h2."""
+    start = page.index(f">{title}</span>")
+    end = page.find("<h2", start)
+    return page[start:end if end != -1 else len(page)]
+
+
+def _group_headers(section):
+    """(opening tag, header text without markup) for each group in a section."""
+    return [(tag, re.sub(r"<[^>]+>|\s+", " ", head))
+            for tag, head in re.findall(r'(<details class="g"[^>]*>)\s*<summary[^>]*>(.*?)</summary>', section, re.S)]
+
+
+def test_two_groups(setup):
+    client, _ = setup
+    run = _grouped_run("grp-two", [("GET /a", "GET /a2", "shown", 0.5), ("GET /a", "GET /a2", "shown", 0.6),
+                                   ("GET /b", "GET /b2", "shown", 0.7)])
+    reg = _section(client.get(f"/runs/{run.id}").text, "Regressions")
+    assert reg.count('<details class="g"') == 2
+    assert "2 groups" in reg[:reg.index('<div class="findings">')]
+
+
+def test_group_header_count_and_min_p(setup):
+    client, _ = setup
+    run = _grouped_run("grp-hdr", [("GET /a", "GET /a2", "shown", 0.910), ("GET /a", "GET /a2", "shown", 0.357),
+                                   ("GET /b", "GET /b2", "shown", 0.640)])
+    head = next(h for _, h in _group_headers(_section(client.get(f"/runs/{run.id}").text, "Regressions"))
+                if "GET /a2" in h)
+    assert re.search(r"\b2\b", head)
+    assert "0.357" in head and "0.910" not in head
+
+
+def test_group_rows_same_hx(setup):
+    client, _ = setup
+    run = _grouped_run("grp-hx", [("GET /a", "GET /a2", "shown", 0.5), ("GET /a", "GET /a2", "shown", 0.6),
+                                  ("GET /b", "GET /b2", "shown", 0.7)])
+    page = client.get(f"/runs/{run.id}").text
+    assert page.count('<details class="f"') == 3
+    pre_opened = [f for f in run.findings if f"/findings/{f.id}\"" not in page]
+    assert len(pre_opened) == 1                      # exactly the first regression is rendered server-side
+    for f in run.findings:
+        if f is not pre_opened[0]:
+            assert f'hx-get="/runs/{run.id}/findings/{f.id}"' in page
+    partial = client.get(f"/runs/{run.id}/findings/{run.findings[1].id}")
+    assert partial.status_code == 200 and "<details" not in partial.text
+
+
+def test_group_counts_sum(setup):
+    client, _ = setup
+    run = _grouped_run("grp-sum", [
+        ("GET /a", "GET /a2", "shown", 0.5), ("GET /a", "GET /a2", "shown", 0.6), ("GET /b", "GET /b2", "shown", 0.7),
+        ("GET /a", "GET /a2", "unsure", 0.4), ("GET /c", "GET /c2", "unsure", 0.3),
+        ("GET /d", "GET /d2", "accepted", 0.95), ("GET /d", "GET /d2", "accepted", 0.96),
+        ("GET /d", "GET /d2", "accepted", 0.97)])
+    page = client.get(f"/runs/{run.id}").text
+    assert page.index("Regressions</span>") < page.index("Unsure</span>") < page.index("Intended</span>")
+    assert "always shown, never auto-dismissed" in page
+    for title, n in (("Regressions", 3), ("Unsure", 2), ("Intended", 3)):
+        sec = _section(page, title)
+        groups = sec.split('<details class="g"')[1:]
+        assert sum(g.count('<details class="f"') for g in groups) == n == sec.count('<details class="f"')
+        for g in groups:                              # header count matches the rows nested in the group
+            rows = g.count('<details class="f"')
+            assert re.search(rf"\b{rows}\b", re.sub(r"<[^>]+>", " ", g.split("</summary>")[0]))
+
+
+def test_group_collapse_rule(setup):
+    client, _ = setup
+    specs = [("GET /r", "GET /r2", "shown", 0.1 + i / 100) for i in range(4)]
+    specs += [("GET /s", "GET /s2", "shown", 0.9 + i / 100) for i in range(4)]
+    specs += [("GET /big", "GET /big2", "unsure", 0.2 + i / 100) for i in range(4)]
+    specs += [("GET /small", "GET /small2", "unsure", 0.5 + i / 100) for i in range(3)]
+    run = _grouped_run("grp-open", specs)
+    page = client.get(f"/runs/{run.id}").text
+    reg = _group_headers(_section(page, "Regressions"))
+    assert " open" in reg[0][0]                       # first regression group open even with 4 findings
+    assert " open" not in reg[1][0]                   # a later group with 4 is collapsed
+    uns = {h: tag for tag, h in _group_headers(_section(page, "Unsure"))}
+    assert " open" not in next(t for h, t in uns.items() if "GET /big2" in h)
+    assert " open" in next(t for h, t in uns.items() if "GET /small2" in h)
+
+
+def test_group_order():
+    def view(ep, p):
+        return SimpleNamespace(f=Finding(id="x", endpoint=ep, new_endpoint=ep + "2", path="$", kind="changed",
+                                         source="diff", p=p))
+    vs = [view("X", 0.2), view("Y", 0.1), view("Z", 0.3), view("Z", 0.1), view("Z", 0.5), view("N", None)]
+    groups = views.group_findings(vs)
+    assert [g.endpoint for g in groups] == ["Z", "Y", "X", "N"]   # min p asc, ties by count desc, None last
+    assert [g.count for g in groups] == [3, 1, 1, 1]
+    assert [g.min_p for g in groups] == [0.1, 0.1, 0.2, None]
+    assert groups[0].new_endpoint == "Z2" and len(groups[0].items) == 3
 
 
 def test_static_and_404(setup):
