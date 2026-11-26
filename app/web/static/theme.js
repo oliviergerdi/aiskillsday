@@ -17,15 +17,15 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     const toggle = document.querySelector(".theme-toggle");
-    const updatePressed = () => toggle.setAttribute("aria-pressed", String(isDark()));
-    updatePressed();
+    const updateLabel = () => { toggle.textContent = isDark() ? "Light mode" : "Dark mode"; };
+    updateLabel();
     toggle.hidden = false;
 
-    system.addEventListener("change", updatePressed);
+    system.addEventListener("change", updateLabel);
     toggle.addEventListener("click", () => {
       preference = isDark() ? "light" : "dark";
       root.dataset.theme = preference;
-      updatePressed();
+      updateLabel();
       try {
         localStorage.setItem(key, preference);
       } catch {
