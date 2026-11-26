@@ -193,3 +193,36 @@ def test_signoff_lists_stale_entries(client, saved):
 def test_print_css_hides_controls():
     css = open("app/web/static/nparity.css").read()
     assert "@media print" in css and ".decision" in css.split("@media print", 1)[1]
+
+
+def test_agreement_line_on_run_page(client, saved):
+    page = client.get(f"/runs/{saved.id}").text
+    assert "Agreement with reviewers" not in page                   # nothing decided yet
+    decide(client, saved, "$.total", "reject")
+    page = client.get(f"/runs/{saved.id}").text
+    assert "Agreement with reviewers: 1/1 decided" in page
+    assert "Agreement with reviewers: 1/1 decided" in client.get(f"/runs/{saved.id}/signoff").text
+
+
+def test_web_run_with_headers(client, toys, monkeypatch):
+    monkeypatch.setenv("OLD_TOKEN", "never-saved-value")
+    run = start(client, toys, baseline="",
+                before={"kind": "api", "source": toys + "/v1", "headers": ["Authorization: env:OLD_TOKEN"]})
+    assert run.config["old_headers"] == ["Authorization"]
+    assert "never-saved-value" not in (client.tmp / "runs" / f"{run.id}.yaml").read_text()
+
+
+def test_web_run_missing_header_variable(client, toys, monkeypatch):
+    monkeypatch.delenv("NOPE_TOKEN", raising=False)
+    body = {"before": {"kind": "api", "source": toys + "/v1", "headers": ["Authorization: env:NOPE_TOKEN"]},
+            "after": {"kind": "api", "source": toys + "/v2"}, "name": "toy", "baseline": ""}
+    r = client.post("/run-jobs", json=body)
+    deadline = time.monotonic() + 10
+    while time.monotonic() < deadline:
+        job = client.get(r.json()["job_url"]).json()
+        if job["state"] != "running":
+            break
+        time.sleep(0.05)
+    assert job["state"] == "failed"
+    assert job["error"]["field"] == "before_headers"              # shown inline next to the Headers field
+    assert "NOPE_TOKEN" in job["error"]["message"]

@@ -56,7 +56,7 @@ def test_kinds_and_counts(built):
     assert f[("GET /orders/{id}", "$.total")].kind == "changed"
     assert f[("GET /orders/{id}", "$.total")].differing == 1
     assert len(f[("GET /orders/{id}", "$.total")].samples) == 3
-    assert f[("GET /orders", "$.items")].kind == "list_length_changed"
+    assert f[("GET /orders", "$.items")].kind == "items_removed"        # PRD 0002: keyed lists match by id
     assert f[("GET /customers/{id}", "$.currency")].kind == "missing_in_new"
     assert f[("GET /customers/{id}", "endpoint")].kind == "moved"
     assert f[("GET /customers/{id}", "endpoint")].new_endpoint == "GET /clients/{clientId}"

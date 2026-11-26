@@ -19,7 +19,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from nparity.review import Ledger, compare, finding_key, open_counts, review_states, scope_of, stale, verdict
+from nparity.review import (Ledger, agreement, compare, finding_key, open_counts, review_states, scope_of, stale,
+                            verdict)
 
 TEMPLATES = Jinja2Templates(directory=Path(__file__).parent / "templates")
 TEMPLATES.env.filters["run_name"] = views.run_name
@@ -140,7 +141,7 @@ def run_page(request: Request, run_id: str, baseline: str | None = None):
         "missed": [d for d in (run.score.details if run.score else []) if not d["ok"]],
         "n_fields": len(run.fields), "rule_maps": rule_maps,
         "comparison": comparison, "baseline": base, "candidates": candidates,
-        "scope": scope_of(run),
+        "scope": scope_of(run), "agreement": agreement(run, led),
     })
 
 
@@ -172,6 +173,7 @@ def signoff_page(request: Request, run_id: str):
         "accepted": sections["accepted"], "intended": sections["intended"],
         "stale": stale(run, led), "th": th, "baseline": base,
         "comparison": compare(run, base) if base else None, "scope": scope_of(run),
+        "agreement": agreement(run, led),
     })
 
 

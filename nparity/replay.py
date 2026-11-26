@@ -48,12 +48,12 @@ class _Counter:
 
 
 def send(client: httpx.Client, base: str, req: Request, policy: RetryPolicy,
-         on_retry: Any = None) -> HttpResult:
+         on_retry: Any = None, headers: dict[str, str] | None = None) -> HttpResult:
     path, query = fill(req)
     url = base.rstrip("/") + path
 
     def call() -> httpx.Response:
-        r = client.request(req.method, url, params=query or None,
+        r = client.request(req.method, url, params=query or None, headers=headers,
                            json=req.body if req.body is not None else None)   # timeout lives on the client
         if r.status_code in policy.statuses:
             r.raise_for_status()
@@ -73,15 +73,17 @@ def send(client: httpx.Client, base: str, req: Request, policy: RetryPolicy,
 
 
 def replay(reqs: list[Request], emap: dict[str, EndpointMap], client: httpx.Client, old_base: str,
-           new_base: str, policy: RetryPolicy = RetryPolicy(), workers: int = 8) -> tuple[list[Sample], int]:
+           new_base: str, policy: RetryPolicy = RetryPolicy(), workers: int = 8,
+           old_headers: dict[str, str] | None = None,
+           new_headers: dict[str, str] | None = None) -> tuple[list[Sample], int]:
     """Returns (samples in request order, number of retries). Errors are results, never exceptions."""
     retries = _Counter()
 
     def one(req: Request) -> Sample:
-        old = send(client, old_base, req, policy, retries)
+        old = send(client, old_base, req, policy, retries, old_headers)
         m = emap.get(req.endpoint)
         new_req = to_new(req, m) if m else None
-        new = (send(client, new_base, new_req, policy, retries) if new_req
+        new = (send(client, new_base, new_req, policy, retries, new_headers) if new_req
                else HttpResult(status=None, error="unmapped"))
         return Sample(old_request=req, new_request=new_req, old=old, new=new)
 

@@ -8,7 +8,7 @@ from pathlib import Path
 import httpx
 import typer
 
-from nparity import pipeline, store
+from nparity import headers, pipeline, store
 from nparity.tls import tls_verify
 from nparity.models import Run
 
@@ -54,6 +54,8 @@ def run(
     new: str = typer.Option(..., help="New service base URL"),
     old_spec: str | None = typer.Option(None, help="Old OpenAPI/Swagger spec: URL or file (default <old>/openapi.json)"),
     new_spec: str | None = typer.Option(None, help="New spec: URL or file (default <new>/openapi.json)"),
+    old_header: list[str] = typer.Option([], "--old-header", help="Repeatable. 'Name: env:VAR', value read from the environment"),
+    new_header: list[str] = typer.Option([], "--new-header", help="Repeatable. 'Name: env:VAR'"),
     intent: Path = typer.Option(Path("fixtures/intent.md")),
     seeds: Path = typer.Option(Path("fixtures/seeds.yaml")),
     answer_key: Path | None = typer.Option(Path("fixtures/answer_key.yaml")),
@@ -63,7 +65,13 @@ def run(
     runs_dir: Path = typer.Option(store.DEFAULT_DIR),
 ) -> None:
     cfg = pipeline.RunConfig(old=old, new=new, old_spec=old_spec, new_spec=new_spec, intent=intent, seeds=seeds,
-                             answer_key=answer_key if score else None, backend=backend, name=name)
+                             answer_key=answer_key if score else None, backend=backend, name=name,
+                             old_headers=list(old_header), new_headers=list(new_header))
+    try:
+        headers.resolve(cfg.old_headers, "old")
+        headers.resolve(cfg.new_headers, "new")
+    except headers.HeaderError as exc:
+        raise typer.BadParameter(str(exc)) from exc
     with httpx.Client(timeout=30, verify=tls_verify(), follow_redirects=True) as client:
         r = pipeline.run(cfg, client)
     path = store.save(r, runs_dir)

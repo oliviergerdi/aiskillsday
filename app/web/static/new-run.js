@@ -105,6 +105,7 @@ rerunEdit.addEventListener("click", () => {
   const values = {
     before_kind: c.before.kind, before_source: c.before.source, before_base: c.before.base_url || "",
     after_kind: c.after.kind, after_source: c.after.source, after_base: c.after.base_url || "",
+    before_headers: (c.before.headers || []).join("; "), after_headers: (c.after.headers || []).join("; "),
     name: c.name, backend: c.backend, seeds: c.seeds, intent: c.intent,
   };
   for (const [name, value] of Object.entries(values)) form.elements[name].value = value;
@@ -269,6 +270,7 @@ form.addEventListener("submit", (event) => {
     kind: values.get(side + "_kind"),
     source: values.get(side + "_source").trim(),
     base_url: values.get(side + "_base")?.trim() || "",
+    headers: (values.get(side + "_headers") || "").split(/[;\n]/).map((h) => h.trim()).filter(Boolean),
   });
   const before = source("before");
   const after = source("after");

@@ -62,6 +62,7 @@
 
 <h2>How this was decided</h2>
 <ul class="plain">
+  {% if agreement.decided %}<li>{{ agreement.text }} (reviewers saw the model's label first)</li>{% endif %}
   {% if run.score %}<li>Answer key: {{ run.score.correct }}/{{ run.score.total }} correct, {{ run.score.false_regressions }} false regressions</li>{% endif %}
   <li>Thresholds: mapping accepted at p ≥ {{ th.mapping.auto_accept }}; intended at p ≥ {{ th.triage_intended.auto_accept }}; regression at p ≥ {{ th.triage_regression.auto_accept }}; anything below its bar goes to a human</li>
   <li>{{ run.config.requests }} requests across {{ run.config.endpoints }} endpoints · {{ run.noise|length }} noise rules applied · {{ run.telemetry.rule_decisions }} decisions by rule, {{ run.telemetry.llm_calls }} by LLM · {{ "%.1f"|format(run.telemetry.seconds) }} s · ${{ "%.4f"|format(run.telemetry.cost_usd) }}</li>

@@ -125,3 +125,19 @@ def test_latest_baseline(runs):
     assert latest_baseline(later, pool).id == b.id
     assert latest_baseline(a, pool) is None
     assert latest_baseline(scope_of(a), pool).id == "later"
+
+
+def test_agreement_table(runs, ledger):
+    """Review focus 3: a missed regression has its own count."""
+    from nparity.review import agreement
+    run = runs[0]
+    assert agreement(run, ledger).decided == 0 and agreement(run, ledger).undecided == 8
+    ledger.record(run, by_path(run, "$.total"), "reject", "T")        # model regression -> agree
+    ledger.record(run, by_path(run, "$.currency"), "accept", "T")     # model regression -> false regression
+    ledger.record(run, by_path(run, "status"), "reject", "T")         # model intended -> missed regression
+    ledger.record(run, by_path(run, "$.legacyCode"), "accept", "T")   # model intended -> agree
+    ledger.record(run, by_path(run, "$.detail"), "accept", "T")       # model unsure
+    a = agreement(run, ledger)
+    assert (a.decided, a.agree, a.false_regressions, a.missed_regressions, a.model_unsure, a.undecided) == \
+        (5, 2, 1, 1, 1, 3)
+    assert a.text.startswith("Agreement with reviewers: 2/4 decided · 1 false regressions · 1 missed")

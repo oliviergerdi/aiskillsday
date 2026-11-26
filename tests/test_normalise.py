@@ -21,11 +21,12 @@ def test_mask_scoped_to_endpoint():
     assert (o.body, n.body, noise) == ({"id": 1}, {"id": 2}, [])
 
 
-def test_unordered_sorts_and_records_only_when_changed():
+def test_order_only_is_noise_and_diff_matches_by_key():
+    from nparity.diff import diff
     page = lambda ids: {"page": 1, "items": [{"id": i} for i in ids]}
     o, n, noise = normalise("GET /orders", res(page([1, 2, 3])), res(page([3, 2, 1])), RULES)
-    assert o.body == n.body
-    assert [x.path for x in noise] == ["$.items"]
+    assert [(x.path, x.rule) for x in noise] == [("$.items", "order (matched by id)")]
+    assert diff(o, n) == []
     _, _, noise2 = normalise("GET /orders", res(page([4, 5])), res(page([])), RULES)
     assert noise2 == []
 

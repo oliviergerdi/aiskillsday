@@ -20,8 +20,12 @@ def test_missing_and_added():
                                                                     ("$.b", "added_in_new")}
 
 
-def test_list_length_no_element_diffs():
-    assert kinds({"items": [{"id": 4}, {"id": 5}]}, {"items": []}) == {("$.items", "list_length_changed")}
+def test_keyed_list_membership_no_element_diffs():
+    assert kinds({"items": [{"id": 4}, {"id": 5}]}, {"items": []}) == {("$.items", "items_removed")}
+
+
+def test_unkeyed_list_length():
+    assert kinds({"items": [{"q": 1}, {"q": 2}]}, {"items": []}) == {("$.items", "list_length_changed")}
 
 
 def test_nested_elements():

@@ -12,6 +12,7 @@ from typing import Any
 from nparity.config import Thresholds
 from nparity.evaluator.base import Answer, Backend, Choice, tally
 from nparity.jsonpath import MISSING, value_at
+from nparity.lists import keys_text, membership
 from nparity.models import Finding, Sample, Telemetry
 
 TEMPLATE = "triage-v2"
@@ -28,6 +29,8 @@ WHAT = {
     "changed": "value changed", "missing_in_new": "field missing from the new response",
     "added_in_new": "new field added to the response", "status_changed": "HTTP status code changed",
     "list_length_changed": "number of items in the list changed", "type_changed": "value type changed",
+    "items_removed": "list items present in the old response are missing from the new one",
+    "items_added": "the new response's list has items the old one doesn't",
     "declared_type_changed": "declared schema type changed", "moved": "endpoint moved to a new path",
     "renamed": "field renamed", "dropped": "field no longer returned",
 }
@@ -65,6 +68,15 @@ def _example(f: Finding, s: Sample) -> str:
     elif f.kind == "renamed":
         old = _show(value_at(s.old.body, f.path))
         new = _show(value_at(s.new.body, f"$.{f.type_info.get('new_field')}"))
+    elif f.kind in ("items_removed", "items_added"):
+        a, b = value_at(s.old.body, f.path), value_at(s.new.body, f.path)
+        m = membership(a, b)
+        if m:
+            k, removed, added = m
+            keys = removed if f.kind == "items_removed" else added
+            return (f"- {call}: old {len(a)} items → new {len(b)} items; only in "
+                    f"{'old' if f.kind == 'items_removed' else 'new'}: {keys_text(k, keys)}")
+        old, new = _show(a), _show(b)
     elif f.kind == "list_length_changed":
         a, b = value_at(s.old.body, f.path), value_at(s.new.body, f.path)
         old, new = (len(a) if isinstance(a, list) else _show(a)), (len(b) if isinstance(b, list) else _show(b))

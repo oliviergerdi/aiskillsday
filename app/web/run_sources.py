@@ -8,7 +8,9 @@ from urllib.parse import urljoin
 
 import httpx
 import yaml
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
+from nparity.headers import parse as parse_header
 
 DOCUMENT_LIMIT = 10 * 1024 * 1024
 CAPTURE_PATH = "/captured-response"
@@ -25,6 +27,15 @@ class SourceInput(BaseModel):
     kind: Literal["api", "spec", "manifest"]
     source: str = Field(min_length=1, max_length=4096, pattern=r"\S")
     base_url: str = Field(default="", max_length=4096)
+    headers: list[str] = Field(default_factory=list, max_length=20)   # "Name: env:VAR" only
+
+    @field_validator("headers")
+    @classmethod
+    def _headers(cls, value: list[str]) -> list[str]:
+        cleaned = [h.strip() for h in value if h.strip()]
+        for h in cleaned:
+            parse_header(h)
+        return cleaned
 
 
 @dataclass(frozen=True)
@@ -59,10 +70,11 @@ def is_spec(data: object) -> bool:
     return isinstance(data, dict) and ("openapi" in data or "swagger" in data) and isinstance(data.get("paths"), dict)
 
 
-def read_document(client: httpx.Client, source: str) -> tuple[object, str | None]:
+def read_document(client: httpx.Client, source: str,
+                  headers: dict[str, str] | None = None) -> tuple[object, str | None]:
     try:
         if source.lower().startswith(("https://", "http://")):
-            with client.stream("GET", http_url(source)) as response:
+            with client.stream("GET", http_url(source), headers=headers) as response:
                 response.raise_for_status()
                 content = bytearray()
                 for chunk in response.iter_bytes():
@@ -127,7 +139,8 @@ def from_manifest(value: str, override: str, side: str) -> Source:
     return Source(f"http://{side}.capture.invalid", CAPTURE_SPEC, (status, data), label)
 
 
-def resolve_source(client: httpx.Client, target: SourceInput, side: str) -> Source:
+def resolve_source(client: httpx.Client, target: SourceInput, side: str,
+                   headers: dict[str, str] | None = None) -> Source:
     source, override = target.source.strip(), target.base_url.strip()
     if target.kind == "manifest":
         return from_manifest(source, override, side)
@@ -135,7 +148,7 @@ def resolve_source(client: httpx.Client, target: SourceInput, side: str) -> Sour
         base = str(http_url(source, base=True))
         for filename in ("openapi.json", "swagger.json"):
             try:
-                data, _ = read_document(client, f"{base.rstrip('/')}/{filename}")
+                data, _ = read_document(client, f"{base.rstrip('/')}/{filename}", headers)
             except httpx.HTTPStatusError as exc:
                 if exc.response.status_code not in {404, 405}:
                     raise
@@ -145,7 +158,7 @@ def resolve_source(client: httpx.Client, target: SourceInput, side: str) -> Sour
             if is_spec(data):
                 return Source(base, data)
         raise InputError("No OpenAPI document found. Choose Swagger / OpenAPI and enter the spec location.")
-    data, document_url = read_document(client, source)
+    data, document_url = read_document(client, source, headers)
     if not is_spec(data):
         raise InputError("The document must be a Swagger or OpenAPI spec with a paths section.")
     base = str(http_url(override, base=True)) if override else server_url(data, document_url)

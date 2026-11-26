@@ -174,3 +174,43 @@ def latest_baseline(run_or_scope: Run | str, runs: list[Run], before: datetime |
     candidates = [r for r in runs if scope_of(r) == scope and r.id != exclude
                   and (before is None or r.started_at < before)]
     return max(candidates, key=lambda r: r.started_at, default=None)
+
+
+class Agreement(BaseModel):
+    """How the model's labels compare with human decisions in the run's scope (PRD 0002).
+
+    Agreement, not accuracy: reviewers saw the model's label before deciding.
+    """
+    decided: int = 0
+    agree: int = 0
+    false_regressions: int = 0      # human accepted, model said regression
+    missed_regressions: int = 0     # human rejected, model said intended: the dangerous one
+    model_unsure: int = 0
+    undecided: int = 0
+
+    @property
+    def text(self) -> str:
+        scored = self.decided - self.model_unsure
+        return (f"Agreement with reviewers: {self.agree}/{scored} decided · {self.false_regressions} false regressions"
+                f" · {self.missed_regressions} missed · {self.model_unsure} model unsure"
+                f" · {self.undecided} not yet reviewed")
+
+
+def agreement(run: Run, ledger: Ledger) -> Agreement:
+    a = Agreement()
+    scope = scope_of(run)
+    for f in run.findings:
+        e = ledger.get(scope, finding_key(f))
+        if e is None:
+            a.undecided += 1
+            continue
+        a.decided += 1
+        if f.label == "unsure" or f.label is None:
+            a.model_unsure += 1
+        elif (e.decision, f.label) in (("accept", "intended"), ("reject", "regression")):
+            a.agree += 1
+        elif e.decision == "accept":
+            a.false_regressions += 1
+        else:
+            a.missed_regressions += 1
+    return a

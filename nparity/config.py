@@ -53,9 +53,31 @@ class UnorderedRule(BaseModel):
     key: str | None = None
 
 
+class ListRule(BaseModel):
+    endpoint: str
+    path: str                      # generic path of the list, e.g. "$.items" or "$"
+    key: str | None = None         # None = compare by position
+
+
 class NoiseRules(BaseModel):
     mask: list[MaskRule] = Field(default_factory=list)
-    unordered: list[UnorderedRule] = Field(default_factory=list)
+    unordered: list[UnorderedRule] = Field(default_factory=list)    # legacy alias of `lists` with a key
+    lists: list[ListRule] = Field(default_factory=list)
+    defaults: dict[str, bool] = Field(default_factory=lambda: {"datetime": True, "date": True, "uuid": True,
+                                                               "epoch": True})
+
+    def list_keys(self, endpoint: str) -> dict[str, object]:
+        """generic list path -> key name, or lists.NO_KEY to force positional compare."""
+        from nparity.lists import NO_KEY
+
+        out: dict[str, object] = {r.path: r.key for r in self.unordered if r.endpoint == endpoint and r.key}
+        for r in self.lists:
+            if r.endpoint == endpoint:
+                out[r.path] = r.key or NO_KEY
+        return out
+
+    def default_on(self, kind: str) -> bool:
+        return self.defaults.get(kind, True)
 
 
 def load_noise(path: str | Path = "config/noise.yaml") -> NoiseRules:

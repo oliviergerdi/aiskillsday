@@ -10,12 +10,14 @@ from typing import Any
 
 from nparity.config import Thresholds
 from nparity.jsonpath import MISSING, value_at
+from nparity.lists import keys_text, membership
 from nparity.models import Finding, Run, Sample
 from nparity.replay import fill
 
 KIND_TEXT = {
     "changed": "value changed", "missing_in_new": "missing in new", "added_in_new": "added in new",
     "status_changed": "status changed", "list_length_changed": "list length changed",
+    "items_removed": "items only in old", "items_added": "items only in new",
     "type_changed": "type changed", "declared_type_changed": "declared type changed",
     "moved": "moved · from mapping", "renamed": "renamed · from mapping", "dropped": "dropped · from mapping",
 }
@@ -101,6 +103,11 @@ def _kind_text(f: Finding, s: Sample | None) -> str:
     text = KIND_TEXT.get(f.kind, f.kind)
     if s is not None and f.kind == "status_changed":
         text = f"status {s.old.status} → {s.new.status}"
+    elif s is not None and f.kind in ("items_removed", "items_added"):
+        m = membership(value_at(s.old.body, f.path), value_at(s.new.body, f.path))
+        if m:
+            k, removed, added = m
+            text += ": " + keys_text(k, removed if f.kind == "items_removed" else added, cap=5)
     elif s is not None and f.kind == "list_length_changed":
         a, b = value_at(s.old.body, f.path), value_at(s.new.body, f.path)
         if isinstance(a, list) and isinstance(b, list):

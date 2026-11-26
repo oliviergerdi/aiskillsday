@@ -15,7 +15,7 @@ from pydantic import ValidationError
 
 from app.web.configs import DEFAULT_DIR as CONFIGS_DIR, RunInput, config_path, save_config
 from app.web.run_sources import InputError, local_file, resolve_source
-from nparity import pipeline, store
+from nparity import headers, pipeline, store
 from nparity.config import Seeds, load_seeds
 from nparity.evaluator.fake import FakeBackend
 from nparity.models import AnswerKey
@@ -135,13 +135,22 @@ def compare(job_id: str, inputs: RunInput, directory: Path, progress: Callable[[
         seeds.methods = ["GET"]
     ev = FakeBackend(AnswerKey()) if inputs.backend == "fake" and not inputs.score else None
 
+    try:
+        old_h = headers.resolve(inputs.before.headers, "before")
+        new_h = headers.resolve(inputs.after.headers, "after")
+    except headers.HeaderError as exc:
+        raise InputError(str(exc), "before_headers" if "before" in str(exc) else "after_headers") from exc
+    if old_h or new_h:
+        progress(f"Headers: before {', '.join(old_h) or 'none'} · after {', '.join(new_h) or 'none'} (values from environment)")
+
     with httpx.Client(timeout=30, verify=tls_verify(), follow_redirects=True) as client:
         progress("Loading before source")
-        before = resolve_source(client, inputs.before, "old")
+        before = resolve_source(client, inputs.before, "old", old_h)
         progress("Loading after source")
-        after = resolve_source(client, inputs.after, "new")
+        after = resolve_source(client, inputs.after, "new", new_h)
         config = pipeline.RunConfig(
             before.base_url, after.base_url, intent=intent_path, seeds=seeds_path,
+            old_headers=inputs.before.headers, new_headers=inputs.after.headers,
             answer_key=defaults.answer_key if inputs.score else None,
             backend=inputs.backend, name=f"{inputs.name}-{job_id[:12]}",
         )

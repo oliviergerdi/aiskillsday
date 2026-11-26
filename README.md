@@ -186,14 +186,19 @@ You need:
        - {customerId: 1, items: [{sku: A1, qty: 2, unit: 5.0}]}
    ```
 4. **An intent note** (Markdown): what the rewrite is meant to change, as an explicit list, ending with "Nothing else should change". Be unambiguous: a vague sentence gets a vague (unsure) answer, which is the point.
-5. Optional: **noise rules** (`config/noise.yaml`: masked paths, unordered lists) and an **answer key** to score against.
+5. **Auth headers**, if the services need them: `Name: env:VAR` per side, never a literal value. In the web form: the *Headers* box on each side. On the CLI: `--old-header "Authorization: env:OLD_TOKEN" --new-header "Authorization: env:NEW_TOKEN"`. Pass the variables inline, as with the Fireworks key, so they only exist for that one process:
+   ```bash
+   OLD_TOKEN="$(…your secret command…)" NEW_TOKEN="$(…)" uv run uvicorn app.main:app --reload
+   ```
+   Runs and configurations store header **names** only. A missing variable fails the run before any request, naming the variable.
+6. Optional: **noise rules** (`config/noise.yaml`: masked paths, unordered lists) and an **answer key** to score against.
 
 ## How it works
 
 1. **Generate** requests from the old spec crossed with the seeds (up to 5 per endpoint).
 2. **Map** old to new. Rules first (same method, matching path words, same path-param count; exact field names). Only what the rules can't settle goes to the LLM, asked once with the full candidate list.
 3. **Replay** each request against old and its mapped counterpart against new, with per-call retry (exponential backoff with jitter, 4 attempts).
-4. **Normalise** noise (masks, unordered lists, accepted renames), then **diff** deterministically and check observed and declared **types**. Numbers, rounding, counts and pagination are caught here, never by the LLM.
+4. **Normalise** noise: explicit masks, accepted renames, and by default per-call datetimes, dates, UUIDs and epoch timestamps are replaced by their *format* (`<datetime tz=Z precision=s>`), so a value that differs per call is noise but a change of format, timezone or type is still a finding. Lists of objects with a stable key (`id`, `uuid`, `key`, `code`) are matched by key: paths like `$.items[id=10].name`, and items only on one side become one *items removed* / *items added* finding. Then **diff** deterministically and check observed and declared **types**. Numbers, rounding, counts and pagination are caught here, never by the LLM.
 5. **Triage** each finding against the intent note: one 1-token question, answer read from logprobs. Intended needs p ≥ 0.98, regression needs p ≥ 0.999; anything below its bar becomes **unsure** and goes to a human. Nothing is auto-dismissed.
 6. **Report**: a `Run` saved as YAML in `runs/`, rendered by the CLI and the web UI. Scored against the answer key when one is given.
 

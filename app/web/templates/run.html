@@ -38,6 +38,9 @@
   <div class="count err"><div class="n">{{ c.error }}</div><div class="l">Errors</div></div>
 </div>
 
+{% if agreement.decided %}
+<div class="scoreline"><span>{{ agreement.text }}</span><span class="sub">reviewers saw the model's label first</span></div>
+{% endif %}
 {% if run.score %}
 <div class="scoreline">
   <span>Answer key: <b>{{ run.score.correct }}/{{ run.score.total }} correct</b></span>

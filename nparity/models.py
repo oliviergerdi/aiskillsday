@@ -21,6 +21,8 @@ FindingKind = Literal[
     "moved",
     "renamed",
     "dropped",
+    "items_removed",
+    "items_added",
 ]
 FindingSource = Literal["diff", "types", "mapping"]
 Label = Literal["intended", "regression", "unsure"]

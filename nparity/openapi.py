@@ -29,7 +29,8 @@ class Endpoint:
         return self.path_params + self.query_params
 
 
-def load_spec(client: httpx.Client, base_url: str, spec: str | None = None) -> dict[str, Any]:
+def load_spec(client: httpx.Client, base_url: str, spec: str | None = None,
+              headers: dict[str, str] | None = None) -> dict[str, Any]:
     """Spec from `spec` (URL or local JSON/YAML file), else <base_url>/openapi.json."""
     import json
     from pathlib import Path
@@ -39,7 +40,7 @@ def load_spec(client: httpx.Client, base_url: str, spec: str | None = None) -> d
     if spec and not spec.startswith(("http://", "https://")):
         text = Path(spec).read_text(encoding="utf-8")
         return json.loads(text) if spec.endswith(".json") else yaml.safe_load(text)
-    resp = client.get(spec or f"{base_url.rstrip('/')}/openapi.json")
+    resp = client.get(spec or f"{base_url.rstrip('/')}/openapi.json", headers=headers)
     resp.raise_for_status()
     try:
         return resp.json()

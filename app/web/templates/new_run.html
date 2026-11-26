@@ -50,6 +50,11 @@
                placeholder="https://example.com/api" spellcheck="false" disabled>
         <small class="field-error" role="alert" data-error-for="{{ side }}_base" hidden></small>
       </div>
+      <label for="{{ side }}-headers">Headers <span class="sub">(optional, separate several with ;)</span></label>
+      <input id="{{ side }}-headers" name="{{ side }}_headers" type="text" maxlength="2000" spellcheck="false"
+             placeholder="Authorization: env:{{ 'OLD' if side == 'before' else 'NEW' }}_TOKEN">
+      <small class="sub">Values come from the server's environment. Only <code>Name: env:VAR</code> is accepted, so no secret is ever saved.</small>
+      <small class="field-error" role="alert" data-error-for="{{ side }}_headers" hidden></small>
     </fieldset>
     {% endfor %}
   </div>

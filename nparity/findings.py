@@ -55,7 +55,7 @@ def build_findings(emap: list[EndpointMap], fmap: list[FieldMap], samples: list[
             o, n, ns = normalise(endpoint, s.old, s.new, rules, renames)
             for x in ns:
                 noise.setdefault((x.endpoint, x.path, x.rule), x)
-            for d in diff(o, n):
+            for d in diff(o, n, rules.list_keys(endpoint)):
                 key = (endpoint, d.path, d.kind)
                 f = groups.get(key)
                 if f is None:
