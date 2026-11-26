@@ -66,7 +66,8 @@ Judges score nine things (see the scoring sheet). Slide that carries each: probl
 2. Slide 14: name one risk (10 s).
 3. Slide 8: skip the Petstore run and say it is in the repo (40 s).
 
-## Likely questions (appendix slides 16 to 19)
+## Likely questions (appendix slides 16 to 20)
+- **What is not built?** Appendix slide 20: PRDs 0003 to 0007 and authorization tokens. Built: ledger and sign-off, headers and list matching, seed generation and coverage.
 - **Why trust the AI?** Slide 9. Probabilities, thresholds, no regression auto-dismissed.
 - **Who has committed or paid?** No one yet. We have one interview and a working prototype. Say so.
 - **What stops a copy?** See slide 5: judging intent with a probability, plus the calibration.
