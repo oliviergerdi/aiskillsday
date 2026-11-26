@@ -35,9 +35,20 @@ def load(run_id: str, dir: str | Path = DEFAULT_DIR) -> Run:
     return Run.model_validate(yaml.safe_load(path.read_text(encoding="utf-8")))
 
 
+def delete(run_id: str, dir: str | Path = DEFAULT_DIR) -> None:
+    if not run_id or run_id in {".", ".."} or any(char in run_id for char in "/\\\0"):
+        raise ValueError("Invalid run ID.")
+    (Path(dir) / f"{run_id}.yaml").unlink(missing_ok=True)
+
+
 def list_runs(dir: str | Path = DEFAULT_DIR) -> list[Run]:
     d = Path(dir)
     if not d.is_dir():
         return []
-    runs = [Run.model_validate(yaml.safe_load(p.read_text(encoding="utf-8"))) for p in d.glob("*.yaml")]
+    runs = []
+    for path in d.glob("*.yaml"):
+        try:
+            runs.append(Run.model_validate(yaml.safe_load(path.read_text(encoding="utf-8"))))
+        except FileNotFoundError:
+            continue
     return sorted(runs, key=lambda r: r.started_at, reverse=True)

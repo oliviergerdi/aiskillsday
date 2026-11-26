@@ -169,6 +169,23 @@ def test_baseline_header_and_override(client, saved):
     assert "No baseline" in none
 
 
+def test_delete_run_from_runs_list(client, saved):
+    alternate = saved.model_copy(update={"id": "keep-this-run"})
+    store.save(alternate, app.state.runs_dir)
+    page = client.get("/").text
+    assert f'hx-delete="/runs/{saved.id}"' in page
+    assert "hx-confirm=" in page
+    blocked = client.delete(f"/runs/{saved.id}", headers={"Origin": "https://example.com"})
+    assert blocked.status_code == 403
+
+    deleted = client.delete(f"/runs/{saved.id}")
+    assert deleted.status_code == 200
+    assert deleted.headers["HX-Redirect"] == "/"
+    assert client.get(f"/runs/{saved.id}").status_code == 404
+    assert client.get(f"/runs/{alternate.id}").status_code == 200
+    assert saved.id not in client.get("/").text
+
+
 def test_signoff_page(client, saved):
     decide(client, saved, "$.detail", "accept", note="ok")
     decide(client, saved, "$.total", "reject", note="rounding bug")

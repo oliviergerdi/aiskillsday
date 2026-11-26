@@ -6,7 +6,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, Response
 from fastapi.templating import Jinja2Templates
 
 from app.web import views
@@ -57,7 +57,7 @@ def local_run_request(request: Request) -> None:
     expected = f"{request.url.scheme}://{request.url.netloc}"
     local = request.client and request.client.host in {"127.0.0.1", "::1"}
     if not local or request.url.hostname not in {"localhost", "127.0.0.1", "::1"} or (origin and origin != expected):
-        raise HTTPException(status_code=403, detail="Open nParity on localhost to start a comparison.")
+        raise HTTPException(status_code=403, detail="Open nParity on localhost for this action.")
 
 
 @router.get("/compare", response_class=HTMLResponse)
@@ -111,6 +111,15 @@ def comparison_detail(request: Request, name: str):
 def runs_page(request: Request):
     runs = [(r, views.counts(r)) for r in store.list_runs(runs_dir(request))]
     return TEMPLATES.TemplateResponse(request, "runs.html", {"runs": runs, "nav": "runs"})
+
+
+@router.delete("/runs/{run_id}", dependencies=[Depends(local_run_request)])
+def delete_run(request: Request, run_id: str) -> Response:
+    try:
+        store.delete(run_id, runs_dir(request))
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail="Invalid run ID.") from exc
+    return Response(headers={"HX-Redirect": "/"})
 
 
 def baseline_for(request: Request, run: Run, requested: str | None):
