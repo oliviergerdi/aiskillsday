@@ -1,0 +1,5 @@
+# Deterministic noise rules, applied to both sides before diffing. Endpoints use v1 names.
+mask:
+  - {endpoint: "POST /orders", paths: ["$.id", "$.createdAt"]}
+unordered:
+  - {endpoint: "GET /orders", path: "$.items", key: id}

@@ -1,0 +1,10 @@
+# Values by parameter name (v1 names). The generator crosses them per endpoint, capped.
+params:
+  id: [1, 2, 999]      # 999 = not found
+  page: [1, 2]
+bodies:
+  "POST /orders":
+    - customerId: 1
+      items: [{sku: A1, qty: 2, unit: 5.0}]
+    - customerId: 2
+      items: [{sku: B2, qty: 1, unit: 3.0}]

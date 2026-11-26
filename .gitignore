@@ -16,3 +16,8 @@ poetry.toml
 
 # macOS
 .DS_Store
+
+# nparity
+runs/*
+!runs/demo.yaml
+cache/

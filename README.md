@@ -96,6 +96,16 @@ poetry run python proto/logprobs_test.py --model <fireworks-model-id>
 Writes to its own directory: `proto/raw/<EXP>_<n>.json` and `proto/results.json`
 (both regenerated per run — `raw/` keeps one file per recorded call).
 
+## Running nParity
+
+```bash
+poetry run pytest -q                                   # everything, key-free (FakeBackend)
+poetry run pytest -m live -v                           # Fireworks checks, needs FIREWORKS_API_KEY
+poetry run uvicorn app.main:app --reload               # toys at /v1 and /v2, web UI at /
+```
+
+Design and plan: `docs/nparity-design.md`, `docs/nparity-plan.md`. UI mockup: `docs/mockups/web-ui.html`.
+
 ## Troubleshooting
 
 | Symptom | Fix |

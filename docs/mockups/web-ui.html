@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>nParity — mockup</title>
+<!--
+  STATIC MOCKUP. Data is hand-written from the toy demo (build spec, 10 seeded differences).
+  Real build: Jinja templates + HTMX partials; views below map to routes:
+    #runs     -> GET /
+    #run      -> GET /runs/{id}
+    #mapping  -> GET /runs/{id}/mapping
+  Finding rows expand with <details> here; in the real app the body is an HTMX partial
+  (hx-get="/runs/{id}/findings/{fid}").
+-->
+<style>
+  :root {
+    --bg: #fbfbfa; --surface: #ffffff; --ink: #1d2125; --muted: #66707a; --line: #e3e5e8;
+    --code-bg: #f4f5f6;
+    --reg: #c0392b; --reg-bg: #fdecea;
+    --uns: #a86b00; --uns-bg: #fff4df;
+    --int: #1f7a4d; --int-bg: #e6f4ec;
+    --noi: #5f6b76; --noi-bg: #eef0f2;
+    --err: #7d3cc0; --err-bg: #f2eafb;
+    --rule: #2d5fa8; --rule-bg: #e8effa;
+    --hl-old: #fde2df; --hl-new: #fff0c2;
+    --accent: #2d5fa8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #15181b; --surface: #1d2125; --ink: #e7e9eb; --muted: #9aa3ab; --line: #30363c;
+      --code-bg: #24292e;
+      --reg: #ff8a7a; --reg-bg: #3a1f1c;
+      --uns: #f3c069; --uns-bg: #3a2e17;
+      --int: #6fd3a0; --int-bg: #17332a;
+      --noi: #aab4bd; --noi-bg: #2a3035;
+      --err: #c9a2f5; --err-bg: #2f2340;
+      --rule: #8fb4ec; --rule-bg: #1e2a3d;
+      --hl-old: #4a2622; --hl-new: #4a3d16;
+      --accent: #8fb4ec;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  code, pre, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 13px; }
+  a { color: var(--accent); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+
+  .mock-banner { background: var(--uns-bg); color: var(--uns); text-align: center; font-size: 13px; padding: 4px 16px; }
+  header.top { border-bottom: 1px solid var(--line); background: var(--surface); }
+  header.top .wrap { display: flex; align-items: center; gap: 24px; height: 56px; }
+  .brand { font-weight: 700; font-size: 18px; letter-spacing: -0.01em; }
+  .brand span { color: var(--muted); font-weight: 400; font-size: 14px; margin-left: 6px; }
+  nav.views { display: flex; gap: 4px; }
+  nav.views a { text-decoration: none; color: var(--muted); padding: 6px 12px; border-radius: 6px; font-size: 14px; }
+  nav.views a.active { background: var(--code-bg); color: var(--ink); font-weight: 600; }
+
+  main { padding: 24px 0 64px; }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  h2 { font-size: 16px; margin: 32px 0 10px; display: flex; align-items: center; gap: 8px; }
+  .sub { color: var(--muted); font-size: 13px; }
+  .crumbs { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+
+  .badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 999px; white-space: nowrap; }
+  .b-reg { color: var(--reg); background: var(--reg-bg); }
+  .b-uns { color: var(--uns); background: var(--uns-bg); }
+  .b-int { color: var(--int); background: var(--int-bg); }
+  .b-noi { color: var(--noi); background: var(--noi-bg); }
+  .b-err { color: var(--err); background: var(--err-bg); }
+  .b-rule { color: var(--rule); background: var(--rule-bg); }
+  .b-llm { color: var(--muted); background: var(--code-bg); }
+
+  /* runs list */
+  table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); font-weight: 600; background: var(--code-bg); }
+  tr:last-child td { border-bottom: 0; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .table-scroll { overflow-x: auto; }
+
+  /* run header */
+  .run-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+  .counts { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+  .count { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; border-top: 3px solid var(--line); }
+  .count .n { font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .count .l { font-size: 13px; color: var(--muted); }
+  .count.reg { border-top-color: var(--reg); } .count.reg .n { color: var(--reg); }
+  .count.uns { border-top-color: var(--uns); } .count.uns .n { color: var(--uns); }
+  .count.int { border-top-color: var(--int); }
+  .count.noi { border-top-color: var(--noi); }
+  .count.err { border-top-color: var(--err); }
+
+  .scoreline { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 12px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; font-size: 14px; }
+  .scoreline b { font-variant-numeric: tabular-nums; }
+
+  /* findings */
+  .findings { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  details.f { border-bottom: 1px solid var(--line); }
+  details.f:last-child { border-bottom: 0; }
+  details.f > summary { list-style: none; cursor: pointer; display: grid;
+    grid-template-columns: 14px minmax(160px, 1.2fr) minmax(120px, 1fr) 130px 150px; gap: 12px; align-items: center; padding: 10px 14px; }
+  details.f > summary::-webkit-details-marker { display: none; }
+  details.f > summary::before { content: "▸"; color: var(--muted); font-size: 12px; }
+  details.f[open] > summary::before { content: "▾"; }
+  details.f > summary:hover { background: var(--code-bg); }
+  .f-ep { font-weight: 600; }
+  .f-ep small { display: block; font-weight: 400; color: var(--muted); }
+  .f-path code { background: var(--code-bg); padding: 1px 6px; border-radius: 4px; }
+  .f-kind { font-size: 13px; color: var(--muted); }
+  .f-reason { grid-column: 2 / -1; font-size: 13px; color: var(--muted); margin-top: -4px; }
+
+  .pbar { display: flex; align-items: center; gap: 8px; font-size: 13px; font-variant-numeric: tabular-nums; }
+  .pbar .track { position: relative; flex: 1; height: 6px; background: var(--code-bg); border-radius: 3px; min-width: 60px; }
+  .pbar .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; }
+  .pbar .thr { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); opacity: 0.6; }
+
+  .f-body { padding: 4px 14px 18px 40px; }
+  .meta-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 8px 0 14px; }
+  .meta-grid div { background: var(--code-bg); border-radius: 6px; padding: 8px 10px; font-size: 13px; }
+  .meta-grid .k { color: var(--muted); font-size: 12px; display: block; }
+  .req { font-size: 13px; margin: 6px 0 10px; }
+  .req code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; }
+  .sbs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .pane { border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .pane .ph { font-size: 12px; font-weight: 600; padding: 6px 10px; background: var(--code-bg); border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; }
+  .pane pre { margin: 0; padding: 8px 0; overflow-x: auto; }
+  .pane pre span { display: block; padding: 0 10px; white-space: pre; }
+  .pane pre span.hl-old { background: var(--hl-old); }
+  .pane pre span.hl-new { background: var(--hl-new); }
+  .samples { margin-top: 12px; font-size: 13px; }
+  .samples ul { margin: 4px 0 0; padding-left: 18px; }
+  .samples li { margin: 2px 0; }
+  .reasonbox { margin-top: 12px; padding: 8px 12px; border-left: 3px solid var(--accent); background: var(--code-bg); font-size: 14px; border-radius: 0 6px 6px 0; }
+  .reasonbox .k { color: var(--muted); font-size: 12px; display: block; }
+  .actions { margin-top: 12px; display: flex; gap: 8px; }
+  .btn { font: inherit; font-size: 13px; padding: 4px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: not-allowed; opacity: 0.7; }
+
+  .footer-tele { margin-top: 32px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; display: flex; gap: 20px; flex-wrap: wrap; }
+  .footer-tele b { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  .top3 { font-size: 12px; color: var(--muted); }
+  .arrow { color: var(--muted); padding: 0 4px; }
+
+  @media (max-width: 760px) {
+    .counts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    details.f > summary { grid-template-columns: 14px 1fr; }
+    details.f > summary > :nth-child(n+3) { grid-column: 2; }
+    .f-reason { grid-column: 2; }
+    .sbs, .meta-grid { grid-template-columns: 1fr; }
+    .f-body { padding-left: 14px; }
+    header.top .wrap { gap: 12px; }
+    .brand span { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="mock-banner">Static mockup · hand-written data from the toy demo · nothing here is live</div>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">nParity<span>did we break anything?</span></div>
+    <nav class="views">
+      <a href="#runs" data-view="runs">Runs</a>
+      <a href="#run" data-view="run">Run</a>
+      <a href="#mapping" data-view="mapping">Mapping</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ============================ RUNS LIST ============================ -->
+<section class="view" id="view-runs">
+  <h1>Runs</h1>
+  <p class="sub">Saved runs from <code>runs/*.yaml</code>. Start one from the terminal: <code>nparity run --old … --new … --intent fixtures/intent.md</code></p>
+  <div class="table-scroll">
+  <table>
+    <thead><tr>
+      <th>Run</th><th>Backend</th><th class="num">Regr.</th><th class="num">Unsure</th><th class="num">Intended</th><th class="num">Noise</th><th class="num">Errors</th><th>Answer key</th><th class="num">Time</th><th class="num">Cost</th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td><a href="#run">2026-11-26T1105-toy</a><br><span class="sub">v1 → v2 toy · frozen demo run</span></td>
+        <td><span class="badge b-llm">flash</span></td>
+        <td class="num"><span class="badge b-reg">3</span></td><td class="num"><span class="badge b-uns">1</span></td>
+        <td class="num">4</td><td class="num">2</td><td class="num">0</td>
+        <td>10/10 · 0 false regr.</td><td class="num">31.2 s</td><td class="num">$0.0011</td>
+      </tr>
+      <tr>
+        <td><a href="#run">2026-11-26T1032-toy</a><br><span class="sub">v1 → v2 toy</span></td>
+        <td><span class="badge b-llm">flash</span></td>
+        <td class="num"><span class="badge b-reg">3</span></td><td class="num"><span class="badge b-uns">2</span></td>
+        <td class="num">3</td><td class="num">2</td><td class="num"><span class="badge b-err">1</span></td>
+        <td>9/10 · 0 false regr.</td><td class="num">44.8 s</td><td class="num">$0.0012</td>
+      </tr>
+      <tr>
+        <td><a href="#run">2026-11-26T0958-toy</a><br><span class="sub">v1 → v2 toy</span></td>
+        <td><span class="badge b-llm">fake</span></td>
+        <td class="num"><span class="badge b-reg">3</span></td><td class="num"><span class="badge b-uns">1</span></td>
+        <td class="num">4</td><td class="num">2</td><td class="num">0</td>
+        <td>10/10 · 0 false regr.</td><td class="num">0.4 s</td><td class="num">$0</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============================ RUN PAGE ============================ -->
+<section class="view" id="view-run">
+  <div class="crumbs"><a href="#runs">Runs</a> / 2026-11-26T1105-toy</div>
+  <div class="run-head">
+    <div>
+      <h1>v1 → v2 toy service</h1>
+      <div class="sub">
+        old <code>http://localhost:8000/v1</code> · new <code>http://localhost:8000/v2</code> ·
+        intent <code>fixtures/intent.md</code> · backend <span class="badge b-llm">flash</span>
+        <code>fireworks/deepseek-v4p1-flash-1017-us@1</code>
+      </div>
+    </div>
+    <a href="#mapping">Mapping: 5 endpoints, 14 fields →</a>
+  </div>
+
+  <div class="counts">
+    <div class="count reg"><div class="n">3</div><div class="l">Regressions</div></div>
+    <div class="count uns"><div class="n">1</div><div class="l">Unsure</div></div>
+    <div class="count int"><div class="n">4</div><div class="l">Intended</div></div>
+    <div class="count noi"><div class="n">2</div><div class="l">Noise removed</div></div>
+    <div class="count err"><div class="n">0</div><div class="l">Errors</div></div>
+  </div>
+
+  <div class="scoreline">
+    <span>Answer key: <b>10/10 correct</b></span>
+    <span><b>1</b> flagged unsure</span>
+    <span><b>0</b> false regressions</span>
+    <span><b>1</b> endpoint move discovered</span>
+    <span>Samples: <b>17</b> requests across <b>5</b> endpoints</span>
+  </div>
+
+  <!-- ---------- Regressions ---------- -->
+  <h2><span class="badge b-reg">Regressions</span> always shown, never auto-dismissed</h2>
+  <div class="findings">
+
+    <details class="f" open>
+      <summary>
+        <div class="f-ep">GET /orders/{id}<small>→ GET /orders/{id}</small></div>
+        <div class="f-path"><code>$.total</code></div>
+        <div class="f-kind">value changed · 1 of 3 samples</div>
+        <div class="pbar"><div class="track"><div class="fill" style="width:99.1%;background:var(--reg)"></div></div>0.991</div>
+        <div class="f-reason">Total rounds to 10.00 where it used to be 10.01; the intent note says nothing else should change.</div>
+      </summary>
+      <div class="f-body">
+        <div class="meta-grid">
+          <div><span class="k">Label</span><span class="badge b-reg">regression</span></div>
+          <div><span class="k">p(winner) · threshold</span>0.991 · always shown</div>
+          <div><span class="k">Observed type</span>number (2 dp) → number (2 dp)</div>
+          <div><span class="k">Declared type</span>number → number · no change</div>
+        </div>
+        <div class="req">Sample 2 of 3 · <code>GET /v1/orders/7</code> → <code>GET /v2/orders/7</code></div>
+        <div class="sbs">
+          <div class="pane"><div class="ph"><span>old · v1</span><span>200 OK</span></div>
+<pre><span>{</span><span>  "id": "ord_7",</span><span>  "customerId": 2,</span><span>  "items": [{ "sku": "B2", "qty": 3, "unit": 3.335 }],</span><span class="hl-old">  "total": 10.01,</span><span>  "currency": "ZAR",</span><span>  "status": "paid"</span><span>}</span></pre></div>
+          <div class="pane"><div class="ph"><span>new · v2</span><span>200 OK</span></div>
+<pre><span>{</span><span>  "id": "ord_7",</span><span>  "customerId": 2,</span><span>  "items": [{ "sku": "B2", "qty": 3, "unit": 3.335 }],</span><span class="hl-new">  "total": 10.0,</span><span>  "currency": "ZAR",</span><span>  "status": "paid"</span><span>}</span></pre></div>
+        </div>
+        <div class="samples"><b>Samples</b>
+          <ul>
+            <li><code>GET /orders/1</code> · same</li>
+            <li><code>GET /orders/7</code> · <b>differs</b> (10.01 → 10.0)</li>
+            <li><code>GET /orders/12</code> · same</li>
+          </ul>
+        </div>
+        <div class="reasonbox"><span class="k">Reason (second call, 60 tokens)</span>10.005 is rounded half-down in v2 (naive float rounding), so the total changed by a cent; the intent note doesn't mention rounding.</div>
+        <div class="actions"><button class="btn" disabled>Confirm</button><button class="btn" disabled>Override → intended</button><span class="sub">ledger: stretch</span></div>
+      </div>
+    </details>
+
+    <details class="f">
+      <summary>
+        <div class="f-ep">GET /orders?page={page}<small>→ GET /orders?page={page}</small></div>
+        <div class="f-path"><code>$.items</code></div>
+        <div class="f-kind">list length 3 → 0 · 1 of 2 samples</div>
+        <div class="pbar"><div class="track"><div class="fill" style="width:99.6%;background:var(--reg)"></div></div>0.996</div>
+        <div class="f-reason">Page 2 is empty in v2 but had 3 orders in v1: looks like an off-by-one in pagination.</div>
+      </summary>
+      <div class="f-body"><p class="sub">Body loaded via HTMX in the real app (same layout as above).</p></div>
+    </details>
+
+    <details class="f">
+      <summary>
+        <div class="f-ep">GET /customers/{id}<small>→ GET /clients/{clientId}</small></div>
+        <div class="f-path"><code>$.currency</code></div>
+        <div class="f-kind">missing in new · 1 of 3 samples · type: required → optional</div>
+        <div class="pbar"><div class="track"><div class="fill" style="width:97.4%;background:var(--reg)"></div></div>0.974</div>
+        <div class="f-reason">currency disappears for business customers; only fullName and legacyCode were meant to change.</div>
+      </summary>
+      <div class="f-body"><p class="sub">Body loaded via HTMX in the real app. Declared-type finding attached: v1 <code>currency: string, required</code> · v2 <code>currency: string | null, optional</code>.</p></div>
+    </details>
+  </div>
+
+  <!-- ---------- Unsure ---------- -->
+  <h2><span class="badge b-uns">Unsure</span> below threshold, needs a human</h2>
+  <div class="findings">
+    <details class="f">
+      <summary>
+        <div class="f-ep">GET /orders/{id}<small>404 · id=999</small></div>
+        <div class="f-path"><code>$.detail</code></div>
+        <div class="f-kind">value changed · 1 of 1 sample</div>
+        <div class="pbar"><div class="track"><div class="fill" style="width:62%;background:var(--uns)"></div><div class="thr" style="left:98%"></div></div>0.62</div>
+        <div class="f-reason">Leans intended (error wording), but below the 0.98 bar for waving a change through.</div>
+      </summary>
+      <div class="f-body">
+        <div class="meta-grid">
+          <div><span class="k">Label</span><span class="badge b-uns">unsure</span> (leans intended)</div>
+          <div><span class="k">p(winner) · threshold</span>0.62 · intended needs 0.98</div>
+          <div><span class="k">Distribution</span>intended 0.62 · regression 0.31 · unsure 0.07</div>
+          <div><span class="k">Observed type</span>string → string</div>
+        </div>
+        <div class="sbs">
+          <div class="pane"><div class="ph"><span>old · v1</span><span>404</span></div>
+<pre><span>{</span><span class="hl-old">  "detail": "Order not found"</span><span>}</span></pre></div>
+          <div class="pane"><div class="ph"><span>new · v2</span><span>404</span></div>
+<pre><span>{</span><span class="hl-new">  "detail": "No order with id 999"</span><span>}</span></pre></div>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <!-- ---------- Intended ---------- -->
+  <h2><span class="badge b-int">Intended</span> matches the intent note</h2>
+  <div class="findings">
+    <details class="f">
+      <summary>
+        <div class="f-ep">POST /orders<small>→ POST /orders</small></div>
+        <div class="f-path"><code>status</code></div>
+        <div class="f-kind">status 200 → 201 · 2 of 2 samples</div>
+        <div class="pbar"><div class="track"><div class="fill" style="width:99.3%;background:var(--int)"></div><div class="thr" style="left:98%"></div></div>0.993</div>
+        <div class="f-reason">Intent: "returns 201 on create".</div>
+      </summary>
+      <div class="f-body"><p class="sub">Body via HTMX.</p></div>
+    </details>
+    <details class="f">
+      <summary>
+        <div class="f-ep">GET /customers/{id}<small>→ GET /clients/{clientId}</small></div>
+        <div class="f-path"><code>$.legacyCode</code></div>
+        <div class="f-kind">missing in new · 3 of 3 samples</div>
+        <div class="pbar"><div class="track"><div class="fill" style="width:99.6%;background:var(--int)"></div><div class="thr" style="left:98%"></div></div>0.996</div>
+        <div class="f-reason">Intent: "drops the deprecated legacyCode field".</div>
+      </summary>
+      <div class="f-body"><p class="sub">Body via HTMX.</p></div>
+    </details>
+    <details class="f">
+      <summary>
+        <div class="f-ep">GET /customers/{id}<small>→ GET /clients/{clientId}</small></div>
+        <div class="f-path"><code>$.fullName → $.name</code></div>
+        <div class="f-kind">renamed · from mapping</div>
+        <div class="pbar"><div class="track"><div class="fill" style="width:99%;background:var(--int)"></div><div class="thr" style="left:95%"></div></div>0.990</div>
+        <div class="f-reason">Rename accepted by the mapper; values identical after normalising.</div>
+      </summary>
+      <div class="f-body"><p class="sub">Body via HTMX.</p></div>
+    </details>
+    <details class="f">
+      <summary>
+        <div class="f-ep">GET /customers/{id}<small>→ GET /clients/{clientId}</small></div>
+        <div class="f-path"><code>endpoint</code></div>
+        <div class="f-kind">moved · from mapping</div>
+        <div class="pbar"><div class="track"><div class="fill" style="width:99.7%;background:var(--int)"></div><div class="thr" style="left:95%"></div></div>0.997</div>
+        <div class="f-reason">No path-token match, so the mapper widened to all GET endpoints and the model picked /clients/{clientId}.</div>
+      </summary>
+      <div class="f-body"><p class="sub">Body via HTMX.</p></div>
+    </details>
+  </div>
+
+  <!-- ---------- Noise ---------- -->
+  <h2><span class="badge b-noi">Noise removed</span> by normaliser rules, no LLM</h2>
+  <div class="findings">
+    <details class="f">
+      <summary>
+        <div class="f-ep">GET /orders<small>→ GET /orders</small></div>
+        <div class="f-path"><code>$.items[*]</code></div>
+        <div class="f-kind">list order differs</div>
+        <div class="sub">rule: <code>unordered: $.items, key id</code></div>
+      </summary>
+      <div class="f-body"><p class="sub">Body via HTMX.</p></div>
+    </details>
+    <details class="f">
+      <summary>
+        <div class="f-ep">POST /orders<small>→ POST /orders</small></div>
+        <div class="f-path"><code>$.id, $.createdAt</code></div>
+        <div class="f-kind">differs every call</div>
+        <div class="sub">rule: <code>mask $.id, $.createdAt</code></div>
+      </summary>
+      <div class="f-body"><p class="sub">Body via HTMX.</p></div>
+    </details>
+  </div>
+
+  <div class="footer-tele">
+    <span>Decisions: <b>22</b> by rule, <b>14</b> by LLM</span>
+    <span>LLM calls: <b>14</b> (<b>5</b> reasons)</span>
+    <span>Retries: <b>2</b></span>
+    <span>Time: <b>31.2 s</b></span>
+    <span>Tokens: <b>3,104</b> in (<b>1,210</b> cached) · <b>247</b> out</span>
+    <span>Cost: <b>$0.0011</b></span>
+  </div>
+</section>
+
+<!-- ============================ MAPPING ============================ -->
+<section class="view" id="view-mapping">
+  <div class="crumbs"><a href="#runs">Runs</a> / <a href="#run">2026-11-26T1105-toy</a> / mapping</div>
+  <h1>Mapping: v1 → v2</h1>
+  <p class="sub">Rules first (method + path tokens, exact field names). The model only sees what the rules couldn't settle, asked once with the full candidate list.</p>
+
+  <h2>Endpoints <span class="sub">4 by rule · 1 by LLM</span></h2>
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>Old (v1)</th><th></th><th>New (v2)</th><th>Source</th><th class="num">p(winner)</th><th>Status</th><th>Runners-up</th></tr></thead>
+    <tbody>
+      <tr><td><code>GET /orders</code></td><td class="arrow">→</td><td><code>GET /orders</code></td><td><span class="badge b-rule">rule</span></td><td class="num">—</td><td><span class="badge b-int">accepted</span></td><td class="top3">—</td></tr>
+      <tr><td><code>POST /orders</code></td><td class="arrow">→</td><td><code>POST /orders</code></td><td><span class="badge b-rule">rule</span></td><td class="num">—</td><td><span class="badge b-int">accepted</span></td><td class="top3">—</td></tr>
+      <tr><td><code>GET /orders/{id}</code></td><td class="arrow">→</td><td><code>GET /orders/{id}</code></td><td><span class="badge b-rule">rule</span></td><td class="num">—</td><td><span class="badge b-int">accepted</span></td><td class="top3">—</td></tr>
+      <tr><td><code>GET /customers/{id}</code></td><td class="arrow">→</td><td><code>GET /clients/{clientId}</code></td><td><span class="badge b-llm">llm</span></td><td class="num">0.997</td><td><span class="badge b-int">accepted</span></td><td class="top3">GET /orders/{id} 0.002 · none 0.001</td></tr>
+      <tr><td><code>GET /health</code></td><td class="arrow">→</td><td><code>GET /health</code></td><td><span class="badge b-rule">rule</span></td><td class="num">—</td><td><span class="badge b-int">accepted</span></td><td class="top3">—</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>Fields <span class="sub">GET /customers/{id} → GET /clients/{clientId} · 4 by rule · 2 by LLM</span></h2>
+  <div class="table-scroll">
+  <table>
+    <thead><tr><th>Old field</th><th></th><th>New field</th><th>Source</th><th class="num">p(winner)</th><th>Status</th><th>Type (declared)</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td class="arrow">→</td><td><code>id</code></td><td><span class="badge b-rule">rule</span></td><td class="num">—</td><td><span class="badge b-int">accepted</span></td><td>integer → integer</td></tr>
+      <tr><td><code>email</code></td><td class="arrow">→</td><td><code>email</code></td><td><span class="badge b-rule">rule</span></td><td class="num">—</td><td><span class="badge b-int">accepted</span></td><td>string → string</td></tr>
+      <tr><td><code>type</code></td><td class="arrow">→</td><td><code>type</code></td><td><span class="badge b-rule">rule</span></td><td class="num">—</td><td><span class="badge b-int">accepted</span></td><td>enum[person, business] → same</td></tr>
+      <tr><td><code>currency</code></td><td class="arrow">→</td><td><code>currency</code></td><td><span class="badge b-rule">rule</span></td><td class="num">—</td><td><span class="badge b-int">accepted</span></td><td><span class="badge b-reg">string, required → string|null, optional</span></td></tr>
+      <tr><td><code>fullName</code></td><td class="arrow">→</td><td><code>name</code></td><td><span class="badge b-llm">llm</span></td><td class="num">0.990</td><td><span class="badge b-int">accepted</span></td><td>string → string</td></tr>
+      <tr><td><code>legacyCode</code></td><td class="arrow">→</td><td><span class="sub">none (dropped)</span></td><td><span class="badge b-llm">llm</span></td><td class="num">0.981</td><td><span class="badge b-int">accepted</span></td><td>string → —</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="sub" style="margin-top:10px">Other endpoint pairs: all fields matched by exact name (8 rule decisions), not shown.</p>
+</section>
+
+</main>
+
+<script>
+  // Mockup-only view switching. Real app: separate routes.
+  function show() {
+    var v = (location.hash || "#run").slice(1);
+    if (!document.getElementById("view-" + v)) v = "run";
+    document.querySelectorAll(".view").forEach(function (s) { s.classList.toggle("active", s.id === "view-" + v); });
+    document.querySelectorAll("nav.views a").forEach(function (a) { a.classList.toggle("active", a.dataset.view === v); });
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener("hashchange", show);
+  show();
+</script>
+</body>
+</html>

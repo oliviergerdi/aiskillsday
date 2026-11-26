@@ -1,0 +1,12 @@
+# Thresholds apply to p(winner), the winner's raw probability (evaluator spec section 6).
+# `default` applies to every backend; add a block keyed by backend id to override.
+default:
+  mapping:            # wrong accept = misleading diff, usually noticed
+    auto_accept: 0.95
+    needs_review: 0.50
+  triage_intended:    # wrong accept = hidden regression, the worst failure
+    auto_accept: 0.98
+    needs_review: 0.50
+  triage_regression:  # never auto-dismissed; always shown
+    auto_accept: null
+    needs_review: null

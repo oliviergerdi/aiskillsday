@@ -1,0 +1,17 @@
+# Mapping entries feed FakeBackend; findings entries are what the run is scored on.
+# `expect: noise` matches only normaliser Noise records; everything else matches only findings.
+mapping:
+  - {old: "GET /customers/{id}", new: "GET /clients/{clientId}"}
+  - {endpoint: "GET /customers/{id}", old_field: fullName, new_field: name}
+  - {endpoint: "GET /customers/{id}", old_field: legacyCode, new_field: null}
+findings:
+  - {n: 1,  endpoint: "GET /orders",         path: "$.items",      expect: noise}
+  - {n: 2,  endpoint: "POST /orders",        path: "$.id",         expect: noise}
+  - {n: 3,  endpoint: "POST /orders",        path: "status",       expect: intended}
+  - {n: 4,  endpoint: "GET /customers/{id}", path: "$.fullName",   expect: intended}
+  - {n: 5,  endpoint: "GET /customers/{id}", path: "$.legacyCode", expect: intended}
+  - {n: 6,  endpoint: "GET /orders/{id}",    path: "$.total",      expect: regression}
+  - {n: 7,  endpoint: "GET /orders",         path: "$.items",      expect: regression}
+  - {n: 8,  endpoint: "GET /customers/{id}", path: "$.currency",   expect: regression}
+  - {n: 9,  endpoint: "GET /orders/{id}",    path: "$.detail",     expect: unsure}
+  - {n: 10, endpoint: "GET /customers/{id}", path: "endpoint",     expect: intended}
