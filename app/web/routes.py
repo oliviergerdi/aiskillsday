@@ -82,8 +82,10 @@ def run_page(request: Request, run_id: str):
         first = sections["shown"][0]
         first.body_html = body.render(v=first)
     rule_maps = sum(m.source == "rule" for m in run.endpoints) + sum(m.source == "rule" for m in run.fields)
+    counts = views.counts(run)
     return TEMPLATES.TemplateResponse(request, "run.html", {
-        "run": run, "nav": "run", "c": views.counts(run), "sections": sections,
+        "run": run, "nav": "run", "c": counts, "sections": sections,
+        "verdict": views.verdict(counts), "empty": not run.findings,
         "missed": [d for d in (run.score.details if run.score else []) if not d["ok"]],
         "n_fields": len(run.fields), "rule_maps": rule_maps,
     })

@@ -1,8 +1,14 @@
+import html
+from datetime import datetime, timezone
+from pathlib import Path
+
 import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.web import views
 from nparity import pipeline, store
+from nparity.models import Run
 from nparity.retry import RetryPolicy
 
 
@@ -51,6 +57,46 @@ def test_mapping_page(setup):
     assert r.status_code == 200
     for s in ("GET /clients/{clientId}", "llm", "none (dropped)", "string, required → string | null, optional"):
         assert s in r.text, s
+
+
+def test_verdict_with_regressions(setup):
+    client, run = setup
+    c = views.counts(run)
+    page = client.get(f"/runs/{run.id}").text
+    verdict = f"{c['regression']} regressions and {c['unsure']} unsure need review"
+    assert verdict in page
+    assert page.index(verdict) < page.index('class="counts"')
+    store.save(store.load("demo", Path(__file__).parent.parent / "runs"), app.state.runs_dir)
+    demo = client.get("/runs/demo").text
+    assert "3 regressions and 1 unsure need review" in demo
+    assert demo.index("3 regressions and 1 unsure need review") < demo.index('class="counts"')
+
+
+def test_verdict_clean_run(setup):
+    client, _ = setup
+    run = Run(id="clean", started_at=datetime.now(timezone.utc),
+              config={"old": "http://a", "new": "http://b", "backend": "x", "requests": 0, "endpoints": 0})
+    store.save(run, app.state.runs_dir)
+    page = client.get("/runs/clean").text
+    assert "No regressions found" in page
+    assert "None." not in page
+    assert page.count("Nothing to review") == 1
+
+
+def test_reason_once_when_expanded(setup):
+    client, run = setup
+    f = next(f for f in run.findings if f.status == "shown" and f.reason)
+    page = client.get(f"/runs/{run.id}").text
+    expanded = page.split('<details class="f" open', 1)[1].split("</details>", 1)[0]
+    assert expanded.count(html.escape(f.reason)) == 1
+    assert html.escape(f.reason) not in client.get(f"/runs/{run.id}/findings/{f.id}").text
+
+
+def test_no_dead_controls(setup):
+    client, run = setup
+    assert "ledger: stretch" not in client.get(f"/runs/{run.id}").text
+    for f in run.findings:
+        assert "disabled" not in client.get(f"/runs/{run.id}/findings/{f.id}").text
 
 
 def test_static_and_404(setup):

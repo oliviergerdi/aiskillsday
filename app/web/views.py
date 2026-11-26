@@ -127,6 +127,12 @@ def counts(run: Run) -> dict[str, int]:
             "noise": len(run.noise), "error": len(run.errors)}
 
 
+def verdict(c: dict[str, int]) -> tuple[str, str]:
+    if c["regression"] or c["unsure"]:
+        return f"{c['regression']} regressions and {c['unsure']} unsure need review", "reg" if c["regression"] else "uns"
+    return "No regressions found", "int"
+
+
 def declared_types(run: Run) -> dict[tuple[str, str], str]:
     return {(f.endpoint, f.path): f.type_info["declared"] for f in run.findings if "declared" in f.type_info}
 
