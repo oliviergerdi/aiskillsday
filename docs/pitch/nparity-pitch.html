@@ -736,8 +736,8 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
         <p class="body">Each remaining difference is checked against the change list in someone's head. None of the tools we found does this step.</p>
       </div>
     </div>
-    <p class="callout push">Engineers spend <span class="todo">X hours</span> per check going through <span class="todo">N differences</span> by hand, and the few regressions hide among noise and intended changes.</p>
-    <aside class="notes">Fill X and N from the stopwatch run on Petstore v2 to v3 before we present. Step 3 is the part nobody automates.</aside>
+    <p class="callout push">Petstore v2 to v3: <strong>39 differences</strong> to read. nParity took about <strong>20 seconds</strong>. By hand we estimate about <strong>2 hours</strong> <span class="todo">not yet timed</span>.</p>
+    <aside class="notes">39 differences and 20.4 s are measured (run 2026-11-26T105859-petstore: 20 endpoints, 25 regression, 13 unsure, 1 intended). The 2 hours is our estimate, not a stopwatch: 20 endpoints x 3 samples x 2 min per comparison, the same model as the problem definition. Say so. Step 3 is the part nobody automates.</aside>
   </section>
 
   <section class="slide" id="s15" aria-label="Alternatives and why now">
