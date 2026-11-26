@@ -141,7 +141,10 @@ function renderSteps(job) {
   });
 }
 
+let openTimer = null;
+
 function resetConsole() {
+  clearTimeout(openTimer);
   output.hidden = false;
   report.hidden = true;
   report.removeAttribute("href");
@@ -196,12 +199,14 @@ function fieldFromLoc(loc) {
 
 async function followJob(url) {
   let seen = 0;
+  let sawRunning = false;
   while (true) {
     const job = await getJSON(url, { cache: "no-store" });
     for (const line of job.lines.slice(seen)) appendLine(line);
     seen = job.lines.length;
     renderSteps(job);
     if (job.state === "running") {
+      sawRunning = true;
       statusText.textContent = "Running";
       await new Promise((resolve) => setTimeout(resolve, 400));
       continue;
@@ -212,9 +217,9 @@ async function followJob(url) {
       report.href = job.report_url;
       report.hidden = false;
     }
-    if (job.state === "complete") {
+    if (job.state === "complete" && sawRunning) {
       opening.hidden = false;
-      setTimeout(() => location.assign(job.report_url), 1500);
+      openTimer = setTimeout(() => location.replace(job.report_url), 1500);
     }
     return;
   }
