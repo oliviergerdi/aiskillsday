@@ -7,6 +7,9 @@ __pycache__/
 .venv/
 venv/
 
+# Local poetry config (only created by `poetry config ... --local`)
+poetry.toml
+
 # Secrets — FIREWORKS_API_KEY lives in the environment, never in the repo
 .env
 .env.*

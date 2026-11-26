@@ -66,7 +66,6 @@ uv sync
 
 That's it. uv resolves Python from `PATH` (so it picks up the mise/asdf 3.14), creates
 a `.venv/` in the project (gitignored) and installs dependencies from `uv.lock`.
-Set `UV_NATIVE_TLS=1` only if a corporate proxy breaks TLS.
 
 `[tool.uv] package = false` (and `package-mode = false` for Poetry) in `pyproject.toml` is
 deliberate: there is no importable `aiskillsday` package, so the project itself must not
@@ -78,6 +77,9 @@ pin the same versions, so Poetry is held to the cooldown too: after `uv lock`, a
 temporarily pinning the differing packages to the `uv.lock` versions, run `poetry lock`, restore
 `pyproject.toml`, and run `poetry lock` again. `tests/test_project_config.py` fails if the two
 locks drift.
+
+`exclude-newer` is a relative duration, so a fresh `uv lock` on a later day can resolve newer
+versions. The committed `uv.lock` is the source of truth; regenerate it deliberately.
 
 Poetry equivalents (Poetry 2.x still works):
 
@@ -122,6 +124,7 @@ Design and plan: `docs/nparity-design.md`, `docs/nparity-plan.md`. UI mockup: `d
 | `mise ERROR No version is set for python` | You're outside the repo (no `.tool-versions` applies). `cd` in, or set a default: `mise use -g python@3.14.0` |
 | `asdf: No preset version installed for command python` | `asdf install` in the repo root |
 | `asdf: No plugin named python` | `asdf plugin add python https://github.com/asdf-community/asdf-python.git` |
+| `uv sync` fails with a TLS / certificate error behind a corporate proxy | `UV_NATIVE_TLS=1 uv sync` (uses the system keychain) |
 | uv used the wrong Python | `uv sync --python "$(mise which python)"` (or `asdf where python`) |
 | Wrong Python version in a fresh shell | Both managers installed — disable one. For mise: remove `asdf` from the oh-my-zsh `plugins` list; for asdf: drop `eval "$(mise activate zsh)"` |
 

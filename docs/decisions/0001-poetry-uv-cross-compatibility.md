@@ -41,7 +41,7 @@ Make `pyproject.toml` the shared source of truth and support both tools during a
 - Easier: either tool installs from the same `pyproject.toml`. Contributors can move to uv at their own pace.
 - Harder: two locks must stay in sync until the transition ends. Resolvers can pick different versions, so "works on my machine" differences are possible. The CI checks above are required, not optional.
 - uv creates `.venv/` in the project by default, while Poetry keeps its venv in a cache. The README line "No `.venv/` in the project" must change. `.venv/` is already in `.gitignore`.
-- `poetry.toml` was removed from `.gitignore`. Add it back if someone needs a local Poetry config.
+- `poetry.toml` stays in `.gitignore` until Poetry is dropped.
 - A dependency released in the last 7 days cannot be locked. A new bound or pin must wait until the release is 7 days old. Bounds in this change were lowered for this reason.
 - Aligning `poetry.lock` takes the extra steps above. Dropping Poetry removes them.
 
@@ -52,3 +52,5 @@ Verified on 2026-11-26 in the UV-1 worktree, with `UV_NATIVE_TLS=1` for uv and a
 - uv: `uv lock --check`, `uv sync` and `uv run pytest -q` pass.
 - Poetry 2.5.1: `poetry check --lock`, `poetry install --no-interaction` and `poetry run pytest -q` pass.
 - `uv.lock` and `poetry.lock` pin identical versions.
+
+The CA bundle and the `sitecustomize` shim are local workarounds for the Zscaler proxy, not repo requirements. The repo has no CI yet, so the CI checks in the Decision section (`uv lock --check`, `poetry check --lock`) are a follow-up. The Poetry end date is also still to be set.

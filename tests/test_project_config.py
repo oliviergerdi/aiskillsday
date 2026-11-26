@@ -55,7 +55,7 @@ def test_design_doc_uses_uv_run_pytest():
 def test_uv_and_poetry_locks_pin_same_versions():
     def versions(name):
         pkgs = tomllib.loads((ROOT / name).read_text())["package"]
-        return {p["name"]: p["version"] for p in pkgs if p["name"] != "aiskillsday"}
+        return {p["name"].lower().replace("_", "-"): p["version"] for p in pkgs if p["name"] != "aiskillsday"}
 
     assert versions("uv.lock") == versions("poetry.lock")
 
