@@ -98,6 +98,16 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 #run-console { max-height: 240px; min-height: 100px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere;
   margin: 8px 0 12px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--code-bg); }
 .run-output [hidden] { display: none; }
+/* UX-7 progress steps */
+.run-steps { list-style: none; margin: 12px 0; padding: 0; display: grid; gap: 6px; }
+.run-steps li { color: var(--muted); }
+.run-step-marker { display: inline-block; min-width: 4.5em; font-size: 12px; font-weight: 600; text-transform: uppercase; }
+.run-steps li[data-state="running"] { color: var(--ink); font-weight: 600; }
+.run-steps li[data-state="running"] .run-step-marker { color: var(--accent); }
+.run-steps li[data-state="done"] .run-step-marker { color: var(--int); }
+.run-steps li[data-state="failed"] { color: var(--reg); font-weight: 600; }
+.run-step-error { display: block; margin-left: 4.5em; color: var(--reg); font-weight: 400; }
+.run-details summary { cursor: pointer; font-weight: 600; }
 .counts { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
 .count { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; border-top: 3px solid var(--line); }
 .count .n { font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
