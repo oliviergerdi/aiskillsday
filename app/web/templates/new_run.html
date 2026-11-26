@@ -1,12 +1,27 @@
 {% extends "base.html" %}
 {% block title %}New run · nParity{% endblock %}
 {% block content %}
-<div class="run-head">
-  <h1>New comparison</h1>
-  <div class="run-presets" aria-label="Comparison presets">
-    <button type="button" class="run-button" data-preset="toy">Load toy demo</button>
-    <button type="button" class="run-button" data-preset="petstore">Load Petstore</button>
+<section class="rerun" aria-labelledby="rerun-title">
+  <h1 id="rerun-title">Rerun a configuration</h1>
+  <div class="source-grid">
+    <div class="run-field">
+      <label for="rerun-config">Configuration</label>
+      <select id="rerun-config"></select>
+      <small class="sub" id="rerun-summary"></small>
+    </div>
+    <div class="run-field">
+      <label for="rerun-baseline">Compare with</label>
+      <select id="rerun-baseline"></select>
+      <small class="sub">New, unchanged and resolved findings are counted against this run.</small>
+    </div>
   </div>
+  <div class="run-presets">
+    <button type="button" class="run-button primary" id="rerun-start">Start rerun</button>
+    <button type="button" class="run-button" id="rerun-edit">Edit in form</button>
+  </div>
+</section>
+<div class="run-head">
+  <h2>New comparison</h2>
 </div>
 <form id="comparison-form" class="comparison-form">
   <div class="source-grid">
@@ -53,6 +68,10 @@
       <div class="run-field">
         <label for="run-intent">Intent file <span class="sub">(optional)</span></label>
         <input id="run-intent" name="intent" type="text" maxlength="4096" placeholder="fixtures/petstore/intent.md">
+      </div>
+      <div class="run-field">
+        <label class="check"><input id="run-save" name="save_config" type="checkbox"> Save as configuration</label>
+        <small class="sub">Saved under the run name in <code>comparisons/</code>, so it appears in the rerun menu.</small>
       </div>
     </div>
   </details>

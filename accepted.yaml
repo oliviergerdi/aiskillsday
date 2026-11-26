@@ -1,0 +1,61 @@
+entries:
+- scope: petstore
+  key: GET /pet/{petId} -> GET /pet/{petId} | $ | type_changed
+  endpoint: GET /pet/{petId}
+  path: $
+  kind: type_changed
+  decision: accept
+  by: G
+  at: '2026-11-26T15:04:03.303296+02:00'
+  note: My Note
+  run: 2026-11-26T150322-petstore-d840b8332559
+  model_label: regression
+  model_p: 0.9999539910584438
+- scope: petstore
+  key: GET /store/order/{orderId} -> GET /store/order/{orderId} | $ | type_changed
+  endpoint: GET /store/order/{orderId}
+  path: $
+  kind: type_changed
+  decision: accept
+  by: G
+  at: '2026-11-26T15:04:10.861396+02:00'
+  note: ''
+  run: 2026-11-26T150322-petstore-d840b8332559
+  model_label: regression
+  model_p: 0.9999593508262
+- scope: petstore
+  key: GET /store/order/{orderId} -> GET /store/order/{orderId} | $.code | missing_in_new
+  endpoint: GET /store/order/{orderId}
+  path: $.code
+  kind: missing_in_new
+  decision: accept
+  by: G
+  at: '2026-11-26T15:04:13.712349+02:00'
+  note: ''
+  run: 2026-11-26T150322-petstore-d840b8332559
+  model_label: regression
+  model_p: 0.999992610027306
+- scope: petstore
+  key: GET /store/order/{orderId} -> GET /store/order/{orderId} | $.complete | added_in_new
+  endpoint: GET /store/order/{orderId}
+  path: $.complete
+  kind: added_in_new
+  decision: reject
+  by: G
+  at: '2026-11-26T15:04:15.768064+02:00'
+  note: ''
+  run: 2026-11-26T150322-petstore-d840b8332559
+  model_label: regression
+  model_p: 0.9999781802380545
+- scope: petstore
+  key: GET /store/order/{orderId} -> GET /store/order/{orderId} | $.id | added_in_new
+  endpoint: GET /store/order/{orderId}
+  path: $.id
+  kind: added_in_new
+  decision: accept
+  by: G
+  at: '2026-11-26T15:04:24.472377+02:00'
+  note: ''
+  run: 2026-11-26T150322-petstore-d840b8332559
+  model_label: regression
+  model_p: 0.9998512510642201

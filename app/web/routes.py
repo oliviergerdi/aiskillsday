@@ -10,10 +10,16 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from app.web import views
+from app.web.configs import list_configs, load_config
 from app.web.run_jobs import RunInput, RunJobs
 from nparity import store
 from nparity.config import load_thresholds
 from nparity.models import Run
+from typing import Literal
+
+from pydantic import BaseModel, Field
+
+from nparity.review import Ledger, compare, finding_key, open_counts, review_states, scope_of, stale, verdict
 
 TEMPLATES = Jinja2Templates(directory=Path(__file__).parent / "templates")
 router = APIRouter()
@@ -29,6 +35,14 @@ def load(request: Request, run_id: str) -> Run:
         return store.load(run_id, runs_dir(request))
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail=f"No run {run_id}")
+
+
+def comparisons_dir(request: Request) -> Path:
+    return Path(getattr(request.app.state, "comparisons_dir", "comparisons"))
+
+
+def ledger(request: Request) -> Ledger:
+    return Ledger.load(getattr(request.app.state, "ledger_path", "accepted.yaml"))
 
 
 def thresholds(run: Run):
@@ -50,7 +64,7 @@ def new_run(request: Request):
 
 @router.post("/run-jobs", status_code=202, dependencies=[Depends(local_run_request)])
 def start_run(request: Request, inputs: RunInput):
-    job_id = jobs.start(inputs, runs_dir(request))
+    job_id = jobs.start(inputs, runs_dir(request), comparisons_dir(request))
     if job_id is None:
         raise HTTPException(status_code=409, detail="A comparison is already running. Try again when it finishes.")
     return {"job_url": f"/run-jobs/{job_id}"}
@@ -64,40 +78,113 @@ def run_status(job_id: str):
     return job
 
 
+@router.get("/comparisons", dependencies=[Depends(local_run_request)])
+def comparisons_list(request: Request):
+    return [{"name": c.name, "backend": c.backend, "before": c.before.source, "after": c.after.source}
+            for c in list_configs(comparisons_dir(request))]
+
+
+@router.get("/comparisons/{name}", dependencies=[Depends(local_run_request)])
+def comparison_detail(request: Request, name: str):
+    try:
+        config = load_config(name, comparisons_dir(request))
+    except (FileNotFoundError, ValueError):
+        raise HTTPException(status_code=404, detail=f"No configuration {name}")
+    led = ledger(request)
+    runs = [r for r in store.list_runs(runs_dir(request)) if r.config.get("config") == name]
+    return {"config": config.model_dump(mode="json", exclude={"save_config", "baseline"}),
+            "runs": [{"id": r.id, "started_at": r.started_at.isoformat(), "open": open_counts(r, led)["open"]}
+                     for r in runs]}
+
+
 @router.get("/", response_class=HTMLResponse)
 def runs_page(request: Request):
     runs = [(r, views.counts(r)) for r in store.list_runs(runs_dir(request))]
     return TEMPLATES.TemplateResponse(request, "runs.html", {"runs": runs, "nav": "runs"})
 
 
+def baseline_for(request: Request, run: Run, requested: str | None):
+    """(baseline run or None, same-scope candidates). `requested` ('' = none) overrides the stored one."""
+    candidates = [r for r in store.list_runs(runs_dir(request)) if scope_of(r) == scope_of(run) and r.id != run.id]
+    wanted = run.config.get("baseline") if requested is None else requested
+    base = next((r for r in candidates if r.id == wanted), None) if wanted else None
+    return base, candidates
+
+
 @router.get("/runs/{run_id}", response_class=HTMLResponse)
-def run_page(request: Request, run_id: str):
+def run_page(request: Request, run_id: str, baseline: str | None = None):
     run = load(request, run_id)
     th = thresholds(run)
-    body = TEMPLATES.get_template("_finding_body.html")
-    sections = defaultdict(list)
-    for f in run.findings:
-        sections[f.status or "unsure"].append(views.finding_view(run, f, th))
-    if sections["shown"]:                       # first regression opens server-side, the rest load via HTMX
-        first = sections["shown"][0]
-        first.body_html = body.render(v=first)
+    led = ledger(request)
+    base, candidates = baseline_for(request, run, baseline)
+    comparison = compare(run, base) if base else None
+    states = review_states(run, led)
+    sections = views.build_sections(run, states, th, comparison)
+    first = (sections["regression"] or sections["rejected"] or [None])[0]
+    if first is not None:                      # first open regression opens server-side, the rest via HTMX
+        first.body_html = TEMPLATES.get_template("_finding_body.html").render(v=first)
     rule_maps = sum(m.source == "rule" for m in run.endpoints) + sum(m.source == "rule" for m in run.fields)
-    counts = views.counts(run)
     return TEMPLATES.TemplateResponse(request, "run.html", {
-        "run": run, "nav": "run", "c": counts, "sections": sections,
-        "verdict": views.verdict(counts), "empty": not run.findings,
+        "run": run, "nav": "run", "c": views.review_counts(sections, run), "sections": sections,
+        "verdict": verdict(run, led), "empty": not run.findings,
         "missed": [d for d in (run.score.details if run.score else []) if not d["ok"]],
         "n_fields": len(run.fields), "rule_maps": rule_maps,
+        "comparison": comparison, "baseline": base, "candidates": candidates,
+        "scope": scope_of(run),
     })
+
+
+def find(run: Run, fid: str):
+    f = next((x for x in run.findings + run.errors if x.id == fid), None)
+    if f is None:
+        raise HTTPException(status_code=404, detail=f"No finding {fid}")
+    return f
 
 
 @router.get("/runs/{run_id}/findings/{fid}", response_class=HTMLResponse)
 def finding_partial(request: Request, run_id: str, fid: str):
     run = load(request, run_id)
-    f = next((x for x in run.findings + run.errors if x.id == fid), None)
-    if f is None:
-        raise HTTPException(status_code=404, detail=f"No finding {fid}")
-    return TEMPLATES.TemplateResponse(request, "_finding_body.html", {"v": views.finding_view(run, f, thresholds(run))})
+    v = views.review_view(run, find(run, fid), thresholds(run), review_states(run, ledger(request)))
+    return TEMPLATES.TemplateResponse(request, "_finding_body.html", {"v": v})
+
+
+@router.get("/runs/{run_id}/signoff", response_class=HTMLResponse)
+def signoff_page(request: Request, run_id: str):
+    run = load(request, run_id)
+    th = thresholds(run)
+    led = ledger(request)
+    base, _ = baseline_for(request, run, None)
+    states = review_states(run, led)
+    sections = views.build_sections(run, states, th, compare(run, base) if base else None)
+    return TEMPLATES.TemplateResponse(request, "signoff.html", {
+        "run": run, "nav": "run", "verdict": verdict(run, led), "oc": open_counts(run, led),
+        "open_items": sections["rejected"] + sections["regression"] + sections["unsure"],
+        "accepted": sections["accepted"], "intended": sections["intended"],
+        "stale": stale(run, led), "th": th, "baseline": base,
+        "comparison": compare(run, base) if base else None, "scope": scope_of(run),
+    })
+
+
+class DecisionIn(BaseModel):
+    decision: Literal["accept", "reject"]
+    by: str = Field(min_length=1, max_length=80, pattern=r"\S")
+    note: str = Field(default="", max_length=500)
+
+
+@router.post("/runs/{run_id}/findings/{fid}/decision", dependencies=[Depends(local_run_request)])
+def record_decision(request: Request, run_id: str, fid: str, body: DecisionIn):
+    run = load(request, run_id)
+    f = find(run, fid)
+    if f.status == "error":
+        raise HTTPException(status_code=422, detail="Errors need a rerun, not a decision.")
+    entry = ledger(request).record(run, f, body.decision, body.by, body.note)
+    return {"entry": entry.model_dump(mode="json")}
+
+
+@router.delete("/runs/{run_id}/findings/{fid}/decision", dependencies=[Depends(local_run_request)])
+def undo_decision(request: Request, run_id: str, fid: str):
+    run = load(request, run_id)
+    return {"removed": ledger(request).remove(scope_of(run), finding_key(find(run, fid)))}
 
 
 @router.get("/runs/{run_id}/mapping", response_class=HTMLResponse)

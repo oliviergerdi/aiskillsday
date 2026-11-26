@@ -19,10 +19,11 @@ def setup(tmp_path_factory):
     run = pipeline.run(pipeline.RunConfig(old="http://testserver/v1", new="http://testserver/v2", workers=1,
                                           retry=RetryPolicy(base=0.0)), client)
     store.save(run, d)
-    before = app.state.runs_dir
+    before, before_ledger = app.state.runs_dir, app.state.ledger_path
     app.state.runs_dir = d
+    app.state.ledger_path = d / "accepted.yaml"          # never the repo's real ledger
     yield client, run
-    app.state.runs_dir = before
+    app.state.runs_dir, app.state.ledger_path = before, before_ledger
 
 
 def test_runs_page(setup):
@@ -69,16 +70,16 @@ def test_mapping_page(setup):
 
 
 def test_verdict_with_regressions(setup):
+    """PRD 0001 verdict: open items from review state (UX-2 placement kept)."""
     client, run = setup
-    c = views.counts(run)
     page = client.get(f"/runs/{run.id}").text
-    verdict = f"{c['regression']} regressions and {c['unsure']} unsure need review"
+    verdict = "4 open items: 0 confirmed regressions, 4 need review"
     assert verdict in page
     assert page.index(verdict) < page.index('class="counts"')
     store.save(store.load("demo", Path(__file__).parent.parent / "runs"), app.state.runs_dir)
     demo = client.get("/runs/demo").text
-    assert "3 regressions and 1 unsure need review" in demo
-    assert demo.index("3 regressions and 1 unsure need review") < demo.index('class="counts"')
+    assert verdict in demo
+    assert demo.index(verdict) < demo.index('class="counts"')
 
 
 def test_verdict_clean_run(setup):
@@ -87,7 +88,7 @@ def test_verdict_clean_run(setup):
               config={"old": "http://a", "new": "http://b", "backend": "x", "requests": 0, "endpoints": 0})
     store.save(run, app.state.runs_dir)
     page = client.get("/runs/clean").text
-    assert "No regressions found" in page
+    assert "Ready to cut over" in page
     assert "None." not in page
     assert page.count("Nothing to review") == 1
 

@@ -1,0 +1,7 @@
+name: toy
+before: {kind: api, source: "http://localhost:8000/v1", base_url: ""}
+after: {kind: api, source: "http://localhost:8000/v2", base_url: ""}
+seeds: fixtures/seeds.yaml
+intent: fixtures/intent.md
+backend: fake
+score: true

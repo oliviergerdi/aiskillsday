@@ -1,0 +1,7 @@
+name: petstore
+before: {kind: spec, source: "https://petstore.swagger.io/v2/swagger.json", base_url: "https://petstore.swagger.io/v2"}
+after: {kind: spec, source: "https://petstore3.swagger.io/api/v3/openapi.json", base_url: "https://petstore3.swagger.io/api/v3"}
+seeds: fixtures/petstore/seeds.yaml
+intent: fixtures/petstore/intent.md
+backend: flash
+score: false

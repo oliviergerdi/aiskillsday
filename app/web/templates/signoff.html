@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Sign-off · {{ run.id }} · nParity{% endblock %}
+{% block content %}
+<div class="crumbs noprint"><a href="/">Runs</a> / <a href="/runs/{{ run.id }}">{{ run.id }}</a> / sign-off</div>
+<div class="run-head">
+  <div>
+    <h1>Cutover sign-off</h1>
+    <div class="sub">{{ run.config.old }} → {{ run.config.new }} · scope <code>{{ scope }}</code> · run {{ run.id }},
+      {{ run.started_at.astimezone().strftime("%d %b %Y %H:%M") }} · backend {{ run.config.backend }}</div>
+    {% if comparison %}<div class="sub">vs {{ baseline.started_at.astimezone().strftime("%d %b %H:%M") }} run ({{ baseline.id }}):
+      {{ comparison.counts.new }} new · {{ comparison.counts.unchanged }} unchanged · {{ comparison.counts.resolved }} resolved</div>{% endif %}
+  </div>
+  <button type="button" class="run-button noprint" onclick="window.print()">Print</button>
+</div>
+
+<div class="verdict {{ verdict[1] }}">{{ verdict[0] }}</div>
+
+<h2>Open items <span class="sub">{{ oc.open }} · confirmed regressions first</span></h2>
+{% if open_items or run.errors %}
+<div class="table-scroll"><table>
+  <thead><tr><th>Status</th><th>Endpoint</th><th>Path</th><th>Kind</th><th>Model</th><th class="num">p</th><th>Reason / decision</th></tr></thead>
+  <tbody>
+  {% for v in open_items %}
+    <tr>
+      <td>{% if v.state == "rejected" %}<span class="badge b-reg">confirmed regression</span>{% else %}<span class="badge {{ 'b-reg' if v.f.status == 'shown' else 'b-uns' }}">needs review</span>{% endif %}</td>
+      <td><code>{{ v.f.endpoint }}</code></td><td><code>{{ v.f.path }}</code></td><td>{{ v.f.kind }}</td>
+      <td>{{ v.f.label or "—" }}</td><td class="num">{{ v.p_text }}</td>
+      <td>{% if v.entry %}Rejected by {{ v.entry.by }}, {{ v.entry.at.strftime("%d %b %H:%M") }}{% if v.entry.note %}: “{{ v.entry.note }}”{% endif %}{% else %}{{ v.f.reason or "" }}{% endif %}</td>
+    </tr>
+  {% endfor %}
+  {% for e in run.errors %}
+    <tr><td><span class="badge b-err">error</span></td><td><code>{{ e.endpoint }}</code></td><td><code>{{ e.path }}</code></td>
+      <td colspan="3">rerun needed</td><td>{{ e.reason }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% else %}<div class="findings"><div class="empty">Nothing open.</div></div>{% endif %}
+
+<h2>Accepted by reviewer <span class="sub">{{ accepted|length }}</span></h2>
+{% if accepted %}
+<div class="table-scroll"><table>
+  <thead><tr><th>Endpoint</th><th>Path</th><th>Kind</th><th>Accepted by</th><th>When</th><th>Note</th><th>Model said</th></tr></thead>
+  <tbody>
+  {% for v in accepted %}
+    <tr><td><code>{{ v.f.endpoint }}</code></td><td><code>{{ v.f.path }}</code></td><td>{{ v.f.kind }}</td>
+      <td>{{ v.entry.by }}</td><td>{{ v.entry.at.strftime("%d %b %H:%M") }}</td><td>{{ v.entry.note }}</td>
+      <td>{{ v.entry.model_label or "—" }}{% if v.entry.model_p is not none %} p={{ "%.3f"|format(v.entry.model_p) }}{% endif %}{% if v.entry.run != run.id %} <span class="sub">(run {{ v.entry.run }})</span>{% endif %}</td></tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% else %}<p class="sub">None.</p>{% endif %}
+
+<h2>Intended, per the model <span class="sub">{{ intended|length }} · p ≥ {{ th.triage_intended.auto_accept }} against the intent note</span></h2>
+{% if intended %}
+<ul class="plain">{% for v in intended %}<li><code>{{ v.f.endpoint }}</code> <code>{{ v.f.path }}</code> · {{ v.f.kind }} · p={{ v.p_text }}</li>{% endfor %}</ul>
+{% else %}<p class="sub">None.</p>{% endif %}
+
+{% if stale %}
+<h2>No longer seen <span class="sub">ledger entries in this scope with no matching finding</span></h2>
+<ul class="plain">{% for e in stale %}<li>{{ e.decision }} · <code>{{ e.endpoint }}</code> <code>{{ e.path }}</code> · {{ e.kind }} · by {{ e.by }}, {{ e.at.strftime("%d %b %H:%M") }}</li>{% endfor %}</ul>
+{% endif %}
+
+<h2>How this was decided</h2>
+<ul class="plain">
+  {% if run.score %}<li>Answer key: {{ run.score.correct }}/{{ run.score.total }} correct, {{ run.score.false_regressions }} false regressions</li>{% endif %}
+  <li>Thresholds: mapping accepted at p ≥ {{ th.mapping.auto_accept }}; intended at p ≥ {{ th.triage_intended.auto_accept }}; regression at p ≥ {{ th.triage_regression.auto_accept }}; anything below its bar goes to a human</li>
+  <li>{{ run.config.requests }} requests across {{ run.config.endpoints }} endpoints · {{ run.noise|length }} noise rules applied · {{ run.telemetry.rule_decisions }} decisions by rule, {{ run.telemetry.llm_calls }} by LLM · {{ "%.1f"|format(run.telemetry.seconds) }} s · ${{ "%.4f"|format(run.telemetry.cost_usd) }}</li>
+</ul>
+<p class="sub">Names are typed, not authenticated (prototype).</p>
+{% endblock %}

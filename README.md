@@ -44,7 +44,7 @@ From inside the repo, `python --version` must print 3.14.x.
 
 ```bash
 uv sync                    # creates .venv/ in the repo (gitignored) from uv.lock
-UV_NATIVE_TLS=1 uv sync    # the same, behind a TLS-inspecting corporate proxy
+uv sync --system-certs     # the same, behind a TLS-inspecting corporate proxy (or UV_NATIVE_TLS=1)
 ```
 
 Poetry still works from the same `pyproject.toml`:
@@ -234,7 +234,7 @@ Writes `proto/raw/<EXP>_<n>.json` and `proto/results.json`.
 | Symptom | Fix |
 |---|---|
 | `CERTIFICATE_VERIFY_FAILED` on a live run | `uv sync` so `truststore` is installed; it verifies against the macOS keychain |
-| `uv sync` fails with a TLS / certificate error | `UV_NATIVE_TLS=1 uv sync` |
+| `uv sync` / `uv run` fails with `invalid peer certificate: UnknownIssuer` | Corporate TLS proxy: add `--system-certs` (`uv run --system-certs pytest -q`) or `export UV_NATIVE_TLS=1` for the session. Only needed while uv downloads packages |
 | Live tests say `SKIPPED (FIREWORKS_API_KEY not set)` | The key didn't reach the process. Use the inline form exactly as above; `nexus key export` takes no arguments |
 | Flash answers come back as `LLM error: ...` / every triage is unsure | Fireworks unreachable or the key is wrong. The run still completes; errors are marked, not hidden |
 | Web form: "Set FIREWORKS_API_KEY in the server environment" | Start `uvicorn` with the inline key (see Web UI) |

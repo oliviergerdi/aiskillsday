@@ -13,26 +13,18 @@ import httpx
 import yaml
 from pydantic import BaseModel, Field, ValidationError
 
-from app.web.run_sources import InputError, SourceInput, local_file, resolve_source
+from app.web.configs import DEFAULT_DIR as CONFIGS_DIR, RunInput, config_path, save_config
+from app.web.run_sources import InputError, local_file, resolve_source
 from nparity import pipeline, store
 from nparity.config import Seeds, load_seeds
 from nparity.evaluator.fake import FakeBackend
 from nparity.models import AnswerKey
 from nparity.retry import RetryPolicy
+from nparity.review import latest_baseline, scope_of
 from nparity.tls import tls_verify
 
 LOG = logging.getLogger(__name__)
 HISTORY_LIMIT = 32
-
-
-class RunInput(BaseModel):
-    before: SourceInput
-    after: SourceInput
-    seeds: str = Field(default="", max_length=4096)
-    intent: str = Field(default="", max_length=4096)
-    backend: Literal["fake", "flash"] = "fake"
-    name: str = Field(default="comparison", max_length=50, pattern=r"^[a-zA-Z0-9_-]+$")
-    score: bool = False
 
 
 @dataclass
@@ -47,7 +39,7 @@ class RunJobs:
         self.jobs: dict[str, Job] = {}
         self.lock = Lock()
 
-    def start(self, inputs: RunInput, directory: Path) -> str | None:
+    def start(self, inputs: RunInput, directory: Path, configs: Path = CONFIGS_DIR) -> str | None:
         with self.lock:
             if any(job.state == "running" for job in self.jobs.values()):
                 return None
@@ -55,7 +47,7 @@ class RunJobs:
                 del self.jobs[next(iter(self.jobs))]
             job_id = uuid4().hex
             job = self.jobs[job_id] = Job()
-            Thread(target=self.run, args=(job_id, job, inputs, directory), daemon=True).start()
+            Thread(target=self.run, args=(job_id, job, inputs, directory, configs), daemon=True).start()
             return job_id
 
     def status(self, job_id: str) -> dict | None:
@@ -65,13 +57,13 @@ class RunJobs:
                 return {"state": job.state, "lines": list(job.lines), "report_url": job.report_url}
         return None
 
-    def run(self, job_id: str, job: Job, inputs: RunInput, directory: Path) -> None:
+    def run(self, job_id: str, job: Job, inputs: RunInput, directory: Path, configs: Path = CONFIGS_DIR) -> None:
         def progress(message: str) -> None:
             with self.lock:
                 job.lines.append(message)
 
         try:
-            report_id = compare(job_id, inputs, directory, progress)
+            report_id = compare(job_id, inputs, directory, progress, configs)
         except InputError as exc:
             message = str(exc)
         except httpx.HTTPStatusError as exc:
@@ -94,7 +86,8 @@ class RunJobs:
             job.state = "failed"
 
 
-def compare(job_id: str, inputs: RunInput, directory: Path, progress: Callable[[str], None]) -> str:
+def compare(job_id: str, inputs: RunInput, directory: Path, progress: Callable[[str], None],
+            configs: Path = CONFIGS_DIR) -> str:
     if inputs.backend == "flash" and not os.environ.get("FIREWORKS_API_KEY"):
         raise InputError("Set FIREWORKS_API_KEY in the server environment to use Flash.")
     defaults = pipeline.RunConfig("", "")
@@ -133,6 +126,27 @@ def compare(job_id: str, inputs: RunInput, directory: Path, progress: Callable[[
         else:
             raise InputError("Choose saved responses for both sides to compare captures. Specs from a manifest can be combined with live API sources.")
 
+    if inputs.save_config:
+        save_config(inputs, configs)
+        progress(f"Saved configuration {inputs.name}")
+    if config_path(inputs.name, configs).is_file():
+        run.config["config"] = inputs.name
+    run.config["baseline"] = resolve_baseline(inputs.baseline, run, directory)
+    if run.config["baseline"]:
+        progress(f"Baseline: {run.config['baseline']}")
     progress(f"Saving report with {len(run.findings)} findings and {len(run.errors)} errors")
     store.save(run, directory)
     return run.id
+
+
+def resolve_baseline(choice: str, run, directory: Path) -> str | None:
+    """'auto' = newest earlier run in the same scope; '' = none; otherwise an existing run id."""
+    if not choice:
+        return None
+    if choice == "auto":
+        b = latest_baseline(scope_of(run), store.list_runs(directory), before=run.started_at, exclude=run.id)
+        return b.id if b else None
+    try:
+        return store.load(choice, directory).id
+    except (FileNotFoundError, ValueError):
+        return None

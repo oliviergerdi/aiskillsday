@@ -46,6 +46,10 @@ class FindingView:
     new_lines: list[Line] = field(default_factory=list)
     samples: list[tuple[str, str]] = field(default_factory=list)
     body_html: str = ""
+    run_id: str = ""
+    state: str | None = None          # review state (PRD 0001): needs_review | intended_model | accepted | rejected
+    entry: Any = None                 # ledger Entry when a human decided
+    baseline_status: str | None = None   # new | unchanged, when compared with a baseline
 
 
 def request_line(s: Sample, side: str) -> str:
@@ -139,3 +143,41 @@ def declared_types(run: Run) -> dict[tuple[str, str], str]:
 
 def value_text(v: Any) -> str:
     return "absent" if v is MISSING else json.dumps(v, ensure_ascii=False)
+
+
+# ---- PRD 0001: review sections (formatting only; state comes from nparity.review) ----
+
+SECTION_ORDER = ("rejected", "regression", "unsure", "intended", "accepted")
+
+
+def review_view(run: Run, f: Finding, th: Thresholds, states: dict, comparison=None) -> FindingView:
+    v = finding_view(run, f, th)
+    v.run_id = run.id
+    if f.status != "error":
+        v.state, v.entry = states.get(f.id, (None, None))
+    if comparison is not None:
+        v.baseline_status = comparison.status.get(f.id)
+    return v
+
+
+def build_sections(run: Run, states: dict, th: Thresholds, comparison=None) -> dict[str, list[FindingView]]:
+    """rejected | regression (to review) | unsure (to review) | intended (model) | accepted (reviewer)."""
+    out: dict[str, list[FindingView]] = {k: [] for k in SECTION_ORDER}
+    for f in run.findings:
+        state = states.get(f.id, ("needs_review", None))[0]
+        if state == "rejected":
+            key = "rejected"
+        elif state == "accepted":
+            key = "accepted"
+        elif state == "intended_model":
+            key = "intended"
+        else:
+            key = "regression" if f.status == "shown" else "unsure"
+        out[key].append(review_view(run, f, th, states, comparison))
+    return out
+
+
+def review_counts(sections: dict[str, list[FindingView]], run: Run) -> dict[str, int]:
+    return {"rejected": len(sections["rejected"]), "regression": len(sections["regression"]),
+            "unsure": len(sections["unsure"]), "intended": len(sections["intended"]),
+            "accepted": len(sections["accepted"]), "noise": len(run.noise), "error": len(run.errors)}

@@ -20,3 +20,4 @@
   <ul>{% for req, state in v.samples %}<li><code>{{ req }}</code> · {% if state == "differs" %}<b>differs</b>{% else %}{{ state }}{% endif %}</li>{% endfor %}</ul>
 </div>
 {% endif %}
+{% if v.state %}{% include "_decision.html" %}{% endif %}

@@ -4,7 +4,6 @@ const output = document.querySelector(".run-output");
 const statusText = document.querySelector("#run-status");
 const consoleOutput = document.querySelector("#run-console");
 const report = document.querySelector("#run-report");
-const presets = document.querySelectorAll("[data-preset]");
 const toyDemo = {
   before: location.origin + "/v1",
   after: location.origin + "/v2",
@@ -33,32 +32,69 @@ for (const panel of panels) {
   updateSource(panel);
 }
 
-for (const button of presets) {
-  button.addEventListener("click", () => {
-    const toy = button.dataset.preset === "toy";
-    const before = toy ? toyDemo.before : "https://petstore.swagger.io/v2";
-    const after = toy ? toyDemo.after : "https://petstore3.swagger.io/api/v3";
-    const values = {
-      before_kind: toy ? "api" : "spec",
-      after_kind: toy ? "api" : "spec",
-      before_source: toy ? before : before + "/swagger.json",
-      after_source: toy ? after : after + "/openapi.json",
-      before_base: toy ? "" : before,
-      after_base: toy ? "" : after,
-      name: toy ? "toy" : "petstore",
-      backend: toy ? "fake" : "flash",
-      seeds: toy ? toyDemo.seeds : "fixtures/petstore/seeds.yaml",
-      intent: toy ? toyDemo.intent : "fixtures/petstore/intent.md",
-    };
-    for (const [name, value] of Object.entries(values)) form.elements[name].value = value;
-    for (const panel of panels) updateSource(panel);
-    form.querySelector(".run-settings").open = true;
-  });
+const rerunSelect = document.querySelector("#rerun-config");
+const rerunBaseline = document.querySelector("#rerun-baseline");
+const rerunSummary = document.querySelector("#rerun-summary");
+const rerunStart = document.querySelector("#rerun-start");
+const rerunEdit = document.querySelector("#rerun-edit");
+let loadedConfig = null;   // the configuration currently shown in the rerun menu
+
+function option(value, label) {
+  const o = document.createElement("option");
+  o.value = value;
+  o.textContent = label;
+  return o;
 }
+
+function when(iso) {
+  return new Date(iso).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+}
+
+async function loadConfig(name) {
+  const data = await getJSON("/comparisons/" + encodeURIComponent(name), { cache: "no-store" });
+  loadedConfig = data.config;
+  const c = data.config;
+  rerunSummary.textContent = `${c.before.source} → ${c.after.source} · ${c.backend}${c.score ? " · scored" : ""}`;
+  const choices = [option("auto", data.runs.length ? `Latest: ${when(data.runs[0].started_at)} (${data.runs[0].open} open)` : "Latest (no runs yet)")];
+  for (const r of data.runs) choices.push(option(r.id, `${when(r.started_at)} · ${r.open} open · ${r.id}`));
+  choices.push(option("", "None"));
+  rerunBaseline.replaceChildren(...choices);
+}
+
+async function loadConfigs() {
+  try {
+    const configs = await getJSON("/comparisons", { cache: "no-store" });
+    rerunSelect.replaceChildren(...configs.map((c) => option(c.name, `${c.name} (${c.backend})`)));
+    if (configs.length) await loadConfig(configs[0].name);
+    else rerunSummary.textContent = "No saved configurations yet. Tick “Save as configuration” below.";
+  } catch (error) {
+    rerunSummary.textContent = error.message;
+  }
+}
+
+rerunSelect.addEventListener("change", () => loadConfig(rerunSelect.value).catch(showError));
+
+rerunEdit.addEventListener("click", () => {
+  if (!loadedConfig) return;
+  const c = loadedConfig;
+  const values = {
+    before_kind: c.before.kind, before_source: c.before.source, before_base: c.before.base_url || "",
+    after_kind: c.after.kind, after_source: c.after.source, after_base: c.after.base_url || "",
+    name: c.name, backend: c.backend, seeds: c.seeds, intent: c.intent,
+  };
+  for (const [name, value] of Object.entries(values)) form.elements[name].value = value;
+  for (const panel of panels) updateSource(panel);
+  form.querySelector(".run-settings").open = true;
+  form.scrollIntoView({ block: "start" });
+});
+
+rerunStart.addEventListener("click", () => {
+  if (loadedConfig) startJob({ ...loadedConfig, baseline: rerunBaseline.value });
+});
 
 function setRunning(running) {
   submit.disabled = running;
-  for (const button of presets) button.disabled = running;
+  rerunStart.disabled = running;
 }
 
 function resetConsole() {
@@ -108,7 +144,30 @@ function showError(error) {
   appendLine(error.message);
 }
 
-form.addEventListener("submit", async (event) => {
+async function startJob(body) {
+  resetConsole();
+  output.scrollIntoView({ block: "nearest" });
+  statusText.textContent = "Starting";
+  setRunning(true);
+  try {
+    const { job_url } = await getJSON("/run-jobs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const url = new URL(location.href);
+    url.searchParams.set("job", job_url.split("/").at(-1));
+    history.replaceState(null, "", url);
+    await followJob(job_url);
+    loadConfigs();
+  } catch (error) {
+    showError(error);
+  } finally {
+    setRunning(false);
+  }
+}
+
+form.addEventListener("submit", (event) => {
   event.preventDefault();
   const values = new FormData(form);
   const source = (side) => ({
@@ -121,37 +180,20 @@ form.addEventListener("submit", async (event) => {
   const backend = values.get("backend");
   const seeds = values.get("seeds").trim();
   const intent = values.get("intent").trim();
+  const name = values.get("name").trim() || "comparison";
   const scoreDemo = before.kind === "api" && before.source === toyDemo.before
     && after.kind === "api" && after.source === toyDemo.after
     && backend === "fake" && seeds === toyDemo.seeds && intent === toyDemo.intent;
-  resetConsole();
-  output.scrollIntoView({ block: "nearest" });
-  statusText.textContent = "Starting";
-  setRunning(true);
-  try {
-    const { job_url } = await getJSON("/run-jobs", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        before,
-        after,
-        backend,
-        name: values.get("name").trim() || "comparison",
-        seeds,
-        intent,
-        score: scoreDemo,
-      }),
-    });
-    const url = new URL(location.href);
-    url.searchParams.set("job", job_url.split("/").at(-1));
-    history.replaceState(null, "", url);
-    await followJob(job_url);
-  } catch (error) {
-    showError(error);
-  } finally {
-    setRunning(false);
-  }
+  const fromConfig = loadedConfig && loadedConfig.name === name ? loadedConfig.score : false;
+  startJob({
+    before, after, backend, name, seeds, intent,
+    score: scoreDemo || fromConfig,
+    save_config: values.get("save_config") === "on",
+    baseline: "auto",
+  });
 });
+
+loadConfigs();
 
 const jobId = new URLSearchParams(location.search).get("job");
 if (jobId && /^[a-f0-9]{32}$/.test(jobId)) {

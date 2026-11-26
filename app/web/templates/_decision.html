@@ -1,0 +1,21 @@
+<div class="decision" data-run="{{ v.run_id }}" data-finding="{{ v.f.id }}">
+{% if v.entry %}
+  <p class="decided {{ 'acc' if v.entry.decision == 'accept' else 'rej' }}">
+    <b>{{ "Accepted" if v.entry.decision == "accept" else "Rejected as a regression" }}</b> by {{ v.entry.by }}, {{ v.entry.at.strftime("%d %b %H:%M") }}{% if v.entry.note %}: “{{ v.entry.note }}”{% endif %}
+    <span class="sub">· model said {{ v.entry.model_label or "—" }}{% if v.entry.model_p is not none %} p={{ "%.3f"|format(v.entry.model_p) }}{% endif %}{% if v.entry.run != v.run_id %} · decided in run {{ v.entry.run }}{% endif %}</span>
+  </p>
+  <button type="button" class="run-button" data-undo>Undo</button>
+{% else %}
+  <div class="decision-actions">
+    <button type="button" class="run-button" data-decide="accept">Accept</button>
+    <button type="button" class="run-button" data-decide="reject">Reject</button>
+    <span class="sub">Accept: this difference is fine. Reject: it's a real bug and blocks cutover.</span>
+  </div>
+  <form class="decision-form" hidden>
+    <input name="by" placeholder="Your name" required maxlength="80" autocomplete="name">
+    <input name="note" placeholder="Note (optional)" maxlength="500">
+    <button type="submit" class="run-button primary">Save</button>
+    <button type="button" class="run-button" data-cancel>Cancel</button>
+  </form>
+{% endif %}
+</div>

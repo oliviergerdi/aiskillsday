@@ -165,3 +165,32 @@ details.f > summary:hover { background: var(--code-bg); }
   header.top .wrap { gap: 12px; }
   .brand span { display: none; }
 }
+
+/* PRD 0001: rerun menu */
+.rerun { margin-bottom: 28px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.rerun h1 { font-size: 18px; margin-bottom: 8px; }
+.rerun .run-presets { margin-top: 12px; }
+label.check { display: flex; gap: 8px; align-items: center; font-weight: 400; }
+
+/* PRD 0001: decisions */
+.decision { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.decision-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.decision-form { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.decision-form input { padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); }
+.decided { margin: 0 0 8px; }
+.decided.acc b { color: var(--int); }
+.decided.rej b { color: var(--reg); }
+
+/* PRD 0001: run page */
+.head-links { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.baseline-line { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0 0; font-size: 14px; }
+.baseline-line select { max-width: 360px; }
+
+/* PRD 0001: sign-off */
+ul.plain { padding-left: 18px; }
+ul.plain li { margin: 4px 0; }
+@media print {
+  header.top, nav, .noprint, .run-button, .decision { display: none !important; }
+  body { background: #fff; color: #000; }
+  .table-scroll { overflow: visible; }
+}
