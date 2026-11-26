@@ -70,6 +70,8 @@ def summary(r: Run) -> str:
     ]
     if banner := r.basic_checks_summary():
         out.insert(1, banner)
+    if notice := r.independent_data_summary():
+        out.insert(1, notice)
     if r.contract:
         out.append(f"Declared differences: {len(r.contract)}")
     if reg:

@@ -124,7 +124,7 @@ def compact_run(run: Run, filters: list[FindingFilter] | None = None, endpoint: 
             "contract_compared": sum(row.contract_compared for row in run.coverage),
             "behaviour_compared": sum(row.compared > 0 for row in run.coverage),
         },
-        "warning": run.basic_checks_summary(),
+        "warning": run.basic_checks_summary() or run.independent_data_summary(),
         "findings": [_finding_summary(f) for f in selected[offset:offset + limit]],
         "page": {"total": len(selected), "limit": limit, "offset": offset,
                  "next_offset": offset + limit if offset + limit < len(selected) else None},

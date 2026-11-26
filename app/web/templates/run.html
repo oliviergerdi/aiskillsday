@@ -18,6 +18,9 @@
 {% if run.basic_checks_summary() %}
 <p class="limited-comparison"><strong>{{ run.basic_checks_summary() }}</strong> Only status codes and response shapes are checked for the supplied GET requests.</p>
 {% endif %}
+{% if run.independent_data_summary() %}
+<p class="limited-comparison">{{ run.independent_data_summary() }}</p>
+{% endif %}
 
 <form class="baseline-line" method="get">
   <span class="sub">Scope <code>{{ scope }}</code> ·</span>

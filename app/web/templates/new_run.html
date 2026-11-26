@@ -62,7 +62,7 @@
   <div class="run-field">
     <label for="run-intent-text">What was this change meant to do?</label>
     <textarea id="run-intent-text" name="intent_text" required maxlength="20000" rows="6" aria-describedby="intent-hint" placeholder="Example: Customers move from GET /customers/{id} to GET /clients/{clientId}. The field fullName is renamed to name. Nothing else should change."></textarea>
-    <small class="sub" id="intent-hint">Required for now: without an intent note every difference is flagged as a regression.</small>
+    <small class="sub" id="intent-hint">Describe expected changes so nParity can identify possible regressions. If the APIs use separate datasets, say so here. Replay will focus on status codes and response shapes.</small>
     <small class="field-error" role="alert" data-error-for="intent_text" hidden></small>
   </div>
   <p class="sub seed-guidance">

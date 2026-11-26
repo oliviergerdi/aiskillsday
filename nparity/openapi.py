@@ -22,6 +22,8 @@ class Endpoint:
     parameters: list[dict] = field(default_factory=list)
     request_body: dict = field(default_factory=dict)
     responses: dict = field(default_factory=dict)
+    consumes: list[str] = field(default_factory=list)
+    produces: list[str] = field(default_factory=list)
 
     @property
     def key(self) -> str:
@@ -106,6 +108,8 @@ def endpoints(spec: dict[str, Any]) -> list[Endpoint]:
             ep.request_body = resolve(op.get("requestBody") or body_param, spec)
             ep.has_body = bool(ep.request_body)
             ep.responses = resolve(op.get("responses", {}), spec)
+            ep.consumes = op.get("consumes", spec.get("consumes", []))
+            ep.produces = op.get("produces", spec.get("produces", []))
             ep.response_schema = _response_schema(op, spec)
             out.append(ep)
     return sorted(out, key=lambda e: (e.path, e.method))

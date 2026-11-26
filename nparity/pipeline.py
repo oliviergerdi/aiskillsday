@@ -24,7 +24,7 @@ from nparity.openapi import Endpoint, endpoints, load_spec
 from nparity.replay import replay, replay_pairs, to_new
 from nparity.retry import RetryPolicy
 from nparity.score import score
-from nparity.triage import triage
+from nparity.triage import intent_declares_independent_data, triage
 
 STAGES = (
     ("Loading ", "load"),
@@ -165,6 +165,8 @@ def run(
 
     old_h = headers.resolve(cfg.old_headers, "old")     # before any request: a missing variable fails fast
     new_h = headers.resolve(cfg.new_headers, "new")
+    intent = Path(cfg.intent).read_text(encoding="utf-8") if cfg.intent is not None and not cfg.contract_only else ""
+    independent_data = intent_declares_independent_data(intent)
 
     progress("Reading API endpoints")
     old_spec, new_spec = specs or _specs(cfg, client, old_h, new_h)
@@ -219,10 +221,15 @@ def run(
     findings, noise, errors = [], [], []
     if not cfg.contract_only:
         findings, noise, errors = build_findings([] if basic else emap, fmap, samples, load_noise(cfg.noise), v1, v2,
-                                                  shape_only=basic, include_declared=False)
-        intent = Path(cfg.intent).read_text(encoding="utf-8") if cfg.intent is not None else ""
-        progress(f"Triaging {len(findings)} findings")
-        triage(findings, intent, ev, th, tel, workers=cfg.workers)
+                                                  shape_only=basic, include_declared=False, independent_data=independent_data)
+        if independent_data:
+            progress(f"Triaging {len(findings)} findings for human review. The intent describes separate datasets.")
+            for finding in findings:
+                finding.label = finding.status = "unsure"
+                finding.reason = "The recorded status or shape differs. Check the same records before judging regression risk."
+        else:
+            progress(f"Triaging {len(findings)} findings")
+            triage(findings, intent, ev, th, tel, workers=cfg.workers)
     matched = {m.new for m in emap if m.new is not None and m.status == "accepted"}
 
     result = Run(
@@ -230,7 +237,7 @@ def run(
         started_at=started,
         config={"old": cfg.old, "new": cfg.new, "intent": str(cfg.intent) if cfg.intent is not None else None,
                 "seeds": str(seeds_path) if seeds_path else None, "limited_comparison": basic,
-                "contract_only": cfg.contract_only,
+                "contract_only": cfg.contract_only, "independent_data": independent_data,
                 "backend": ev.id, "requests": len(reqs), "endpoints": len(v1),
                 "old_headers": headers.names(cfg.old_headers), "new_headers": headers.names(cfg.new_headers)},
         endpoints=emap, fields=fmap, findings=findings, noise=noise, errors=errors, telemetry=tel,
@@ -238,7 +245,7 @@ def run(
         coverage=coverage.report(v1, v2, samples, allowed_methods(seeds), contract_available=not basic,
                                  matched=matched, contract_only=cfg.contract_only),
     )
-    if cfg.answer_key and not basic and not cfg.contract_only:
+    if cfg.answer_key and not basic and not cfg.contract_only and not independent_data:
         result.score = score(result, AnswerKey.model_validate(load_yaml(cfg.answer_key)))
     tel.seconds = round(time.perf_counter() - t0, 2)
     return result

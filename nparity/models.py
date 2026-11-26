@@ -165,6 +165,12 @@ class Run(BaseModel):
                     "This is not a full comparison.")
         return None
 
+    def independent_data_summary(self) -> str | None:
+        if self.config.get("independent_data"):
+            return ("The intent describes separate datasets. Replay checks status codes and response shapes. "
+                    "Use shared test records to verify value-level behaviour.")
+        return None
+
 
 class AnswerKey(BaseModel):
     mapping: list[dict[str, Any]] = Field(default_factory=list)

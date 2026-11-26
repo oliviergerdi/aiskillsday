@@ -217,6 +217,7 @@ def resolve_baseline(choice: str, run, directory: Path) -> str | None:
         b = latest_baseline(scope_of(run), store.list_runs(directory), before=run.started_at, exclude=run.id)
         return b.id if b else None
     try:
-        return store.load(choice, directory).id
+        baseline = store.load(choice, directory)
+        return baseline.id if scope_of(baseline) == scope_of(run) else None
     except (FileNotFoundError, ValueError):
         return None

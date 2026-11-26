@@ -27,7 +27,7 @@ def _fmt(types: set[str]) -> str:
 
 def build_findings(emap: list[EndpointMap], fmap: list[FieldMap], samples: list[Sample], rules: NoiseRules,
                    old_eps: list[Endpoint], new_eps: list[Endpoint], *, shape_only: bool = False,
-                   include_declared: bool = True,
+                   include_declared: bool = True, independent_data: bool = False,
                    ) -> tuple[list[Finding], list[Noise], list[Finding]]:
     """Returns (findings, noise, errors). Finding ids are stable: sorted by (endpoint, path, kind)."""
     by_old = {m.old: m for m in emap}
@@ -60,10 +60,19 @@ def build_findings(emap: list[EndpointMap], fmap: list[FieldMap], samples: list[
                 replayed_endpoints.add(endpoint)
             if issue == DATA_DIFFERS or (issue == "both errors" and (shape_only or s.old.body == s.new.body)):
                 continue
-            o, n, ns = (s.old, s.new, []) if shape_only else normalise(endpoint, s.old, s.new, rules, renames)
+            independent_schemas = None
+            if independent_data:
+                before = old_by_key.get(endpoint)
+                after = new_by_key.get(new_endpoint)
+                independent_schemas = (
+                    (before.response_schema or {}) if before and s.old.status is not None and 200 <= s.old.status < 300 else {},
+                    (after.response_schema or {}) if after and s.new.status is not None and 200 <= s.new.status < 300 else {},
+                )
+            o, n, ns = ((s.old, s.new, []) if shape_only or independent_data
+                        else normalise(endpoint, s.old, s.new, rules, renames))
             for x in ns:
                 noise.setdefault((x.endpoint, x.path, x.rule), x)
-            for d in diff(o, n, rules.list_keys(endpoint), shape_only=shape_only):
+            for d in diff(o, n, rules.list_keys(endpoint), shape_only=shape_only, independent_schemas=independent_schemas):
                 key = (endpoint, d.path, d.kind)
                 f = groups.get(key)
                 if f is None:
@@ -99,14 +108,14 @@ def build_findings(emap: list[EndpointMap], fmap: list[FieldMap], samples: list[
 
     # mapping decisions are findings too: moved endpoints, renamed and dropped fields
     for m in emap:
-        if not include_declared and m.old not in replayed_endpoints:
+        if independent_data or (not include_declared and m.old not in replayed_endpoints):
             continue
         if m.new is not None and m.status != "unmapped" and m.new != m.old:
             findings.append(Finding(id="", endpoint=m.old, new_endpoint=m.new, path="endpoint", kind="moved",
                                     source="mapping", samples=per_endpoint.get(m.old, [])[:MAX_SAMPLES],
                                     type_info={"mapping": f"{m.old} → {m.new} ({m.source})"}))
     for f in fmap:
-        if not include_declared and f.endpoint not in replayed_endpoints:
+        if independent_data or (not include_declared and f.endpoint not in replayed_endpoints):
             continue
         if f.status == "unmapped" or f.new == f.old:
             continue

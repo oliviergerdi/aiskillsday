@@ -44,6 +44,53 @@ def _shape(value: Any) -> Any:
     return "integer" if type(value) is int else json_class(value)
 
 
+def _dynamic_map(schema: dict) -> bool:
+    return not schema.get("properties") and (
+        schema.get("additionalProperties") is True or isinstance(schema.get("additionalProperties"), dict)
+    )
+
+
+def _observed_types(values: list) -> set[str]:
+    return {"integer" if type(value) is int else json_class(value) for value in values}
+
+
+def _walk_independent(before: list, after: list, path: str, out: list[Diff], schemas: tuple[dict, dict]) -> None:
+    if not before or not after:
+        return
+    old_schema, new_schema = schemas
+    old_types, new_types = _observed_types(before), _observed_types(after)
+    if old_types != new_types:
+        out.append(Diff(path, "type_changed", sorted(old_types), sorted(new_types)))
+        return
+    objects = [[value for value in values if isinstance(value, dict)] for values in (before, after)]
+    if objects[0] and objects[1]:
+        if _dynamic_map(old_schema) and _dynamic_map(new_schema):
+            left, right = [[value for obj in side for value in obj.values()] for side in objects]
+            a, b = old_schema["additionalProperties"], new_schema["additionalProperties"]
+            _walk_independent(left, right, path, out, (a if isinstance(a, dict) else {}, b if isinstance(b, dict) else {}))
+        else:
+            names = set().union(*(value.keys() for side in objects for value in side))
+            old_properties, new_properties = old_schema.get("properties", {}), new_schema.get("properties", {})
+            for name in sorted(names):
+                old_vals, new_vals = [[obj[name] for obj in side if name in obj] for side in objects]
+                item_path = child(path, name)
+                old_required = name in old_schema.get("required", [])
+                new_required = name in new_schema.get("required", [])
+                missing_required = new_required and len(new_vals) < len(objects[1]) and len(old_vals) == len(objects[0])
+                missing_field = not new_vals and (new_required or name not in new_properties)
+                if old_vals and (missing_required or missing_field):
+                    out.append(Diff(item_path, "missing_in_new", old_vals[0], None))
+                elif new_vals and not old_vals and (old_required or name not in old_properties):
+                    out.append(Diff(item_path, "added_in_new", None, new_vals[0]))
+                a = old_properties.get(name, {})
+                b = new_properties.get(name, {})
+                _walk_independent(old_vals, new_vals, item_path, out, (a if isinstance(a, dict) else {}, b if isinstance(b, dict) else {}))
+    if "array" in old_types:
+        left, right = [[item for array in values if isinstance(array, list) for item in array] for values in (before, after)]
+        a, b = old_schema.get("items"), new_schema.get("items")
+        _walk_independent(left, right, path + "[*]", out, (a if isinstance(a, dict) else {}, b if isinstance(b, dict) else {}))
+
+
 def _walk(a: Any, b: Any, path: str, out: list[Diff], keys: dict[str, Any], shape_only: bool) -> None:
     if isinstance(a, dict) and isinstance(b, dict):
         for k in a:
@@ -86,11 +133,14 @@ def _walk(a: Any, b: Any, path: str, out: list[Diff], keys: dict[str, Any], shap
 
 
 def diff(old: HttpResult, new: HttpResult, list_keys: dict[str, Any] | None = None, *,
-         shape_only: bool = False) -> list[Diff]:
+         shape_only: bool = False, independent_schemas: tuple[dict, dict] | None = None) -> list[Diff]:
     if old.error or new.error:
         return []
     out: list[Diff] = []
     if old.status != new.status:
         out.append(Diff("status", "status_changed", old.status, new.status))
-    _walk(old.body, new.body, "$", out, list_keys or {}, shape_only)
+    if independent_schemas is not None:
+        _walk_independent([old.body], [new.body], "$", out, independent_schemas)
+    else:
+        _walk(old.body, new.body, "$", out, list_keys or {}, shape_only)
     return out

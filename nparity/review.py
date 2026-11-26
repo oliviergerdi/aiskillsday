@@ -29,7 +29,8 @@ def finding_key(f: Finding) -> str:
 
 def scope_of(run: Run) -> str:
     """The configuration a run came from, else its old -> new base URLs."""
-    return run.config.get("config") or f"{run.config.get('old')} -> {run.config.get('new')}"
+    scope = run.config.get("config") or f"{run.config.get('old')} -> {run.config.get('new')}"
+    return f"{scope} [separate datasets]" if run.config.get("independent_data") else scope
 
 
 class Entry(BaseModel):
@@ -131,6 +132,8 @@ def verdict(run: Run, ledger: Ledger) -> tuple[str, str]:
             return "Contract checked. Behaviour was not replayed.", "uns"
         if run.coverage and not any(row.compared for row in run.coverage):
             return "No usable behaviour comparisons", "uns"
+        if run.config.get("independent_data"):
+            return "Response shapes reviewed. Use shared data for cutover sign-off.", "uns"
         return "Ready to cut over", "int"
     text = (f"{_n(c['open'], 'open item')}: {_n(c['rejected'], 'confirmed regression')}, "
             f"{c['needs_review']} need review")

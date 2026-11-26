@@ -205,7 +205,7 @@ You need:
      "POST /orders":
        - {customerId: 1, items: [{sku: A1, qty: 2, unit: 5.0}]}
    ```
-4. **An intent note** (Markdown): what the rewrite is meant to change, as an explicit list, ending with "Nothing else should change". Be unambiguous: a vague sentence gets a vague (unsure) answer, which is the point.
+4. **An intent note** (Markdown) describing the expected changes. State whether the APIs use separate datasets or share identical test records. For separate datasets, nParity checks response status and shape and leaves those observations for review.
 5. **Auth headers**, if the services need them: `Name: env:VAR` per side, never a literal value. In the web form: the *Headers* box on each side. On the CLI: `--old-header "Authorization: env:OLD_TOKEN" --new-header "Authorization: env:NEW_TOKEN"`. Pass the variables inline, as with the Fireworks key, so they only exist for that one process:
    ```bash
    OLD_TOKEN="$(…your secret command…)" NEW_TOKEN="$(…)" uv run uvicorn app.main:app --reload

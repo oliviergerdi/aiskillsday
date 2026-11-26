@@ -6,6 +6,7 @@ instead of decoding JSON paths. Template version is part of the cache key via th
 
 from __future__ import annotations
 
+import re
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
@@ -22,8 +23,23 @@ CRITERIA = {
     "unsure": "Unsure: the intent note might cover it, but not clearly.",
 }
 INSTRUCTIONS = ("Compare the difference with the intent note. "
+                "A shared record ID does not establish that two databases contain the same record. "
+                "When the intent allows different records, treat changes in list membership and record values as data differences. "
                 "Which label fits this difference best?")
 MAX_EXAMPLES = 3
+INDEPENDENT_DATA = re.compile(
+    r"\b(?:separate|different|independent)\s+(?:test\s+)?(?:databases|datasets|data sets|data stores)\b"
+    r"|\b(?:datasets|data sets|databases|data stores)\s+(?:are|remain)\s+(?:separate|different|independent)\b"
+    r"|\b(?:each|both)\s+(?:service|api|server)s?\s+(?:has|have|uses?|use)\s+(?:its|their)\s+own\s+(?:database|dataset|data set)\b"
+)
+MATCHED_DATA = re.compile(r"\b(?:identical|shared|matched|same)\s+(?:seeded|test)\s+(?:data|records|fixtures)\b")
+NEGATION = re.compile(r"\b(?:not|never|no|without)\b|n[’']t\b")
+
+
+def intent_declares_independent_data(intent: str) -> bool:
+    statements = [line for line in re.split(r"[.!?;\n]+", intent.lower()) if not NEGATION.search(line)]
+    return bool(any(INDEPENDENT_DATA.search(line) for line in statements)
+                and not any(MATCHED_DATA.search(line) for line in statements))
 
 WHAT = {
     "changed": "value changed", "missing_in_new": "field missing from the new response",

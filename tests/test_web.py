@@ -2,7 +2,6 @@ import html
 import re
 from types import SimpleNamespace
 from datetime import datetime, timezone
-from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -79,7 +78,8 @@ def test_verdict_with_regressions(setup):
     verdict = "4 open items: 0 confirmed regressions, 4 need review"
     assert verdict in page
     assert page.index(verdict) < page.index('class="counts"')
-    store.save(store.load("demo", Path(__file__).parent.parent / "runs"), app.state.runs_dir)
+    legacy = run.model_copy(update={"id": "demo"})
+    (app.state.runs_dir / "demo.yaml").write_text(legacy.model_dump_json(exclude={"contract", "coverage"}), encoding="utf-8")
     demo = client.get("/runs/demo").text
     assert verdict in demo
     assert demo.index(verdict) < demo.index('class="counts"')
