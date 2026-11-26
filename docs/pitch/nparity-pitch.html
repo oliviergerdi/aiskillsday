@@ -734,7 +734,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
       </div>
     </div>
     <p class="callout push">At one migration a quarter (assumed), the base case repays the lean build in about 18 months.</p>
-    <aside class="notes">At one migration a quarter (assumed rate; we have not measured how often migrations happen) 6 migrations take 18 months. Saved per migration is (manual hours - 1) x passes x US$40. Migrations to repay the lean build (US$19,200) are rounded up: 18, 6 and 2. The full build (US$57,600) takes 54, 16 and 5. The lean build covers PRDs 0005 to 0007 and is an upper bound for internal use, since the hosted service (PRD 0007) is only needed if the tool is offered outside the company. The base case is also the case on slide 11. Model: docs/costing/business_case.py</aside>
+    <aside class="notes">At one migration a quarter (assumed rate; we have not measured how often migrations happen) 6 migrations take 18 months. Saved per migration is (manual hours - 1) x passes x US$40. Migrations to repay the lean build (US$19,200) are rounded up: 18, 6 and 2. The full build (US$57,600) takes 54, 16 and 5. The lean build was estimated for PRDs 0005 to 0007; PRD 0005 is now built, so it is an overestimate, and it is an upper bound for internal use, since the hosted service (PRD 0007) is only needed if the tool is offered outside the company. The base case is also the case on slide 11. Model: docs/costing/business_case.py</aside>
   </section>
   <section class="slide" id="s15" aria-label="Before and during">
     <span class="lot">LOT 15</span>
@@ -838,15 +838,14 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
         <tbody>
           <tr><td>PRD 0003 · Trust and models</td><td>A second model provider, vote sampling for models without token probabilities, calibration of the thresholds, real model prices.</td></tr>
           <tr><td>PRD 0004 · Before stage</td><td>Run without an intent note and draft the note from the differences found.</td></tr>
-          <tr><td>PRD 0005 · Flow mapping</td><td>Group the new calls that replace one old call, as in a move from one vendor API to its successor.</td></tr>
           <tr><td>PRD 0006 · Spec optional</td><td>Documentation pages as input, and a per-run targets file.</td></tr>
           <tr><td>PRD 0007 · Hosted service</td><td>Accounts, storage, queue, redaction before model calls and metering. Needed only if the tool is offered outside the company.</td></tr>
           <tr><td>Release requirement</td><td>Authorization tokens for authenticated API calls.</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="callout push">Built: the review ledger and sign-off (PRD 0001), per-side headers and list matching (PRD 0002), seed generation and coverage (PRD 0008).</p>
-    <aside class="notes">Status as checked against the repository on 26 Nov 2026. Each spec is in docs/prd/. PRD 0001, PRD 0002 and PRD 0008 are built in part or in full; the table lists only what is specified and not built. Authorization tokens are not in a PRD yet: the demo uses public, unauthenticated APIs.</aside>
+    <p class="callout push">Built: review ledger and sign-off (PRD 0001), headers and list matching (PRD 0002), spec-only flow mapping (PRD 0005), seed generation and coverage (PRD 0008).</p>
+    <aside class="notes">Status as checked against the repository on 26 Nov 2026. Each spec is in docs/prd/. PRD 0001, PRD 0002, PRD 0005 and PRD 0008 are built in part or in full. Flow mapping suggests the new calls that replace one old call from the specs, with a role, a probability and a quoted source; it does not replay a flow, and scoring needs an engineer-confirmed key; the table lists only what is specified and not built. Authorization tokens are not in a PRD yet: the demo uses public, unauthenticated APIs.</aside>
   </section>
 </main>
 

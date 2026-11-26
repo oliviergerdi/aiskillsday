@@ -52,7 +52,7 @@ Judges score nine things (see the scoring sheet). Slide that carries each: probl
 3. Slide 5: drop the market line (10 s).
 
 ## Likely questions (appendix slides 11 to 19)
-- **What is not built?** Appendix slide 19: PRDs 0003 to 0007 and authorization tokens. Built: ledger and sign-off, headers and list matching, seed generation and coverage.
+- **What is not built?** Appendix slide 19: PRDs 0003, 0004, 0006, 0007 and authorization tokens. Built: ledger and sign-off, headers and list matching, flow mapping, seed generation and coverage.
 - **Why trust the AI?** Appendix slide 12. Probabilities, thresholds, no regression auto-dismissed.
 - **Who has committed or paid?** No one yet. We have one interview and a working prototype. Say so.
 - **What stops a copy?** See slide 5: judging intent with a probability, plus the calibration.
@@ -64,6 +64,7 @@ Judges score nine things (see the scoring sheet). Slide that carries each: probl
 - **POST or DELETE endpoints?** The spec gives contract differences for every method with no calls. Behaviour is replayed for GET by default, other methods opt-in (PRD 0008).
 - **Can an AI agent use it?** Appendix slide 13. Yes, a developer CLI with YAML run output. The agent options (`--format json`, `--compact`, `--detach`, `--dry-run`, `--fail-on`) are built; not in the demo. It is not meant for CI builds.
 - **Data leaving the company?** Redaction before any model call is specified, not built. Run it on an approved model or locally and nothing leaves.
+- **One old call that becomes several new ones?** Flow mapping (PRD 0005) is built: it suggests the new calls, in order, each with a role, a probability and the quoted spec sentence. It works from the specs only and never replays a flow. Shown on the toy flow pair with the fake backend. Real specs need the Flash backend, and scoring needs an engineer-confirmed key.
 - **CSOM to Mesh?** Our worked example. The key is our draft from vendor docs, how our integration calls each API, and one engineer's answer. It has not been reviewed.
 
 ## Checks before you go on
