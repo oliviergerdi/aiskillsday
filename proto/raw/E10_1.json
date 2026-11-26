@@ -1,0 +1,7 @@
+{
+  "error": {
+    "type": "BadRequestError",
+    "status": 400,
+    "message": "Error code: 400 - Prompt logprobs (echo or echo_last with logprobs) are temporarily unsupported for this model. Disable echo/echo_last or omit logprobs."
+  }
+}

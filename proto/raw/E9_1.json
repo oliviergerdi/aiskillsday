@@ -1,0 +1,2169 @@
+{
+  "id": "chatcmpl-a73bf8598c0347df9a5a87101cf603ee",
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": {
+        "content": [
+          {
+            "token": "{\"",
+            "bytes": [
+              123,
+              34
+            ],
+            "logprob": -0.00027355,
+            "top_logprobs": [
+              {
+                "token": "{\"",
+                "bytes": [
+                  123,
+                  34
+                ],
+                "logprob": -0.00027355,
+                "token_id": 24313
+              },
+              {
+                "token": "{\n",
+                "bytes": [
+                  123,
+                  10
+                ],
+                "logprob": -8.6252737,
+                "token_id": 2054
+              },
+              {
+                "token": "A",
+                "bytes": [
+                  65
+                ],
+                "logprob": -10.8752737,
+                "token_id": 35
+              },
+              {
+                "token": "The",
+                "bytes": [
+                  84,
+                  104,
+                  101
+                ],
+                "logprob": -11.3752737,
+                "token_id": 671
+              },
+              {
+                "token": "I",
+                "bytes": [
+                  73
+                ],
+                "logprob": -11.3752737,
+                "token_id": 43
+              }
+            ],
+            "sampling_logprob": -0.00027284768293611705,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 24313,
+            "text_offset": 0,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": "label",
+            "bytes": [
+              108,
+              97,
+              98,
+              101,
+              108
+            ],
+            "logprob": -0.0003416,
+            "top_logprobs": [
+              {
+                "token": "label",
+                "bytes": [
+                  108,
+                  97,
+                  98,
+                  101,
+                  108
+                ],
+                "logprob": -0.0003416,
+                "token_id": 9628
+              },
+              {
+                "token": "type",
+                "bytes": [
+                  116,
+                  121,
+                  112,
+                  101
+                ],
+                "logprob": -8.12534142,
+                "token_id": 4611
+              },
+              {
+                "token": "answer",
+                "bytes": [
+                  97,
+                  110,
+                  115,
+                  119,
+                  101,
+                  114
+                ],
+                "logprob": -10.37534142,
+                "token_id": 19995
+              },
+              {
+                "token": "reason",
+                "bytes": [
+                  114,
+                  101,
+                  97,
+                  115,
+                  111,
+                  110
+                ],
+                "logprob": -12.75034142,
+                "token_id": 86512
+              },
+              {
+                "token": "id",
+                "bytes": [
+                  105,
+                  100
+                ],
+                "logprob": -13.93784142,
+                "token_id": 329
+              }
+            ],
+            "sampling_logprob": -0.00034147370024584234,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 9628,
+            "text_offset": 2,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": "\":\"",
+            "bytes": [
+              34,
+              58,
+              34
+            ],
+            "logprob": -2.4e-07,
+            "top_logprobs": [
+              {
+                "token": "\":\"",
+                "bytes": [
+                  34,
+                  58,
+                  34
+                ],
+                "logprob": -2.4e-07,
+                "token_id": 16562
+              },
+              {
+                "token": "\":",
+                "bytes": [
+                  34,
+                  58
+                ],
+                "logprob": -15.125,
+                "token_id": 3362
+              },
+              {
+                "token": "\":{\"",
+                "bytes": [
+                  34,
+                  58,
+                  123,
+                  34
+                ],
+                "logprob": -20.9375,
+                "token_id": 80642
+              },
+              {
+                "token": "<\uff5cend\u2581of\u2581sentence\uff5c>",
+                "bytes": [
+                  60,
+                  239,
+                  189,
+                  156,
+                  101,
+                  110,
+                  100,
+                  226,
+                  150,
+                  129,
+                  111,
+                  102,
+                  226,
+                  150,
+                  129,
+                  115,
+                  101,
+                  110,
+                  116,
+                  101,
+                  110,
+                  99,
+                  101,
+                  239,
+                  189,
+                  156,
+                  62
+                ],
+                "logprob": -22.0,
+                "token_id": 1
+              },
+              {
+                "token": ":\"",
+                "bytes": [
+                  58,
+                  34
+                ],
+                "logprob": -22.625,
+                "token_id": 15636
+              }
+            ],
+            "sampling_logprob": -2.3841860752327193e-07,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 16562,
+            "text_offset": 7,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": "A",
+            "bytes": [
+              65
+            ],
+            "logprob": -0.0490041,
+            "top_logprobs": [
+              {
+                "token": "A",
+                "bytes": [
+                  65
+                ],
+                "logprob": -0.0490041,
+                "token_id": 35
+              },
+              {
+                "token": "E",
+                "bytes": [
+                  69
+                ],
+                "logprob": -3.04900408,
+                "token_id": 39
+              },
+              {
+                "token": "B",
+                "bytes": [
+                  66
+                ],
+                "logprob": -8.29900455,
+                "token_id": 36
+              },
+              {
+                "token": "C",
+                "bytes": [
+                  67
+                ],
+                "logprob": -9.42400455,
+                "token_id": 37
+              },
+              {
+                "token": "D",
+                "bytes": [
+                  68
+                ],
+                "logprob": -9.54900455,
+                "token_id": 38
+              }
+            ],
+            "sampling_logprob": -0.049003973603248596,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 35,
+            "text_offset": 10,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": "\",\"",
+            "bytes": [
+              34,
+              44,
+              34
+            ],
+            "logprob": -1.156e-05,
+            "top_logprobs": [
+              {
+                "token": "\",\"",
+                "bytes": [
+                  34,
+                  44,
+                  34
+                ],
+                "logprob": -1.156e-05,
+                "token_id": 10177
+              },
+              {
+                "token": "\"}",
+                "bytes": [
+                  34,
+                  125
+                ],
+                "logprob": -11.37501144,
+                "token_id": 62773
+              },
+              {
+                "token": "\"}\n",
+                "bytes": [
+                  34,
+                  125,
+                  10
+                ],
+                "logprob": -16.50001144,
+                "token_id": 60676
+              },
+              {
+                "token": "\",",
+                "bytes": [
+                  34,
+                  44
+                ],
+                "logprob": -17.25001144,
+                "token_id": 1760
+              },
+              {
+                "token": "\"",
+                "bytes": [
+                  34
+                ],
+                "logprob": -18.50001144,
+                "token_id": 4
+              }
+            ],
+            "sampling_logprob": -1.1563368389033712e-05,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 10177,
+            "text_offset": 11,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": "reason",
+            "bytes": [
+              114,
+              101,
+              97,
+              115,
+              111,
+              110
+            ],
+            "logprob": -1.19e-06,
+            "top_logprobs": [
+              {
+                "token": "reason",
+                "bytes": [
+                  114,
+                  101,
+                  97,
+                  115,
+                  111,
+                  110
+                ],
+                "logprob": -1.19e-06,
+                "token_id": 86512
+              },
+              {
+                "token": "answer",
+                "bytes": [
+                  97,
+                  110,
+                  115,
+                  119,
+                  101,
+                  114
+                ],
+                "logprob": -15.75000095,
+                "token_id": 19995
+              },
+              {
+                "token": "rational",
+                "bytes": [
+                  114,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110,
+                  97,
+                  108
+                ],
+                "logprob": -15.87500095,
+                "token_id": 40938
+              },
+              {
+                "token": "re",
+                "bytes": [
+                  114,
+                  101
+                ],
+                "logprob": -16.06250191,
+                "token_id": 266
+              },
+              {
+                "token": "note",
+                "bytes": [
+                  110,
+                  111,
+                  116,
+                  101
+                ],
+                "logprob": -16.50000191,
+                "token_id": 9595
+              }
+            ],
+            "sampling_logprob": -1.1920935776288388e-06,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 86512,
+            "text_offset": 14,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": "\":\"",
+            "bytes": [
+              34,
+              58,
+              34
+            ],
+            "logprob": -4.8e-07,
+            "top_logprobs": [
+              {
+                "token": "\":\"",
+                "bytes": [
+                  34,
+                  58,
+                  34
+                ],
+                "logprob": -4.8e-07,
+                "token_id": 16562
+              },
+              {
+                "token": "\":",
+                "bytes": [
+                  34,
+                  58
+                ],
+                "logprob": -14.75,
+                "token_id": 3362
+              },
+              {
+                "token": "\"",
+                "bytes": [
+                  34
+                ],
+                "logprob": -17.375,
+                "token_id": 4
+              },
+              {
+                "token": "\"=\"",
+                "bytes": [
+                  34,
+                  61,
+                  34
+                ],
+                "logprob": -21.5,
+                "token_id": 92353
+              },
+              {
+                "token": "\"\"",
+                "bytes": [
+                  34,
+                  34
+                ],
+                "logprob": -22.0,
+                "token_id": 12667
+              }
+            ],
+            "sampling_logprob": -4.768372718899627e-07,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 16562,
+            "text_offset": 20,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": "Same",
+            "bytes": [
+              83,
+              97,
+              109,
+              101
+            ],
+            "logprob": -0.23510434,
+            "top_logprobs": [
+              {
+                "token": "Same",
+                "bytes": [
+                  83,
+                  97,
+                  109,
+                  101
+                ],
+                "logprob": -0.23510434,
+                "token_id": 59964
+              },
+              {
+                "token": "GET",
+                "bytes": [
+                  71,
+                  69,
+                  84
+                ],
+                "logprob": -2.23510432,
+                "token_id": 25175
+              },
+              {
+                "token": "Ret",
+                "bytes": [
+                  82,
+                  101,
+                  116
+                ],
+                "logprob": -2.98510432,
+                "token_id": 11614
+              },
+              {
+                "token": "Both",
+                "bytes": [
+                  66,
+                  111,
+                  116,
+                  104
+                ],
+                "logprob": -3.48510432,
+                "token_id": 26545
+              },
+              {
+                "token": "M",
+                "bytes": [
+                  77
+                ],
+                "logprob": -4.48510456,
+                "token_id": 47
+              }
+            ],
+            "sampling_logprob": -0.235104039311409,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 59964,
+            "text_offset": 23,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": " GET",
+            "bytes": [
+              32,
+              71,
+              69,
+              84
+            ],
+            "logprob": -1.14435637,
+            "top_logprobs": [
+              {
+                "token": " GET",
+                "bytes": [
+                  32,
+                  71,
+                  69,
+                  84
+                ],
+                "logprob": -1.14435637,
+                "token_id": 36643
+              },
+              {
+                "token": " operation",
+                "bytes": [
+                  32,
+                  111,
+                  112,
+                  101,
+                  114,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110
+                ],
+                "logprob": -2.01935625,
+                "token_id": 7408
+              },
+              {
+                "token": " resource",
+                "bytes": [
+                  32,
+                  114,
+                  101,
+                  115,
+                  111,
+                  117,
+                  114,
+                  99,
+                  101
+                ],
+                "logprob": -2.14435625,
+                "token_id": 7823
+              },
+              {
+                "token": " single",
+                "bytes": [
+                  32,
+                  115,
+                  105,
+                  110,
+                  103,
+                  108,
+                  101
+                ],
+                "logprob": -2.26935625,
+                "token_id": 4031
+              },
+              {
+                "token": " get",
+                "bytes": [
+                  32,
+                  103,
+                  101,
+                  116
+                ],
+                "logprob": -2.51935625,
+                "token_id": 1178
+              }
+            ],
+            "sampling_logprob": -1.144356369972229,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 36643,
+            "text_offset": 27,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": "-by",
+            "bytes": [
+              45,
+              98,
+              121
+            ],
+            "logprob": -0.11164045,
+            "top_logprobs": [
+              {
+                "token": "-by",
+                "bytes": [
+                  45,
+                  98,
+                  121
+                ],
+                "logprob": -0.11164045,
+                "token_id": 10531
+              },
+              {
+                "token": " single",
+                "bytes": [
+                  32,
+                  115,
+                  105,
+                  110,
+                  103,
+                  108,
+                  101
+                ],
+                "logprob": -3.23664045,
+                "token_id": 4031
+              },
+              {
+                "token": " by",
+                "bytes": [
+                  32,
+                  98,
+                  121
+                ],
+                "logprob": -3.23664045,
+                "token_id": 513
+              },
+              {
+                "token": "-s",
+                "bytes": [
+                  45,
+                  115
+                ],
+                "logprob": -4.61164045,
+                "token_id": 1715
+              },
+              {
+                "token": " customer",
+                "bytes": [
+                  32,
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  109,
+                  101,
+                  114
+                ],
+                "logprob": -5.61164045,
+                "token_id": 8619
+              }
+            ],
+            "sampling_logprob": -0.11164036393165588,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 10531,
+            "text_offset": 31,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": "-id",
+            "bytes": [
+              45,
+              105,
+              100
+            ],
+            "logprob": -0.00253475,
+            "top_logprobs": [
+              {
+                "token": "-id",
+                "bytes": [
+                  45,
+                  105,
+                  100
+                ],
+                "logprob": -0.00253475,
+                "token_id": 47189
+              },
+              {
+                "token": "-ID",
+                "bytes": [
+                  45,
+                  73,
+                  68
+                ],
+                "logprob": -6.00253487,
+                "token_id": 77607
+              },
+              {
+                "token": "-",
+                "bytes": [
+                  45
+                ],
+                "logprob": -9.75253487,
+                "token_id": 15
+              },
+              {
+                "token": "-client",
+                "bytes": [
+                  45,
+                  99,
+                  108,
+                  105,
+                  101,
+                  110,
+                  116
+                ],
+                "logprob": -15.00253487,
+                "token_id": 100253
+              },
+              {
+                "token": " id",
+                "bytes": [
+                  32,
+                  105,
+                  100
+                ],
+                "logprob": -15.87753487,
+                "token_id": 4099
+              }
+            ],
+            "sampling_logprob": -0.002534738276153803,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 47189,
+            "text_offset": 34,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": " client",
+            "bytes": [
+              32,
+              99,
+              108,
+              105,
+              101,
+              110,
+              116
+            ],
+            "logprob": -0.28748763,
+            "top_logprobs": [
+              {
+                "token": " client",
+                "bytes": [
+                  32,
+                  99,
+                  108,
+                  105,
+                  101,
+                  110,
+                  116
+                ],
+                "logprob": -0.28748763,
+                "token_id": 8438
+              },
+              {
+                "token": " customer",
+                "bytes": [
+                  32,
+                  99,
+                  117,
+                  115,
+                  116,
+                  111,
+                  109,
+                  101,
+                  114
+                ],
+                "logprob": -2.03748751,
+                "token_id": 8619
+              },
+              {
+                "token": " operation",
+                "bytes": [
+                  32,
+                  111,
+                  112,
+                  101,
+                  114,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110
+                ],
+                "logprob": -2.41248751,
+                "token_id": 7408
+              },
+              {
+                "token": " on",
+                "bytes": [
+                  32,
+                  111,
+                  110
+                ],
+                "logprob": -4.03748751,
+                "token_id": 377
+              },
+              {
+                "token": " for",
+                "bytes": [
+                  32,
+                  102,
+                  111,
+                  114
+                ],
+                "logprob": -5.53748751,
+                "token_id": 362
+              }
+            ],
+            "sampling_logprob": -0.2874873876571655,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 8438,
+            "text_offset": 37,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": " operation",
+            "bytes": [
+              32,
+              111,
+              112,
+              101,
+              114,
+              97,
+              116,
+              105,
+              111,
+              110
+            ],
+            "logprob": -0.92977679,
+            "top_logprobs": [
+              {
+                "token": " operation",
+                "bytes": [
+                  32,
+                  111,
+                  112,
+                  101,
+                  114,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110
+                ],
+                "logprob": -0.92977679,
+                "token_id": 7408
+              },
+              {
+                "token": "/c",
+                "bytes": [
+                  47,
+                  99
+                ],
+                "logprob": -1.17977679,
+                "token_id": 5252
+              },
+              {
+                "token": " lookup",
+                "bytes": [
+                  32,
+                  108,
+                  111,
+                  111,
+                  107,
+                  117,
+                  112
+                ],
+                "logprob": -1.42977679,
+                "token_id": 64018
+              },
+              {
+                "token": " resource",
+                "bytes": [
+                  32,
+                  114,
+                  101,
+                  115,
+                  111,
+                  117,
+                  114,
+                  99,
+                  101
+                ],
+                "logprob": -3.05477667,
+                "token_id": 7823
+              },
+              {
+                "token": " retrieval",
+                "bytes": [
+                  32,
+                  114,
+                  101,
+                  116,
+                  114,
+                  105,
+                  101,
+                  118,
+                  97,
+                  108
+                ],
+                "logprob": -4.55477667,
+                "token_id": 44382
+              }
+            ],
+            "sampling_logprob": -0.9297767877578735,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 7408,
+            "text_offset": 44,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": ";",
+            "bytes": [
+              59
+            ],
+            "logprob": -0.02518942,
+            "top_logprobs": [
+              {
+                "token": ";",
+                "bytes": [
+                  59
+                ],
+                "logprob": -0.02518942,
+                "token_id": 29
+              },
+              {
+                "token": " with",
+                "bytes": [
+                  32,
+                  119,
+                  105,
+                  116,
+                  104
+                ],
+                "logprob": -4.2751894,
+                "token_id": 418
+              },
+              {
+                "token": ",",
+                "bytes": [
+                  44
+                ],
+                "logprob": -4.7751894,
+                "token_id": 14
+              },
+              {
+                "token": " and",
+                "bytes": [
+                  32,
+                  97,
+                  110,
+                  100
+                ],
+                "logprob": -7.1501894,
+                "token_id": 305
+              },
+              {
+                "token": " in",
+                "bytes": [
+                  32,
+                  105,
+                  110
+                ],
+                "logprob": -7.9001894,
+                "token_id": 295
+              }
+            ],
+            "sampling_logprob": -0.025189168751239777,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 29,
+            "text_offset": 54,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": " full",
+            "bytes": [
+              32,
+              102,
+              117,
+              108,
+              108
+            ],
+            "logprob": -0.95629513,
+            "top_logprobs": [
+              {
+                "token": " full",
+                "bytes": [
+                  32,
+                  102,
+                  117,
+                  108,
+                  108
+                ],
+                "logprob": -0.95629513,
+                "token_id": 3530
+              },
+              {
+                "token": " legacy",
+                "bytes": [
+                  32,
+                  108,
+                  101,
+                  103,
+                  97,
+                  99,
+                  121
+                ],
+                "logprob": -1.33129513,
+                "token_id": 21689
+              },
+              {
+                "token": " renamed",
+                "bytes": [
+                  32,
+                  114,
+                  101,
+                  110,
+                  97,
+                  109,
+                  101,
+                  100
+                ],
+                "logprob": -2.20629501,
+                "token_id": 61511
+              },
+              {
+                "token": " only",
+                "bytes": [
+                  32,
+                  111,
+                  110,
+                  108,
+                  121
+                ],
+                "logprob": -2.45629501,
+                "token_id": 1353
+              },
+              {
+                "token": " '",
+                "bytes": [
+                  32,
+                  39
+                ],
+                "logprob": -3.33129501,
+                "token_id": 905
+              }
+            ],
+            "sampling_logprob": -0.9562951922416687,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 3530,
+            "text_offset": 55,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": "Name",
+            "bytes": [
+              78,
+              97,
+              109,
+              101
+            ],
+            "logprob": -6.127e-05,
+            "top_logprobs": [
+              {
+                "token": "Name",
+                "bytes": [
+                  78,
+                  97,
+                  109,
+                  101
+                ],
+                "logprob": -6.127e-05,
+                "token_id": 3240
+              },
+              {
+                "token": " name",
+                "bytes": [
+                  32,
+                  110,
+                  97,
+                  109,
+                  101
+                ],
+                "logprob": -10.25006104,
+                "token_id": 2329
+              },
+              {
+                "token": "/",
+                "bytes": [
+                  47
+                ],
+                "logprob": -11.50006104,
+                "token_id": 17
+              },
+              {
+                "token": "_name",
+                "bytes": [
+                  95,
+                  110,
+                  97,
+                  109,
+                  101
+                ],
+                "logprob": -12.25006104,
+                "token_id": 7907
+              },
+              {
+                "token": "-name",
+                "bytes": [
+                  45,
+                  110,
+                  97,
+                  109,
+                  101
+                ],
+                "logprob": -12.62506104,
+                "token_id": 42391
+              }
+            ],
+            "sampling_logprob": -6.0917802329640836e-05,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 3240,
+            "text_offset": 60,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": " maps",
+            "bytes": [
+              32,
+              109,
+              97,
+              112,
+              115
+            ],
+            "logprob": -1.0104332,
+            "top_logprobs": [
+              {
+                "token": " maps",
+                "bytes": [
+                  32,
+                  109,
+                  97,
+                  112,
+                  115
+                ],
+                "logprob": -1.0104332,
+                "token_id": 17942
+              },
+              {
+                "token": " renamed",
+                "bytes": [
+                  32,
+                  114,
+                  101,
+                  110,
+                  97,
+                  109,
+                  101,
+                  100
+                ],
+                "logprob": -1.5104332,
+                "token_id": 61511
+              },
+              {
+                "token": "/",
+                "bytes": [
+                  47
+                ],
+                "logprob": -1.6354332,
+                "token_id": 17
+              },
+              {
+                "token": "\u2192",
+                "bytes": [
+                  226,
+                  134,
+                  146
+                ],
+                "logprob": -1.7604332,
+                "token_id": 8674
+              },
+              {
+                "token": " and",
+                "bytes": [
+                  32,
+                  97,
+                  110,
+                  100
+                ],
+                "logprob": -4.0104332,
+                "token_id": 305
+              }
+            ],
+            "sampling_logprob": -1.010433554649353,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 17942,
+            "text_offset": 64,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": " to",
+            "bytes": [
+              32,
+              116,
+              111
+            ],
+            "logprob": -1.216e-05,
+            "top_logprobs": [
+              {
+                "token": " to",
+                "bytes": [
+                  32,
+                  116,
+                  111
+                ],
+                "logprob": -1.216e-05,
+                "token_id": 304
+              },
+              {
+                "token": " from",
+                "bytes": [
+                  32,
+                  102,
+                  114,
+                  111,
+                  109
+                ],
+                "logprob": -12.3750124,
+                "token_id": 538
+              },
+              {
+                "token": " name",
+                "bytes": [
+                  32,
+                  110,
+                  97,
+                  109,
+                  101
+                ],
+                "logprob": -13.2500124,
+                "token_id": 2329
+              },
+              {
+                "token": " roughly",
+                "bytes": [
+                  32,
+                  114,
+                  111,
+                  117,
+                  103,
+                  104,
+                  108,
+                  121
+                ],
+                "logprob": -13.5000124,
+                "token_id": 22349
+              },
+              {
+                "token": " conceptually",
+                "bytes": [
+                  32,
+                  99,
+                  111,
+                  110,
+                  99,
+                  101,
+                  112,
+                  116,
+                  117,
+                  97,
+                  108,
+                  108,
+                  121
+                ],
+                "logprob": -14.1250124,
+                "token_id": 125807
+              }
+            ],
+            "sampling_logprob": -1.1682578588079195e-05,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 304,
+            "text_offset": 69,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": " name",
+            "bytes": [
+              32,
+              110,
+              97,
+              109,
+              101
+            ],
+            "logprob": -9.78e-06,
+            "top_logprobs": [
+              {
+                "token": " name",
+                "bytes": [
+                  32,
+                  110,
+                  97,
+                  109,
+                  101
+                ],
+                "logprob": -9.78e-06,
+                "token_id": 2329
+              },
+              {
+                "token": " the",
+                "bytes": [
+                  32,
+                  116,
+                  104,
+                  101
+                ],
+                "logprob": -13.25000954,
+                "token_id": 270
+              },
+              {
+                "token": " id",
+                "bytes": [
+                  32,
+                  105,
+                  100
+                ],
+                "logprob": -14.00000954,
+                "token_id": 4099
+              },
+              {
+                "token": " client",
+                "bytes": [
+                  32,
+                  99,
+                  108,
+                  105,
+                  101,
+                  110,
+                  116
+                ],
+                "logprob": -14.12500954,
+                "token_id": 8438
+              },
+              {
+                "token": " a",
+                "bytes": [
+                  32,
+                  97
+                ],
+                "logprob": -14.12500954,
+                "token_id": 260
+              }
+            ],
+            "sampling_logprob": -9.417578439752106e-06,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 2329,
+            "text_offset": 72,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": ",",
+            "bytes": [
+              44
+            ],
+            "logprob": -0.25156158,
+            "top_logprobs": [
+              {
+                "token": ",",
+                "bytes": [
+                  44
+                ],
+                "logprob": -0.25156158,
+                "token_id": 14
+              },
+              {
+                "token": " and",
+                "bytes": [
+                  32,
+                  97,
+                  110,
+                  100
+                ],
+                "logprob": -1.62656164,
+                "token_id": 305
+              },
+              {
+                "token": ".\"",
+                "bytes": [
+                  46,
+                  34
+                ],
+                "logprob": -4.12656164,
+                "token_id": 2148
+              },
+              {
+                "token": ";",
+                "bytes": [
+                  59
+                ],
+                "logprob": -4.87656164,
+                "token_id": 29
+              },
+              {
+                "token": " while",
+                "bytes": [
+                  32,
+                  119,
+                  104,
+                  105,
+                  108,
+                  101
+                ],
+                "logprob": -7.75156164,
+                "token_id": 1901
+              }
+            ],
+            "sampling_logprob": -0.2515615224838257,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 14,
+            "text_offset": 77,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": " legacy",
+            "bytes": [
+              32,
+              108,
+              101,
+              103,
+              97,
+              99,
+              121
+            ],
+            "logprob": -0.11270616,
+            "top_logprobs": [
+              {
+                "token": " legacy",
+                "bytes": [
+                  32,
+                  108,
+                  101,
+                  103,
+                  97,
+                  99,
+                  121
+                ],
+                "logprob": -0.11270616,
+                "token_id": 21689
+              },
+              {
+                "token": " extra",
+                "bytes": [
+                  32,
+                  101,
+                  120,
+                  116,
+                  114,
+                  97
+                ],
+                "logprob": -3.73770618,
+                "token_id": 6712
+              },
+              {
+                "token": " other",
+                "bytes": [
+                  32,
+                  111,
+                  116,
+                  104,
+                  101,
+                  114
+                ],
+                "logprob": -3.73770618,
+                "token_id": 915
+              },
+              {
+                "token": " id",
+                "bytes": [
+                  32,
+                  105,
+                  100
+                ],
+                "logprob": -4.11270618,
+                "token_id": 4099
+              },
+              {
+                "token": " and",
+                "bytes": [
+                  32,
+                  97,
+                  110,
+                  100
+                ],
+                "logprob": -4.48770618,
+                "token_id": 305
+              }
+            ],
+            "sampling_logprob": -0.11270617693662643,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 21689,
+            "text_offset": 78,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": "Code",
+            "bytes": [
+              67,
+              111,
+              100,
+              101
+            ],
+            "logprob": -0.00020859,
+            "top_logprobs": [
+              {
+                "token": "Code",
+                "bytes": [
+                  67,
+                  111,
+                  100,
+                  101
+                ],
+                "logprob": -0.00020859,
+                "token_id": 9945
+              },
+              {
+                "token": " code",
+                "bytes": [
+                  32,
+                  99,
+                  111,
+                  100,
+                  101
+                ],
+                "logprob": -9.12520885,
+                "token_id": 4181
+              },
+              {
+                "token": " fields",
+                "bytes": [
+                  32,
+                  102,
+                  105,
+                  101,
+                  108,
+                  100,
+                  115
+                ],
+                "logprob": -10.75020885,
+                "token_id": 7855
+              },
+              {
+                "token": " dropped",
+                "bytes": [
+                  32,
+                  100,
+                  114,
+                  111,
+                  112,
+                  112,
+                  101,
+                  100
+                ],
+                "logprob": -11.00020885,
+                "token_id": 16405
+              },
+              {
+                "token": " removed",
+                "bytes": [
+                  32,
+                  114,
+                  101,
+                  109,
+                  111,
+                  118,
+                  101,
+                  100
+                ],
+                "logprob": -11.25020885,
+                "token_id": 11130
+              }
+            ],
+            "sampling_logprob": -0.00020875725022051483,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 9945,
+            "text_offset": 85,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": " dropped",
+            "bytes": [
+              32,
+              100,
+              114,
+              111,
+              112,
+              112,
+              101,
+              100
+            ],
+            "logprob": -0.27823693,
+            "top_logprobs": [
+              {
+                "token": " dropped",
+                "bytes": [
+                  32,
+                  100,
+                  114,
+                  111,
+                  112,
+                  112,
+                  101,
+                  100
+                ],
+                "logprob": -0.27823693,
+                "token_id": 16405
+              },
+              {
+                "token": " removed",
+                "bytes": [
+                  32,
+                  114,
+                  101,
+                  109,
+                  111,
+                  118,
+                  101,
+                  100
+                ],
+                "logprob": -1.77823687,
+                "token_id": 11130
+              },
+              {
+                "token": " is",
+                "bytes": [
+                  32,
+                  105,
+                  115
+                ],
+                "logprob": -3.27823687,
+                "token_id": 344
+              },
+              {
+                "token": " omitted",
+                "bytes": [
+                  32,
+                  111,
+                  109,
+                  105,
+                  116,
+                  116,
+                  101,
+                  100
+                ],
+                "logprob": -3.65323687,
+                "token_id": 37376
+              },
+              {
+                "token": " was",
+                "bytes": [
+                  32,
+                  119,
+                  97,
+                  115
+                ],
+                "logprob": -6.02823687,
+                "token_id": 515
+              }
+            ],
+            "sampling_logprob": -0.2782370448112488,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 16405,
+            "text_offset": 89,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": ".\"",
+            "bytes": [
+              46,
+              34
+            ],
+            "logprob": -0.35850528,
+            "top_logprobs": [
+              {
+                "token": ".\"",
+                "bytes": [
+                  46,
+                  34
+                ],
+                "logprob": -0.35850528,
+                "token_id": 2148
+              },
+              {
+                "token": ",",
+                "bytes": [
+                  44
+                ],
+                "logprob": -1.73350525,
+                "token_id": 14
+              },
+              {
+                "token": "\"}",
+                "bytes": [
+                  34,
+                  125
+                ],
+                "logprob": -2.60850525,
+                "token_id": 62773
+              },
+              {
+                "token": " in",
+                "bytes": [
+                  32,
+                  105,
+                  110
+                ],
+                "logprob": -3.23350525,
+                "token_id": 295
+              },
+              {
+                "token": ";",
+                "bytes": [
+                  59
+                ],
+                "logprob": -5.98350525,
+                "token_id": 29
+              }
+            ],
+            "sampling_logprob": -0.35850557684898376,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 2148,
+            "text_offset": 97,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": "}",
+            "bytes": [
+              125
+            ],
+            "logprob": -2.26e-06,
+            "top_logprobs": [
+              {
+                "token": "}",
+                "bytes": [
+                  125
+                ],
+                "logprob": -2.26e-06,
+                "token_id": 95
+              },
+              {
+                "token": "}\n",
+                "bytes": [
+                  125,
+                  10
+                ],
+                "logprob": -13.12500191,
+                "token_id": 1778
+              },
+              {
+                "token": "}\n\n",
+                "bytes": [
+                  125,
+                  10,
+                  10
+                ],
+                "logprob": -15.87500191,
+                "token_id": 2365
+              },
+              {
+                "token": " }",
+                "bytes": [
+                  32,
+                  125
+                ],
+                "logprob": -16.75000191,
+                "token_id": 837
+              },
+              {
+                "token": "}</",
+                "bytes": [
+                  125,
+                  60,
+                  47
+                ],
+                "logprob": -18.25000191,
+                "token_id": 24568
+              }
+            ],
+            "sampling_logprob": -2.2649790025752736e-06,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 95,
+            "text_offset": 99,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          },
+          {
+            "token": "",
+            "bytes": [
+              60,
+              239,
+              189,
+              156,
+              101,
+              110,
+              100,
+              226,
+              150,
+              129,
+              111,
+              102,
+              226,
+              150,
+              129,
+              115,
+              101,
+              110,
+              116,
+              101,
+              110,
+              99,
+              101,
+              239,
+              189,
+              156,
+              62
+            ],
+            "logprob": 0.0,
+            "top_logprobs": [
+              {
+                "token": "<\uff5cend\u2581of\u2581sentence\uff5c>",
+                "bytes": [
+                  60,
+                  239,
+                  189,
+                  156,
+                  101,
+                  110,
+                  100,
+                  226,
+                  150,
+                  129,
+                  111,
+                  102,
+                  226,
+                  150,
+                  129,
+                  115,
+                  101,
+                  110,
+                  116,
+                  101,
+                  110,
+                  99,
+                  101,
+                  239,
+                  189,
+                  156,
+                  62
+                ],
+                "logprob": 0.0,
+                "token_id": 1
+              },
+              {
+                "token": " \n",
+                "bytes": [
+                  32,
+                  10
+                ],
+                "logprob": -20.8125,
+                "token_id": 539
+              },
+              {
+                "token": " ",
+                "bytes": [
+                  32
+                ],
+                "logprob": -21.5625,
+                "token_id": 223
+              },
+              {
+                "token": "```",
+                "bytes": [
+                  96,
+                  96,
+                  96
+                ],
+                "logprob": -21.9375,
+                "token_id": 9854
+              },
+              {
+                "token": "</think>",
+                "bytes": [
+                  60,
+                  47,
+                  116,
+                  104,
+                  105,
+                  110,
+                  107,
+                  62
+                ],
+                "logprob": -22.1875,
+                "token_id": 128822
+              }
+            ],
+            "sampling_logprob": 0.0,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 1,
+            "text_offset": 100,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          }
+        ],
+        "refusal": null
+      },
+      "message": {
+        "content": "{\"label\":\"A\",\"reason\":\"Same GET-by-id client operation; fullName maps to name, legacyCode dropped.\"}",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": null,
+        "audio": null,
+        "function_call": null,
+        "tool_calls": null,
+        "tools": null
+      }
+    }
+  ],
+  "created": 1795593847,
+  "model": "accounts/fireworks/models/deepseek-v4p1-flash-1017",
+  "object": "chat.completion",
+  "metadata": null,
+  "moderation": null,
+  "service_tier": null,
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 26,
+    "prompt_tokens": 197,
+    "total_tokens": 223,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": null,
+      "audio_tokens": null,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": null,
+      "text_tokens": null
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cache_write_tokens": null,
+      "cached_tokens": 68,
+      "image_tokens": null,
+      "text_tokens": null
+    },
+    "output_tokens_details": {
+      "reasoning_tokens": 0
+    }
+  }
+}

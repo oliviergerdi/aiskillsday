@@ -1,0 +1,2046 @@
+{
+  "model": "accounts/fireworks/routers/deepseek-v4p1-flash-1017-us",
+  "base_url": "https://us.api.fireworks.ai/inference/v1",
+  "E0": {
+    "default_model": "accounts/fireworks/routers/deepseek-v4p1-flash-1017-us",
+    "rows": [
+      {
+        "id": "accounts/fireworks/models/deepseek-v4p1-flash-1017",
+        "http": 403,
+        "error": "Error code: 403 - region not allowed: the requested model has deployments outside your account's US data residency. Use a model served in the US, such as a Fireworks router whose name ends in -us or -us-fast.",
+        "resolved_model": null
+      },
+      {
+        "id": "accounts/fireworks/models/deepseek-v4p1-flash",
+        "http": 403,
+        "error": "Error code: 403 - region not allowed: the requested model has deployments outside your account's US data residency. Use a model served in the US, such as a Fireworks router whose name ends in -us or -us-fast.",
+        "resolved_model": null
+      },
+      {
+        "id": "accounts/fireworks/routers/deepseek-v4p1-flash-1017-us",
+        "http": 200,
+        "error": null,
+        "resolved_model": "accounts/fireworks/models/deepseek-v4p1-flash-1017"
+      },
+      {
+        "id": "accounts/fireworks/routers/deepseek-v4p1-flash-us",
+        "http": 200,
+        "error": null,
+        "resolved_model": "accounts/fireworks/models/deepseek-v4p1-flash"
+      },
+      {
+        "id": "accounts/fireworks/routers/deepseek-v4p1-flash-1017-ultrafast",
+        "http": 200,
+        "error": null,
+        "resolved_model": "accounts/fireworks/models/deepseek-v4p1-flash-1017"
+      },
+      {
+        "id": "accounts/fireworks/routers/deepseek-v4p1-flash-1017-spot",
+        "http": 403,
+        "error": "Error code: 403 - region not allowed: the requested model has deployments outside your account's US data residency. Use a model served in the US, such as a Fireworks router whose name ends in -us or -us-fast.",
+        "resolved_model": null
+      },
+      {
+        "id": "accounts/fireworks/routers/deepseek-v4p1-flash-spot",
+        "http": 403,
+        "error": "Error code: 403 - region not allowed: the requested model has deployments outside your account's US data residency. Use a model served in the US, such as a Fireworks router whose name ends in -us or -us-fast.",
+        "resolved_model": null
+      },
+      {
+        "id": "accounts/fireworks/routers/spot-deepseek-v4-flash",
+        "http": 403,
+        "error": "Error code: 403 - region not allowed: the requested model has deployments outside your account's US data residency. Use a model served in the US, such as a Fireworks router whose name ends in -us or -us-fast.",
+        "resolved_model": null
+      }
+    ],
+    "usable": [
+      "accounts/fireworks/routers/deepseek-v4p1-flash-1017-us",
+      "accounts/fireworks/routers/deepseek-v4p1-flash-us",
+      "accounts/fireworks/routers/deepseek-v4p1-flash-1017-ultrafast"
+    ],
+    "newest_usable": [
+      "accounts/fireworks/routers/deepseek-v4p1-flash-1017-us"
+    ],
+    "region_blocked": [
+      "accounts/fireworks/models/deepseek-v4p1-flash-1017",
+      "accounts/fireworks/models/deepseek-v4p1-flash",
+      "accounts/fireworks/routers/deepseek-v4p1-flash-1017-spot",
+      "accounts/fireworks/routers/deepseek-v4p1-flash-spot",
+      "accounts/fireworks/routers/spot-deepseek-v4-flash"
+    ]
+  },
+  "E1": {
+    "model": "accounts/fireworks/routers/deepseek-v4p1-flash-1017-us",
+    "ok": true,
+    "latency": 0.7267857909901068,
+    "choice_keys": [
+      "finish_reason",
+      "index",
+      "logprobs",
+      "message"
+    ],
+    "logprobs_present": true,
+    "logprobs_keys": [
+      "content",
+      "refusal"
+    ],
+    "n_content_entries": 5,
+    "content_entry_keys": [
+      "bytes",
+      "extra_logprobs",
+      "extra_sampling_logprobs",
+      "extra_tokens",
+      "last_activation",
+      "logprob",
+      "routing_matrix",
+      "sampling_logprob",
+      "sampling_mask",
+      "sampling_mask_count",
+      "text_offset",
+      "token",
+      "token_id",
+      "top_logprobs",
+      "top_sampling_logprobs"
+    ],
+    "top_logprobs_entry_keys": [
+      "bytes",
+      "logprob",
+      "token",
+      "token_id"
+    ],
+    "first_token": "We",
+    "first_token_logprob": -5.329e-05,
+    "first_top_logprobs": {
+      "We": -5.329e-05,
+      "</think>": -10.00005341,
+      "Need": -13.00005341,
+      "Answer": -13.37505341,
+      "The": -14.00005341
+    },
+    "finish_reason": "length",
+    "message_keys": [
+      "annotations",
+      "audio",
+      "content",
+      "function_call",
+      "reasoning_content",
+      "refusal",
+      "role",
+      "tool_calls",
+      "tools"
+    ],
+    "content_text": ""
+  },
+  "E2": {
+    "rows": [
+      {
+        "requested": 5,
+        "ok": true,
+        "accepted": true,
+        "returned": 5
+      },
+      {
+        "requested": 10,
+        "ok": false,
+        "accepted": false,
+        "error": "HTTP 400 BadRequestError: Error code: 400 - top_logprobs must be between 0 and 5, got 10",
+        "status": 400
+      },
+      {
+        "requested": 20,
+        "ok": false,
+        "accepted": false,
+        "error": "HTTP 400 BadRequestError: Error code: 400 - top_logprobs must be between 0 and 5, got 20",
+        "status": 400
+      },
+      {
+        "requested": 50,
+        "ok": false,
+        "accepted": false,
+        "error": "HTTP 400 BadRequestError: Error code: 400 - top_logprobs must be between 0 and 5, got 50",
+        "status": 400
+      },
+      {
+        "requested": 100,
+        "ok": false,
+        "accepted": false,
+        "error": "HTTP 400 BadRequestError: Error code: 400 - top_logprobs must be between 0 and 5, got 100",
+        "status": 400
+      }
+    ],
+    "max_accepted": 5,
+    "rejections": [
+      {
+        "requested": 10,
+        "ok": false,
+        "accepted": false,
+        "error": "HTTP 400 BadRequestError: Error code: 400 - top_logprobs must be between 0 and 5, got 10",
+        "status": 400
+      },
+      {
+        "requested": 20,
+        "ok": false,
+        "accepted": false,
+        "error": "HTTP 400 BadRequestError: Error code: 400 - top_logprobs must be between 0 and 5, got 20",
+        "status": 400
+      },
+      {
+        "requested": 50,
+        "ok": false,
+        "accepted": false,
+        "error": "HTTP 400 BadRequestError: Error code: 400 - top_logprobs must be between 0 and 5, got 50",
+        "status": 400
+      },
+      {
+        "requested": 100,
+        "ok": false,
+        "accepted": false,
+        "error": "HTTP 400 BadRequestError: Error code: 400 - top_logprobs must be between 0 and 5, got 100",
+        "status": 400
+      }
+    ]
+  },
+  "E3": {
+    "rows": [
+      {
+        "variant": "baseline (no param)",
+        "ok": true,
+        "reasoning_chars": 79,
+        "reasoning_head": "We need answer only letter. Need map old GET customer by id returns fields incl",
+        "content": "",
+        "has_think_tag": false,
+        "finish_reason": "length",
+        "reasoning_tokens": 16,
+        "first_tokens": [
+          "We",
+          " need",
+          " answer",
+          " only"
+        ],
+        "logprob_tokens_are_reasoning": true
+      },
+      {
+        "variant": "reasoning_effort=none",
+        "ok": true,
+        "reasoning_chars": 0,
+        "reasoning_head": "",
+        "content": "A",
+        "has_think_tag": false,
+        "finish_reason": "stop",
+        "reasoning_tokens": 0,
+        "first_tokens": [
+          "A",
+          ""
+        ],
+        "logprob_tokens_are_reasoning": false
+      },
+      {
+        "variant": "reasoning_effort=minimal",
+        "ok": true,
+        "reasoning_chars": 79,
+        "reasoning_head": "We need answer only letter. Need map old GET customer by id returns fields incl",
+        "content": "",
+        "has_think_tag": false,
+        "finish_reason": "length",
+        "reasoning_tokens": 16,
+        "first_tokens": [
+          "We",
+          " need",
+          " answer",
+          " only"
+        ],
+        "logprob_tokens_are_reasoning": true
+      },
+      {
+        "variant": "reasoning_effort=low",
+        "ok": true,
+        "reasoning_chars": 79,
+        "reasoning_head": "We need answer only letter. Need map old GET customer by id returns fields incl",
+        "content": "",
+        "has_think_tag": false,
+        "finish_reason": "length",
+        "reasoning_tokens": 16,
+        "first_tokens": [
+          "We",
+          " need",
+          " answer",
+          " only"
+        ],
+        "logprob_tokens_are_reasoning": true
+      },
+      {
+        "variant": "extra_body thinking.type=disabled",
+        "ok": true,
+        "reasoning_chars": 0,
+        "reasoning_head": "",
+        "content": "A",
+        "has_think_tag": false,
+        "finish_reason": "stop",
+        "reasoning_tokens": 0,
+        "first_tokens": [
+          "A",
+          ""
+        ],
+        "logprob_tokens_are_reasoning": false
+      },
+      {
+        "variant": "extra_body chat_template_kwargs.thinking=false",
+        "ok": true,
+        "reasoning_chars": 0,
+        "reasoning_head": "",
+        "content": "A",
+        "has_think_tag": false,
+        "finish_reason": "stop",
+        "reasoning_tokens": 0,
+        "first_tokens": [
+          "A",
+          ""
+        ],
+        "logprob_tokens_are_reasoning": false
+      },
+      {
+        "variant": "extra_body reasoning.enabled=false",
+        "ok": false,
+        "error": "HTTP 400 BadRequestError: Error code: 400 - Extra inputs are not permitted, field: 'reasoning'"
+      },
+      {
+        "variant": "extra_body disable_thinking=true",
+        "ok": false,
+        "error": "HTTP 400 BadRequestError: Error code: 400 - Extra inputs are not permitted, field: 'disable_thinking'"
+      },
+      {
+        "variant": "system prompt: answer immediately",
+        "ok": true,
+        "reasoning_chars": 60,
+        "reasoning_head": "We need answer only letter. Need map old GET /customers/{id}",
+        "content": "",
+        "has_think_tag": false,
+        "finish_reason": "length",
+        "reasoning_tokens": 16,
+        "first_tokens": [
+          "We",
+          " need",
+          " answer",
+          " only"
+        ],
+        "logprob_tokens_are_reasoning": true
+      }
+    ],
+    "max_tokens_1": {
+      "ok": true,
+      "content": "",
+      "reasoning": "We",
+      "first_token": "We",
+      "first_top": [
+        "We",
+        "</think>",
+        "Need",
+        "Answer",
+        "The"
+      ],
+      "answer_token_in_top": false
+    },
+    "variants_without_reasoning": [
+      "reasoning_effort=none",
+      "extra_body thinking.type=disabled",
+      "extra_body chat_template_kwargs.thinking=false"
+    ]
+  },
+  "E4": {
+    "request": {
+      "temperature": 0,
+      "max_tokens": 1,
+      "logprobs": true,
+      "top_logprobs": 5,
+      "reasoning_effort": "none"
+    },
+    "ok": true,
+    "first_token": "A",
+    "is_exactly_A": true,
+    "first_token_logprob": -0.00113316,
+    "full_text": "A",
+    "message_content": "A",
+    "top_logprobs": [
+      {
+        "token": "A",
+        "logprob": -0.00113316,
+        "prob": 0.9988674817833555
+      },
+      {
+        "token": "E",
+        "logprob": -7.00113297,
+        "prob": 0.0009108494156784691
+      },
+      {
+        "token": "C",
+        "logprob": -9.62613297,
+        "prob": 6.598171036653815e-05
+      },
+      {
+        "token": "B",
+        "logprob": -9.75113297,
+        "prob": 5.822865502570381e-05
+      },
+      {
+        "token": "Let",
+        "logprob": -10.12613297,
+        "prob": 4.001993031758429e-05
+      }
+    ],
+    "codes_present": {
+      "A": "A",
+      "B": "B",
+      "C": "C",
+      "D": null,
+      "E": "E"
+    },
+    "distribution": {
+      "A": 0.9989648393337901,
+      "B": 5.82343304524464e-05,
+      "C": 6.598814146757201e-05,
+      "D": null,
+      "E": 0.000910938194289789
+    },
+    "usage": {
+      "completion_tokens": 1,
+      "prompt_tokens": 159,
+      "total_tokens": 160,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": null,
+        "audio_tokens": null,
+        "reasoning_tokens": 0,
+        "rejected_prediction_tokens": null,
+        "text_tokens": null
+      },
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cache_write_tokens": null,
+        "cached_tokens": 30,
+        "image_tokens": null,
+        "text_tokens": null
+      },
+      "output_tokens_details": {
+        "reasoning_tokens": 0
+      }
+    }
+  },
+  "E5": {
+    "correct_candidate": {
+      "candidate": "GET /v2/clients/{clientId}",
+      "ok": true,
+      "first_token": "N",
+      "top_logprobs": {
+        "N": {
+          "logprob": -0.00170277,
+          "prob": 0.9982986788903441
+        },
+        "Y": {
+          "logprob": -6.37670279,
+          "prob": 0.0017007213574667193
+        },
+        " N": {
+          "logprob": -15.62670231,
+          "prob": 1.6345921782262988e-07
+        },
+        "Let": {
+          "logprob": -15.87670231,
+          "prob": 1.273021668405035e-07
+        },
+        "Neither": {
+          "logprob": -16.75170326,
+          "prob": 5.306738796454028e-08
+        }
+      },
+      "p_y_variants": {
+        "Y": 0.0017007213574667193,
+        " Y": null,
+        "Yes": null,
+        " Yes": null,
+        "YES": null,
+        " YES": null
+      },
+      "p_n_variants": {
+        "N": 0.9982986788903441,
+        " N": 1.6345921782262988e-07,
+        "No": null,
+        " No": null,
+        "NO": null,
+        " NO": null
+      },
+      "p_y": 0.0017007213574667193,
+      "p_n": 0.9982988423495619,
+      "p_y_normalised": 0.0017007220994798176
+    },
+    "wrong_candidate": {
+      "candidate": "GET /v2/orders/{orderId}",
+      "ok": true,
+      "first_token": "N",
+      "top_logprobs": {
+        "N": {
+          "logprob": -8.3e-07,
+          "prob": 0.9999991700003444
+        },
+        "Let": {
+          "logprob": -15.25000095,
+          "prob": 2.3823674042517078e-07
+        },
+        " N": {
+          "logprob": -15.62500095,
+          "prob": 1.6373755750832767e-07
+        },
+        "No": {
+          "logprob": -16.0,
+          "prob": 1.1253517471925912e-07
+        },
+        "Y": {
+          "logprob": -16.375,
+          "prob": 7.734421907141565e-08
+        }
+      },
+      "p_y_variants": {
+        "Y": 7.734421907141565e-08,
+        " Y": null,
+        "Yes": null,
+        " Yes": null,
+        "YES": null,
+        " YES": null
+      },
+      "p_n_variants": {
+        "N": 0.9999991700003444,
+        " N": 1.6373755750832767e-07,
+        "No": 1.1253517471925912e-07,
+        " No": null,
+        "NO": null,
+        " NO": null
+      },
+      "p_y": 7.734421907141565e-08,
+      "p_n": 0.9999994462730767,
+      "p_y_normalised": 7.734425591688143e-08
+    }
+  },
+  "E6": {
+    "rows": [
+      {
+        "order": 1,
+        "correct_letter": "A",
+        "letters": {
+          "A": "clients_by_id",
+          "B": "orders_by_id",
+          "C": "create_client",
+          "D": "list_clients",
+          "E": "none"
+        },
+        "ok": true,
+        "first_token": "A",
+        "distribution": {
+          "A": 0.9982586871988269,
+          "B": 6.594147902916484e-05,
+          "C": 0.0001231949016233389,
+          "D": 5.13552755048002e-05,
+          "E": 0.001500821145015783
+        },
+        "p_correct": 0.9982586871988269,
+        "p_A": 0.9982586871988269,
+        "correct_is_argmax": true,
+        "top_logprobs": [
+          {
+            "token": "A",
+            "logprob": -0.00178999
+          },
+          {
+            "token": "E",
+            "logprob": -6.50179005
+          },
+          {
+            "token": "C",
+            "logprob": -9.00179005
+          },
+          {
+            "token": "B",
+            "logprob": -9.62679005
+          },
+          {
+            "token": "D",
+            "logprob": -9.87679005
+          }
+        ]
+      },
+      {
+        "order": 2,
+        "correct_letter": "C",
+        "letters": {
+          "A": "orders_by_id",
+          "B": "create_client",
+          "C": "clients_by_id",
+          "D": "none",
+          "E": "list_clients"
+        },
+        "ok": true,
+        "first_token": "C",
+        "distribution": {
+          "A": null,
+          "B": 7.888010679494022e-06,
+          "C": 0.9998336770595669,
+          "D": 0.00015843492975347578,
+          "E": null
+        },
+        "p_correct": 0.9998336770595669,
+        "p_A": null,
+        "correct_is_argmax": true,
+        "top_logprobs": [
+          {
+            "token": "C",
+            "logprob": -0.00017427
+          },
+          {
+            "token": "D",
+            "logprob": -8.75017452
+          },
+          {
+            "token": "B",
+            "logprob": -11.75017452
+          },
+          {
+            "token": "Let",
+            "logprob": -12.50017452
+          },
+          {
+            "token": "The",
+            "logprob": -13.25017452
+          }
+        ]
+      },
+      {
+        "order": 3,
+        "correct_letter": "D",
+        "letters": {
+          "A": "none",
+          "B": "list_clients",
+          "C": "orders_by_id",
+          "D": "clients_by_id",
+          "E": "create_client"
+        },
+        "ok": true,
+        "first_token": "D",
+        "distribution": {
+          "A": 0.00023048809602847138,
+          "B": 5.142884577913949e-05,
+          "C": 7.886868939332877e-06,
+          "D": 0.9996887574567319,
+          "E": 2.143873252122662e-05
+        },
+        "p_correct": 0.9996887574567319,
+        "p_A": 0.00023048809602847138,
+        "correct_is_argmax": true,
+        "top_logprobs": [
+          {
+            "token": "D",
+            "logprob": -0.0003242
+          },
+          {
+            "token": "A",
+            "logprob": -8.37532425
+          },
+          {
+            "token": "B",
+            "logprob": -9.87532425
+          },
+          {
+            "token": "E",
+            "logprob": -10.75032425
+          },
+          {
+            "token": "C",
+            "logprob": -11.75032425
+          }
+        ]
+      }
+    ],
+    "p_correct_each_order": [
+      0.9982586871988269,
+      0.9998336770595669,
+      0.9996887574567319
+    ]
+  },
+  "E7": {
+    "runs": [
+      {
+        "ok": true,
+        "first_token": "A",
+        "distribution": {
+          "A": 0.9989648393337901,
+          "B": 5.82343304524464e-05,
+          "C": 6.598814146757201e-05,
+          "D": null,
+          "E": 0.000910938194289789
+        },
+        "raw_top": {
+          "A": -0.00113316,
+          "E": -7.00113297,
+          "C": -9.62613297,
+          "B": -9.75113297,
+          "Let": -10.12613297
+        },
+        "latency": 0.5077694159699604,
+        "completion_tokens": 1
+      },
+      {
+        "ok": true,
+        "first_token": "A",
+        "distribution": {
+          "A": 0.9989648393337901,
+          "B": 5.82343304524464e-05,
+          "C": 6.598814146757201e-05,
+          "D": null,
+          "E": 0.000910938194289789
+        },
+        "raw_top": {
+          "A": -0.00113316,
+          "E": -7.00113297,
+          "C": -9.62613297,
+          "B": -9.75113297,
+          "Let": -10.12613297
+        },
+        "latency": 0.5132869170047343,
+        "completion_tokens": 1
+      },
+      {
+        "ok": true,
+        "first_token": "A",
+        "distribution": {
+          "A": 0.9992847381848177,
+          "B": 4.003665262697239e-05,
+          "C": 2.7516762109196536e-05,
+          "D": 2.1430075878231825e-05,
+          "E": 0.0006262783245679622
+        },
+        "raw_top": {
+          "A": -0.00074704,
+          "E": -7.3757472,
+          "B": -10.12574673,
+          "C": -10.50074673,
+          "D": -10.75074673
+        },
+        "latency": 0.8807497919769958,
+        "completion_tokens": 1
+      },
+      {
+        "ok": true,
+        "first_token": "A",
+        "distribution": {
+          "A": 0.9989648393337901,
+          "B": 5.82343304524464e-05,
+          "C": 6.598814146757201e-05,
+          "D": null,
+          "E": 0.000910938194289789
+        },
+        "raw_top": {
+          "A": -0.00113316,
+          "E": -7.00113297,
+          "C": -9.62613297,
+          "B": -9.75113297,
+          "Let": -10.12613297
+        },
+        "latency": 0.6573225000174716,
+        "completion_tokens": 1
+      },
+      {
+        "ok": true,
+        "first_token": "A",
+        "distribution": {
+          "A": 0.9989648393337901,
+          "B": 5.82343304524464e-05,
+          "C": 6.598814146757201e-05,
+          "D": null,
+          "E": 0.000910938194289789
+        },
+        "raw_top": {
+          "A": -0.00113316,
+          "E": -7.00113297,
+          "C": -9.62613297,
+          "B": -9.75113297,
+          "Let": -10.12613297
+        },
+        "latency": 1.8588060409529135,
+        "completion_tokens": 1
+      }
+    ],
+    "identical": false,
+    "spread": {
+      "A": {
+        "min": 0.9989648393337901,
+        "max": 0.9992847381848177,
+        "range": 0.0003198988510275669,
+        "n": 5
+      },
+      "B": {
+        "min": 4.003665262697239e-05,
+        "max": 5.82343304524464e-05,
+        "range": 1.8197677825474008e-05,
+        "n": 5
+      },
+      "C": {
+        "min": 2.7516762109196536e-05,
+        "max": 6.598814146757201e-05,
+        "range": 3.8471379358375474e-05,
+        "n": 5
+      },
+      "D": {
+        "min": 2.1430075878231825e-05,
+        "max": 2.1430075878231825e-05,
+        "range": 0.0,
+        "n": 1
+      },
+      "E": {
+        "min": 0.0006262783245679622,
+        "max": 0.000910938194289789,
+        "range": 0.0002846598697218268,
+        "n": 5
+      }
+    },
+    "n_runs": 5,
+    "first_token_counts": {
+      "A": 5
+    }
+  },
+  "E8": {
+    "n_options": 30,
+    "correct_code": "02",
+    "prompt_tokens": 667,
+    "ok": true,
+    "first_token": "02",
+    "top_logprobs": [
+      {
+        "token": "02",
+        "logprob": -0.2314201,
+        "prob": 0.7934060861169162
+      },
+      {
+        "token": "30",
+        "logprob": -1.98142004,
+        "prob": 0.13787331261451852
+      },
+      {
+        "token": "08",
+        "logprob": -3.48142004,
+        "prob": 0.030763694323872038
+      },
+      {
+        "token": "28",
+        "logprob": -3.73142004,
+        "prob": 0.023958789229600878
+      },
+      {
+        "token": "Let",
+        "logprob": -5.35642004,
+        "prob": 0.004717765323064913
+      }
+    ],
+    "codes_seen_in_top_logprobs": [
+      "02",
+      "08",
+      "28",
+      "30"
+    ],
+    "n_codes_seen": 4,
+    "p_correct": 0.8046699508101544,
+    "correct_wins": true
+  },
+  "E9": {
+    "json_object": {
+      "variant": "response_format=json_object",
+      "ok": true,
+      "content": "{\"label\":\"A\",\"reason\":\"Same GET-by-id client operation; fullName maps to name, legacyCode dropped.\"}",
+      "tokens_with_logprobs": 26,
+      "label_token_index": 3,
+      "label_token": "A",
+      "label_logprob": -0.0490041,
+      "label_top_logprobs": {
+        "A": -0.0490041,
+        "E": -3.04900408,
+        "B": -8.29900455,
+        "C": -9.42400455,
+        "D": -9.54900455
+      },
+      "label_distribution": {
+        "A": 0.9521923296128372,
+        "B": 0.0002487682823626115,
+        "C": 8.076323666952045e-05,
+        "D": 7.12733062035584e-05,
+        "E": 0.04740686556192726
+      }
+    },
+    "json_schema": {
+      "variant": "response_format=json_schema(strict)",
+      "ok": true,
+      "content": "{\"label\":\"A\",\"reason\":\"Same GET-by-id customer/client operation; renamed fields (fullName\u2192name) and dropped legacyCode, but same resource and semantics.\"}",
+      "tokens_with_logprobs": 36,
+      "label_token_index": 3,
+      "label_token": "A",
+      "label_logprob": -0.09024519,
+      "label_top_logprobs": {
+        "A": -0.09024519,
+        "E": -2.46524525,
+        "B": -7.21524525,
+        "C": -7.96524525,
+        "D": -8.46524525
+      },
+      "label_distribution": {
+        "A": 0.9137177219699337,
+        "B": 0.0007352987686871422,
+        "C": 0.0003473305445994581,
+        "D": 0.00021066662435425718,
+        "E": 0.08498898209242534
+      }
+    }
+  },
+  "E10": {
+    "logprobs+echo": {
+      "ok": false,
+      "status": 400,
+      "error": "HTTP 400 BadRequestError: Error code: 400 - Prompt logprobs (echo or echo_last with logprobs) are temporarily unsupported for this model. Disable echo/echo_last or omit logprobs."
+    },
+    "logprobs, no echo": {
+      "ok": true,
+      "latency": 1.1231381250545382,
+      "completion_text": " A",
+      "logprobs_keys": [
+        "text_offset",
+        "token_ids",
+        "token_logprobs",
+        "tokens",
+        "top_logprobs"
+      ],
+      "n_token_lp": 1,
+      "n_prompt_lp": 1,
+      "n_top_lp": 1,
+      "first_tokens": [
+        " A"
+      ],
+      "last_tokens": [
+        " A"
+      ],
+      "sample_top": {
+        " A": -0.43528843,
+        " E": -1.18528843,
+        " I": -4.81028843,
+        " C": -4.93528843,
+        "<\uff5cend\u2581of\u2581sentence\uff5c>": -5.68528843
+      },
+      "prompt_tokens": 132,
+      "raw_prompt_echo_chars": 2
+    }
+  },
+  "E11": {
+    "n_calls": 10,
+    "latency_s": {
+      "median": 0.6963513749651611,
+      "min": 0.5021162920165807,
+      "max": 1.124545499915257,
+      "all": [
+        0.5909111659275368,
+        0.5651738749584183,
+        0.5974894579267129,
+        0.5021162920165807,
+        1.124545499915257,
+        0.6144092920003459,
+        0.9224012499907985,
+        1.0574197500245646,
+        0.7782934579299763,
+        1.124522165977396
+      ]
+    },
+    "prompt_tokens_per_call": 159.0,
+    "completion_tokens_per_call": 1.0,
+    "cached_tokens_per_call": [
+      30,
+      30,
+      30,
+      30,
+      30,
+      30,
+      30,
+      30,
+      30,
+      30
+    ],
+    "any_cached": true,
+    "cost_usd_per_call": 7.335e-05,
+    "price_usd_per_mtok": {
+      "input": 0.45,
+      "output": 1.8,
+      "cached_input": 0.009,
+      "source": "pi model config (models.json); Fireworks pricing page not queried"
+    },
+    "rate_limit_headers": {
+      "fireworks-cached-prompt-tokens": "30",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-ratelimit-over-limit": "no",
+      "x-request-id": "chatcmpl-2322d4dc98114c0fb3c046e4ea911705"
+    },
+    "runs": [
+      {
+        "i": 0,
+        "latency": 0.5909111659275368,
+        "prompt_tokens": 159,
+        "completion_tokens": 1,
+        "cached_tokens": 30,
+        "id": "chatcmpl-2322d4dc98114c0fb3c046e4ea911705",
+        "system_fingerprint": null
+      },
+      {
+        "i": 1,
+        "latency": 0.5651738749584183,
+        "prompt_tokens": 159,
+        "completion_tokens": 1,
+        "cached_tokens": 30,
+        "id": "chatcmpl-1ef4c05859934cf3b54d1f4215fb1f1b",
+        "system_fingerprint": null
+      },
+      {
+        "i": 2,
+        "latency": 0.5974894579267129,
+        "prompt_tokens": 159,
+        "completion_tokens": 1,
+        "cached_tokens": 30,
+        "id": "chatcmpl-1ec2bd6cf0de4aa0920c7098b1502a3b",
+        "system_fingerprint": null
+      },
+      {
+        "i": 3,
+        "latency": 0.5021162920165807,
+        "prompt_tokens": 159,
+        "completion_tokens": 1,
+        "cached_tokens": 30,
+        "id": "chatcmpl-3118d549c1f74ee2a86334ad1a8d00c7",
+        "system_fingerprint": null
+      },
+      {
+        "i": 4,
+        "latency": 1.124545499915257,
+        "prompt_tokens": 159,
+        "completion_tokens": 1,
+        "cached_tokens": 30,
+        "id": "chatcmpl-8e1fafe7deaa464dbf41fbb8aad9f52a",
+        "system_fingerprint": null
+      },
+      {
+        "i": 5,
+        "latency": 0.6144092920003459,
+        "prompt_tokens": 159,
+        "completion_tokens": 1,
+        "cached_tokens": 30,
+        "id": "chatcmpl-e1fa5651121c42c083ba037ecac10ded",
+        "system_fingerprint": null
+      },
+      {
+        "i": 6,
+        "latency": 0.9224012499907985,
+        "prompt_tokens": 159,
+        "completion_tokens": 1,
+        "cached_tokens": 30,
+        "id": "chatcmpl-c28eb4c742774dc2a9c206c2ae241f3f",
+        "system_fingerprint": null
+      },
+      {
+        "i": 7,
+        "latency": 1.0574197500245646,
+        "prompt_tokens": 159,
+        "completion_tokens": 1,
+        "cached_tokens": 30,
+        "id": "chatcmpl-07ee4a2d89b34446b9719afa2bb83aa5",
+        "system_fingerprint": null
+      },
+      {
+        "i": 8,
+        "latency": 0.7782934579299763,
+        "prompt_tokens": 159,
+        "completion_tokens": 1,
+        "cached_tokens": 30,
+        "id": "chatcmpl-5d2a9dfa039e4a8ab13e6c4df00f0777",
+        "system_fingerprint": null
+      },
+      {
+        "i": 9,
+        "latency": 1.124522165977396,
+        "prompt_tokens": 159,
+        "completion_tokens": 1,
+        "cached_tokens": 30,
+        "id": "chatcmpl-cf662faa5f514457ac345ee691991f2d",
+        "system_fingerprint": null
+      }
+    ]
+  },
+  "E12": {
+    "rows": [
+      {
+        "order": 1,
+        "n_options": 10,
+        "correct_letter": "A",
+        "stage1": {
+          "ok": true,
+          "first_token": "A",
+          "prompt_tokens": 263,
+          "top_logprobs": [
+            {
+              "token": "A",
+              "logprob": -0.00316963,
+              "prob": 0.9968353879740613
+            },
+            {
+              "token": "E",
+              "logprob": -6.50316954,
+              "prob": 0.0014986815261085393
+            },
+            {
+              "token": "J",
+              "logprob": -6.87816954,
+              "prob": 0.0010300277452164916
+            },
+            {
+              "token": "D",
+              "logprob": -8.50317001,
+              "prob": 0.00020282439348989084
+            },
+            {
+              "token": "C",
+              "logprob": -8.62817001,
+              "prob": 0.00017899189902342784
+            }
+          ],
+          "correct_code": "A",
+          "visible_codes": [
+            "A",
+            "E",
+            "J",
+            "D",
+            "C"
+          ],
+          "n_visible": 5,
+          "distribution": {
+            "A": 0.9970887347230672,
+            "B": null,
+            "C": 0.0001790373900004368,
+            "D": 0.00020287594152011704,
+            "E": 0.001499062417574689,
+            "F": null,
+            "G": null,
+            "H": null,
+            "I": null,
+            "J": 0.0010302895278375595
+          },
+          "p_correct": 0.9970887347230672,
+          "p_correct_absolute": 0.9968353879740613,
+          "mass_on_codes": 0.9997459135378997,
+          "mass_other": 0.0002540864621003447,
+          "winner_letter": "A",
+          "winner_is_correct": true
+        },
+        "stage2": {
+          "ok": true,
+          "first_token": "B",
+          "prompt_tokens": 159,
+          "top_logprobs": [
+            {
+              "token": "B",
+              "logprob": -0.28427985,
+              "prob": 0.7525560124347704
+            },
+            {
+              "token": "C",
+              "logprob": -1.78427982,
+              "prob": 0.16791794861277246
+            },
+            {
+              "token": "A",
+              "logprob": -2.53427982,
+              "prob": 0.07931882252955817
+            },
+            {
+              "token": "D",
+              "logprob": -8.78427982,
+              "prob": 0.0001531213490328972
+            },
+            {
+              "token": "None",
+              "logprob": -11.15927982,
+              "prob": 1.4242504067542653e-05
+            }
+          ],
+          "correct_code": "A",
+          "visible_codes": [
+            "B",
+            "C",
+            "A",
+            "D"
+          ],
+          "n_visible": 4,
+          "distribution": {
+            "A": 0.07932311351924327,
+            "B": 0.752596724210158,
+            "C": 0.1679270326380071,
+            "D": 0.00015312963259168344,
+            "E": null
+          },
+          "p_correct": 0.07932311351924327,
+          "p_correct_absolute": 0.07931882252955817,
+          "mass_on_codes": 0.999945904926134,
+          "mass_other": 5.4095073866000654e-05,
+          "winner_letter": "B",
+          "winner_is_correct": false
+        },
+        "stage2_shortlist": {
+          "A": "correct",
+          "B": "none",
+          "C": "customers_v2",
+          "D": "list_clients",
+          "E": "create_client"
+        },
+        "stage2_p_correct": 0.07932311351924327,
+        "combined_p_correct": 0.07930295858996639
+      },
+      {
+        "order": 2,
+        "n_options": 10,
+        "correct_letter": "D",
+        "stage1": {
+          "ok": true,
+          "first_token": "D",
+          "prompt_tokens": 263,
+          "top_logprobs": [
+            {
+              "token": "D",
+              "logprob": -0.00057597,
+              "prob": 0.9994241958388795
+            },
+            {
+              "token": "E",
+              "logprob": -7.62557602,
+              "prob": 0.0004878141718604621
+            },
+            {
+              "token": "J",
+              "logprob": -9.87557602,
+              "prob": 5.141523544438068e-05
+            },
+            {
+              "token": "C",
+              "logprob": -11.00057602,
+              "prob": 1.6692083046828666e-05
+            },
+            {
+              "token": "Let",
+              "logprob": -12.25057602,
+              "prob": 4.78236186250507e-06
+            }
+          ],
+          "correct_code": "D",
+          "visible_codes": [
+            "D",
+            "E",
+            "J",
+            "C"
+          ],
+          "n_visible": 4,
+          "distribution": {
+            "A": null,
+            "B": null,
+            "C": 1.669241493661918e-05,
+            "D": 0.9994440674562245,
+            "E": 0.0004878238711018843,
+            "F": null,
+            "G": null,
+            "H": null,
+            "I": null,
+            "J": 5.141625773690542e-05
+          },
+          "p_correct": 0.9994440674562245,
+          "p_correct_absolute": 0.9994241958388795,
+          "mass_on_codes": 0.9999801173292312,
+          "mass_other": 1.988267076880046e-05,
+          "winner_letter": "D",
+          "winner_is_correct": true
+        },
+        "stage2": {
+          "ok": true,
+          "first_token": "B",
+          "prompt_tokens": 146,
+          "top_logprobs": [
+            {
+              "token": "B",
+              "logprob": -0.1283848,
+              "prob": 0.8795148766963968
+            },
+            {
+              "token": "C",
+              "logprob": -2.12838483,
+              "prob": 0.11902939137763957
+            },
+            {
+              "token": "A",
+              "logprob": -6.75338459,
+              "prob": 0.0011669233722517796
+            },
+            {
+              "token": "D",
+              "logprob": -8.25338459,
+              "prob": 0.0002603757989314854
+            },
+            {
+              "token": "None",
+              "logprob": -11.50338459,
+              "prob": 1.0095865342120075e-05
+            }
+          ],
+          "correct_code": "A",
+          "visible_codes": [
+            "B",
+            "C",
+            "A",
+            "D"
+          ],
+          "n_visible": 4,
+          "distribution": {
+            "A": 0.0011669565520412632,
+            "B": 0.8795398844382506,
+            "C": 0.11903277580736493,
+            "D": 0.0002603832023432263
+          },
+          "p_correct": 0.0011669565520412632,
+          "p_correct_absolute": 0.0011669233722517796,
+          "mass_on_codes": 0.9999715672452196,
+          "mass_other": 2.8432754780371994e-05,
+          "winner_letter": "B",
+          "winner_is_correct": false
+        },
+        "stage2_shortlist": {
+          "A": "correct",
+          "B": "none",
+          "C": "customers_v2",
+          "D": "list_clients"
+        },
+        "stage2_p_correct": 0.0011669565520412632,
+        "combined_p_correct": 0.0011669333498283375
+      },
+      {
+        "order": 3,
+        "n_options": 10,
+        "correct_letter": "J",
+        "stage1": {
+          "ok": true,
+          "first_token": "J",
+          "prompt_tokens": 263,
+          "top_logprobs": [
+            {
+              "token": "J",
+              "logprob": -0.64039034,
+              "prob": 0.5270866408835597
+            },
+            {
+              "token": "D",
+              "logprob": -1.1403904,
+              "prob": 0.31969418883916945
+            },
+            {
+              "token": "I",
+              "logprob": -1.8903904,
+              "prob": 0.15101284191329345
+            },
+            {
+              "token": "G",
+              "logprob": -6.5153904,
+              "prob": 0.0014804778080970246
+            },
+            {
+              "token": "Let",
+              "logprob": -7.7653904,
+              "prob": 0.00042416399366485756
+            }
+          ],
+          "correct_code": "J",
+          "visible_codes": [
+            "J",
+            "D",
+            "I",
+            "G"
+          ],
+          "n_visible": 4,
+          "distribution": {
+            "A": null,
+            "B": null,
+            "C": null,
+            "D": 0.3199264075999667,
+            "E": null,
+            "F": null,
+            "G": 0.001481553194306678,
+            "H": null,
+            "I": 0.15112253428881303,
+            "J": 0.5274695049169136
+          },
+          "p_correct": 0.5274695049169136,
+          "p_correct_absolute": 0.5270866408835597,
+          "mass_on_codes": 0.9992741494441196,
+          "mass_other": 0.0007258505558803696,
+          "winner_letter": "J",
+          "winner_is_correct": true
+        },
+        "stage2": {
+          "ok": true,
+          "first_token": "B",
+          "prompt_tokens": 153,
+          "top_logprobs": [
+            {
+              "token": "B",
+              "logprob": -0.33634612,
+              "prob": 0.7143758032673202
+            },
+            {
+              "token": "C",
+              "logprob": -1.33634615,
+              "prob": 0.26280416340825696
+            },
+            {
+              "token": "A",
+              "logprob": -3.83634615,
+              "prob": 0.02157227939172165
+            },
+            {
+              "token": "D",
+              "logprob": -6.71134615,
+              "prob": 0.00121702472357783
+            },
+            {
+              "token": "The",
+              "logprob": -11.83634567,
+              "prob": 7.236697008207874e-06
+            }
+          ],
+          "correct_code": "A",
+          "visible_codes": [
+            "B",
+            "C",
+            "A",
+            "D"
+          ],
+          "n_visible": 4,
+          "distribution": {
+            "A": 0.021572942311177335,
+            "B": 0.714397756145366,
+            "C": 0.2628122394205223,
+            "D": 0.0012170621229343215
+          },
+          "p_correct": 0.021572942311177335,
+          "p_correct_absolute": 0.02157227939172165,
+          "mass_on_codes": 0.9999692707908766,
+          "mass_other": 3.072920912339239e-05,
+          "winner_letter": "B",
+          "winner_is_correct": false
+        },
+        "stage2_shortlist": {
+          "A": "correct",
+          "B": "none",
+          "C": "customers_v2",
+          "D": "contacts"
+        },
+        "stage2_p_correct": 0.021572942311177335,
+        "combined_p_correct": 0.021557283579008792
+      }
+    ],
+    "n_options": 10,
+    "correct_wins_all_orders": true,
+    "n_visible_per_order": [
+      5,
+      4,
+      4
+    ],
+    "p_correct_stage1": [
+      0.9970887347230672,
+      0.9994440674562245,
+      0.5274695049169136
+    ],
+    "mass_other_per_order": [
+      0.0002540864621003447,
+      1.988267076880046e-05,
+      0.0007258505558803696
+    ],
+    "combined_p_correct": [
+      0.07930295858996639,
+      0.0011669333498283375,
+      0.021557283579008792
+    ]
+  },
+  "E13": {
+    "codes": [
+      "01",
+      "02",
+      "03",
+      "04",
+      "05",
+      "06",
+      "07",
+      "08",
+      "09",
+      "10"
+    ],
+    "stage1": {
+      "ok": true,
+      "first_token": "01",
+      "prompt_tokens": 261,
+      "top_logprobs": [
+        {
+          "token": "01",
+          "logprob": -0.0001279,
+          "prob": 0.9998721081788563
+        },
+        {
+          "token": "A",
+          "logprob": -9.25012779,
+          "prob": 9.609937073810958e-05
+        },
+        {
+          "token": "02",
+          "logprob": -10.87512779,
+          "prob": 1.8923088078110064e-05
+        },
+        {
+          "token": "03",
+          "logprob": -11.87512779,
+          "prob": 6.961415067413113e-06
+        },
+        {
+          "token": "05",
+          "logprob": -13.62512779,
+          "prob": 1.209712548259723e-06
+        }
+      ],
+      "correct_code": "01",
+      "visible_codes": [
+        "01",
+        "02",
+        "03",
+        "05"
+      ],
+      "n_visible": 4,
+      "distribution": {
+        "01": 0.9999729030529989,
+        "02": 1.8924995672357002e-05,
+        "03": 6.962116832118658e-06,
+        "04": null,
+        "05": 1.20983449667998e-06,
+        "06": null,
+        "07": null,
+        "08": null,
+        "09": null,
+        "10": null
+      },
+      "p_correct": 0.9999729030529989,
+      "p_correct_absolute": 0.9998721081788563,
+      "mass_on_codes": 0.9998992023945501,
+      "mass_other": 0.00010079760544989824,
+      "winner_letter": "01",
+      "winner_is_correct": true
+    },
+    "single_token_codes": [
+      "01",
+      "02",
+      "03",
+      "05"
+    ],
+    "p_correct": 0.9999729030529989
+  },
+  "E14": {
+    "rows": [
+      {
+        "order": 1,
+        "n_options": 10,
+        "correct_letter": "A",
+        "stage1": {
+          "ok": true,
+          "first_token": "A",
+          "prompt_tokens": 261,
+          "top_logprobs": [
+            {
+              "token": "A",
+              "logprob": -0.00267469,
+              "prob": 0.9973288837963222
+            },
+            {
+              "token": "E",
+              "logprob": -6.00267458,
+              "prob": 0.0024721314134968043
+            },
+            {
+              "token": "Let",
+              "logprob": -9.50267506,
+              "prob": 7.465186433081773e-05
+            },
+            {
+              "token": "D",
+              "logprob": -10.25267506,
+              "prob": 3.5263043809638295e-05
+            },
+            {
+              "token": "H",
+              "logprob": -10.50267506,
+              "prob": 2.7462886132427556e-05
+            }
+          ],
+          "correct_code": "A",
+          "visible_codes": [
+            "A",
+            "E",
+            "D",
+            "H"
+          ],
+          "n_visible": 4,
+          "distribution": {
+            "A": 0.997464797212719,
+            "B": null,
+            "C": null,
+            "D": 3.526784936659604e-05,
+            "E": 0.0024724683092105944,
+            "F": null,
+            "G": null,
+            "H": 2.7466628703949342e-05,
+            "I": null,
+            "J": null
+          },
+          "p_correct": 0.997464797212719,
+          "p_correct_absolute": 0.9973288837963222,
+          "mass_on_codes": 0.9998637411397611,
+          "mass_other": 0.00013625886023893585,
+          "winner_letter": "A",
+          "winner_is_correct": true
+        },
+        "stage2": {
+          "ok": true,
+          "first_token": "B",
+          "prompt_tokens": 145,
+          "top_logprobs": [
+            {
+              "token": "B",
+              "logprob": -0.57764632,
+              "prob": 0.5612177402354397
+            },
+            {
+              "token": "A",
+              "logprob": -0.82764632,
+              "prob": 0.4370768155689247
+            },
+            {
+              "token": "D",
+              "logprob": -6.70264626,
+              "prob": 0.0012276588957912257
+            },
+            {
+              "token": "C",
+              "logprob": -7.70264626,
+              "prob": 0.00045163046853282605
+            },
+            {
+              "token": "The",
+              "logprob": -12.07764626,
+              "prob": 5.685188578908326e-06
+            }
+          ],
+          "correct_code": "A",
+          "visible_codes": [
+            "B",
+            "A",
+            "D",
+            "C"
+          ],
+          "n_visible": 4,
+          "distribution": {
+            "A": 0.43708824753830733,
+            "B": 0.5612324191746898,
+            "C": 0.0004516422811605031,
+            "D": 0.0012276910058423866
+          },
+          "p_correct": 0.43708824753830733,
+          "p_correct_absolute": 0.4370768155689247,
+          "mass_on_codes": 0.9999738451686885,
+          "mass_other": 2.6154831311520077e-05,
+          "winner_letter": "B",
+          "winner_is_correct": false
+        },
+        "stage2_shortlist": {
+          "A": "correct",
+          "B": "none",
+          "C": "list_clients",
+          "D": "contacts"
+        },
+        "stage2_p_correct": 0.43708824753830733,
+        "combined_p_correct": 0.4370286903918739
+      },
+      {
+        "order": 2,
+        "n_options": 10,
+        "correct_letter": "D",
+        "stage1": {
+          "ok": true,
+          "first_token": "D",
+          "prompt_tokens": 261,
+          "top_logprobs": [
+            {
+              "token": "D",
+              "logprob": -0.00057812,
+              "prob": 0.9994220470791684
+            },
+            {
+              "token": "E",
+              "logprob": -7.50057793,
+              "prob": 0.0005527648184459456
+            },
+            {
+              "token": "C",
+              "logprob": -10.87557793,
+              "prob": 1.8914571956109965e-05
+            },
+            {
+              "token": "Let",
+              "logprob": -13.62557793,
+              "prob": 1.2091681307944811e-06
+            },
+            {
+              "token": "B",
+              "logprob": -13.62557793,
+              "prob": 1.2091681307944811e-06
+            }
+          ],
+          "correct_code": "D",
+          "visible_codes": [
+            "D",
+            "E",
+            "C",
+            "B"
+          ],
+          "n_visible": 4,
+          "distribution": {
+            "A": null,
+            "B": 1.2091742544909884e-06,
+            "C": 1.8914667746840198e-05,
+            "D": 0.9994271085401373,
+            "E": 0.0005527676178614296,
+            "F": null,
+            "G": null,
+            "H": null,
+            "I": null,
+            "J": null
+          },
+          "p_correct": 0.9994271085401373,
+          "p_correct_absolute": 0.9994220470791684,
+          "mass_on_codes": 0.9999949356377013,
+          "mass_other": 5.064362298745628e-06,
+          "winner_letter": "D",
+          "winner_is_correct": true
+        },
+        "stage2": {
+          "ok": true,
+          "first_token": "A",
+          "prompt_tokens": 136,
+          "top_logprobs": [
+            {
+              "token": "A",
+              "logprob": -0.31339636,
+              "prob": 0.7309601317860855
+            },
+            {
+              "token": "B",
+              "logprob": -1.31339633,
+              "prob": 0.26890521286722524
+            },
+            {
+              "token": "C",
+              "logprob": -9.31339645,
+              "prob": 9.020763854020636e-05
+            },
+            {
+              "token": "D",
+              "logprob": -10.18839645,
+              "prob": 3.7604138392299276e-05
+            },
+            {
+              "token": "The",
+              "logprob": -13.06339645,
+              "prob": 2.1214803174593057e-06
+            }
+          ],
+          "correct_code": "A",
+          "visible_codes": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "n_visible": 4,
+          "distribution": {
+            "A": 0.7309651341969711,
+            "B": 0.26890705315140156,
+            "C": 9.020825588669818e-05,
+            "D": 3.760439574060471e-05
+          },
+          "p_correct": 0.7309651341969711,
+          "p_correct_absolute": 0.7309601317860855,
+          "mass_on_codes": 0.9999931564302433,
+          "mass_other": 6.843569756664891e-06,
+          "winner_letter": "A",
+          "winner_is_correct": true
+        },
+        "stage2_shortlist": {
+          "A": "correct",
+          "B": "none",
+          "C": "list_clients",
+          "D": "create_client"
+        },
+        "stage2_p_correct": 0.7309651341969711,
+        "combined_p_correct": 0.7309614323247038
+      },
+      {
+        "order": 3,
+        "n_options": 10,
+        "correct_letter": "J",
+        "stage1": {
+          "ok": true,
+          "first_token": "J",
+          "prompt_tokens": 261,
+          "top_logprobs": [
+            {
+              "token": "J",
+              "logprob": -0.00551002,
+              "prob": 0.9945051323175687
+            },
+            {
+              "token": "D",
+              "logprob": -5.38050985,
+              "prob": 0.0046054732307747705
+            },
+            {
+              "token": "G",
+              "logprob": -7.13050985,
+              "prob": 0.0008003112447671938
+            },
+            {
+              "token": "Let",
+              "logprob": -10.38051033,
+              "prob": 3.103141963958232e-05
+            },
+            {
+              "token": "C",
+              "logprob": -11.13051033,
+              "prob": 1.4658204721809323e-05
+            }
+          ],
+          "correct_code": "J",
+          "visible_codes": [
+            "J",
+            "D",
+            "G",
+            "C"
+          ],
+          "n_visible": 4,
+          "distribution": {
+            "A": null,
+            "B": null,
+            "C": 1.4659295739926527e-05,
+            "D": 0.004605816018641941,
+            "E": null,
+            "F": null,
+            "G": 0.000800370812366639,
+            "H": null,
+            "I": null,
+            "J": 0.9945791538732514
+          },
+          "p_correct": 0.9945791538732514,
+          "p_correct_absolute": 0.9945051323175687,
+          "mass_on_codes": 0.9999255749978324,
+          "mass_other": 7.442500216758852e-05,
+          "winner_letter": "J",
+          "winner_is_correct": true
+        },
+        "stage2": {
+          "ok": true,
+          "first_token": "B",
+          "prompt_tokens": 144,
+          "top_logprobs": [
+            {
+              "token": "B",
+              "logprob": -0.6037063,
+              "prob": 0.5467813402939561
+            },
+            {
+              "token": "A",
+              "logprob": -0.8537063,
+              "prob": 0.42583373598976526
+            },
+            {
+              "token": "C",
+              "logprob": -3.60370636,
+              "prob": 0.027222638338129122
+            },
+            {
+              "token": "D",
+              "logprob": -8.85370636,
+              "prob": 0.00014285129555359307
+            },
+            {
+              "token": "The",
+              "logprob": -12.35370636,
+              "prob": 4.3137353442067914e-06
+            }
+          ],
+          "correct_code": "A",
+          "visible_codes": [
+            "B",
+            "A",
+            "C",
+            "D"
+          ],
+          "n_visible": 4,
+          "distribution": {
+            "A": 0.42584201183859616,
+            "B": 0.5467919666941996,
+            "C": 0.027223167395412817,
+            "D": 0.0001428540717914235
+          },
+          "p_correct": 0.42584201183859616,
+          "p_correct_absolute": 0.42583373598976526,
+          "mass_on_codes": 0.999980565917404,
+          "mass_other": 1.943408259597046e-05,
+          "winner_letter": "B",
+          "winner_is_correct": false
+        },
+        "stage2_shortlist": {
+          "A": "correct",
+          "B": "none",
+          "C": "contacts",
+          "D": "list_clients"
+        },
+        "stage2_p_correct": 0.42584201183859616,
+        "combined_p_correct": 0.42581031854594203
+      }
+    ],
+    "n_options": 10,
+    "correct_wins_all_orders": true,
+    "n_visible_per_order": [
+      4,
+      4,
+      4
+    ],
+    "p_correct_stage1": [
+      0.997464797212719,
+      0.9994271085401373,
+      0.9945791538732514
+    ],
+    "mass_other_per_order": [
+      0.00013625886023893585,
+      5.064362298745628e-06,
+      7.442500216758852e-05
+    ],
+    "combined_p_correct": [
+      0.4370286903918739,
+      0.7309614323247038,
+      0.42581031854594203
+    ]
+  },
+  "E15": {
+    "rows": [
+      {
+        "variant": "with none (3 options)",
+        "n_options": 3,
+        "ok": true,
+        "top_logprobs": [
+          [
+            "B",
+            -0.6952
+          ],
+          [
+            "A",
+            -0.6952
+          ],
+          [
+            "C",
+            -6.1952
+          ],
+          [
+            "The",
+            -12.3202
+          ],
+          [
+            "Let",
+            -13.3202
+          ]
+        ],
+        "p_correct": 0.49898039083988716,
+        "winner_correct": true,
+        "error": null
+      },
+      {
+        "variant": "without none (2 options)",
+        "n_options": 2,
+        "ok": true,
+        "top_logprobs": [
+          [
+            "A",
+            -0.0001
+          ],
+          [
+            "B",
+            -9.8751
+          ],
+          [
+            "Let",
+            -11.8751
+          ],
+          [
+            "The",
+            -12.1251
+          ],
+          [
+            "C",
+            -12.1251
+          ]
+        ],
+        "p_correct": 0.9999485577862579,
+        "winner_correct": true,
+        "error": null
+      },
+      {
+        "variant": "only correct + none",
+        "n_options": 2,
+        "ok": true,
+        "top_logprobs": [
+          [
+            "A",
+            -0.079
+          ],
+          [
+            "B",
+            -2.579
+          ],
+          [
+            "Let",
+            -10.204
+          ],
+          [
+            "C",
+            -10.829
+          ],
+          [
+            "The",
+            -11.079
+          ]
+        ],
+        "p_correct": 0.9241418122673473,
+        "winner_correct": true,
+        "error": null
+      }
+    ],
+    "p_correct_by_variant": {
+      "with none (3 options)": 0.49898039083988716,
+      "without none (2 options)": 0.9999485577862579,
+      "only correct + none": 0.9241418122673473
+    }
+  }
+}

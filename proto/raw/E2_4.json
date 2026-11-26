@@ -1,0 +1,15 @@
+{
+  "error": {
+    "type": "BadRequestError",
+    "status": 400,
+    "message": "Error code: 400 - top_logprobs must be between 0 and 5, got 50",
+    "code": "invalid_request_error",
+    "param": null,
+    "body": {
+      "object": "error",
+      "type": "invalid_request_error",
+      "code": "invalid_request_error",
+      "message": "top_logprobs must be between 0 and 5, got 50"
+    }
+  }
+}

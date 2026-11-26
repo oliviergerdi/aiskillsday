@@ -1,0 +1,15 @@
+{
+  "error": {
+    "type": "BadRequestError",
+    "status": 400,
+    "message": "Error code: 400 - Extra inputs are not permitted, field: 'reasoning'",
+    "code": "invalid_request_error",
+    "param": null,
+    "body": {
+      "object": "error",
+      "type": "invalid_request_error",
+      "code": "invalid_request_error",
+      "message": "Extra inputs are not permitted, field: 'reasoning'"
+    }
+  }
+}

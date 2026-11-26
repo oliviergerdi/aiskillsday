@@ -1,0 +1,115 @@
+{
+  "id": "chatcmpl-e914e3ebba4d428da4988b83b0544212",
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "logprobs": {
+        "content": [
+          {
+            "token": "A",
+            "bytes": [
+              65
+            ],
+            "logprob": -0.00113316,
+            "top_logprobs": [
+              {
+                "token": "A",
+                "bytes": [
+                  65
+                ],
+                "logprob": -0.00113316,
+                "token_id": 35
+              },
+              {
+                "token": "E",
+                "bytes": [
+                  69
+                ],
+                "logprob": -7.00113297,
+                "token_id": 39
+              },
+              {
+                "token": "C",
+                "bytes": [
+                  67
+                ],
+                "logprob": -9.62613297,
+                "token_id": 37
+              },
+              {
+                "token": "B",
+                "bytes": [
+                  66
+                ],
+                "logprob": -9.75113297,
+                "token_id": 36
+              },
+              {
+                "token": "Let",
+                "bytes": [
+                  76,
+                  101,
+                  116
+                ],
+                "logprob": -10.12613297,
+                "token_id": 5718
+              }
+            ],
+            "sampling_logprob": -0.001132951001636684,
+            "sampling_mask_count": null,
+            "sampling_mask": null,
+            "token_id": 35,
+            "text_offset": 0,
+            "last_activation": null,
+            "routing_matrix": null,
+            "extra_tokens": null,
+            "extra_logprobs": null,
+            "extra_sampling_logprobs": null,
+            "top_sampling_logprobs": null
+          }
+        ],
+        "refusal": null
+      },
+      "message": {
+        "content": "A",
+        "refusal": null,
+        "role": "assistant",
+        "annotations": null,
+        "audio": null,
+        "function_call": null,
+        "tool_calls": null,
+        "tools": null
+      }
+    }
+  ],
+  "created": 1795593840,
+  "model": "accounts/fireworks/models/deepseek-v4p1-flash-1017",
+  "object": "chat.completion",
+  "metadata": null,
+  "moderation": null,
+  "service_tier": null,
+  "system_fingerprint": null,
+  "usage": {
+    "completion_tokens": 1,
+    "prompt_tokens": 159,
+    "total_tokens": 160,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": null,
+      "audio_tokens": null,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": null,
+      "text_tokens": null
+    },
+    "prompt_tokens_details": {
+      "audio_tokens": null,
+      "cache_write_tokens": null,
+      "cached_tokens": 30,
+      "image_tokens": null,
+      "text_tokens": null
+    },
+    "output_tokens_details": {
+      "reasoning_tokens": 0
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "error": {
+    "type": "PermissionDeniedError",
+    "status": 403,
+    "message": "Error code: 403 - region not allowed: the requested model has deployments outside your account's US data residency. Use a model served in the US, such as a Fireworks router whose name ends in -us or -us-fast.",
+    "code": "FORBIDDEN",
+    "param": null,
+    "body": {
+      "message": "region not allowed: the requested model has deployments outside your account's US data residency. Use a model served in the US, such as a Fireworks router whose name ends in -us or -us-fast.",
+      "param": null,
+      "code": "FORBIDDEN",
+      "type": "error"
+    }
+  }
+}
