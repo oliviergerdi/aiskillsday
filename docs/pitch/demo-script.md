@@ -49,7 +49,7 @@ Judges score nine things (see the scoring sheet). Slide that carries each: probl
 
 **Slide 9 (Gerdi).** "The costlier the mistake, the higher the bar. That is why a difference needs 0.98 and a match needs 0.95."
 
-**Slide 10 (Gerdi).** "It is a developer tool, and an AI agent can drive it too. In progress, not in the demo."
+**Slide 10 (Gerdi).** "It is a developer tool, and an AI agent can drive it too. Built, not in the demo."
 
 **Slide 11 (Temba).** Why hosted exists: "Self-host is free for anyone who can run a model with token probabilities. The hosted pass is for teams who cannot, or would rather not. We charge once because a migration happens once."
 
@@ -77,11 +77,11 @@ Judges score nine things (see the scoring sheet). Slide that carries each: probl
 - **What if there is no OpenAPI spec?** Optional by design. Without one we do basic checks only, and the report says so (PRD 0006, PRD 0008).
 - **Authenticated APIs?** Not built for the demo, public APIs only. A token option is a release requirement.
 - **POST or DELETE endpoints?** The spec gives contract differences for every method with no calls. Behaviour is replayed for GET by default, other methods opt-in (PRD 0008).
-- **Can an AI agent use it?** Yes, a developer CLI with YAML run output. The agent options (`--format json`, `--compact`, `--detach`, `--dry-run`, `--fail-on`) are in progress and not in the demo. It is not meant for CI builds.
+- **Can an AI agent use it?** Yes, a developer CLI with YAML run output. The agent options (`--format json`, `--compact`, `--detach`, `--dry-run`, `--fail-on`) are built; not in the demo. It is not meant for CI builds.
 - **Data leaving the company?** Hosted tier redacts before any model call (specified, not built). Self-host keeps everything local.
 - **CSOM to Mesh?** Our worked example. The key is our draft from vendor docs, how our integration calls each API, and one engineer's answer. It has not been reviewed.
 
 ## Checks before you go on
 - Toy APIs and Petstore both run once this morning. Save the output.
 - Deck: `docs/pitch/nparity-pitch.html`, 1280x768 or larger.
-- Chips ("in progress", "verify price", "to test", "not yet timed"): say "in progress" out loud, do not hide them.
+- Chips ("in progress" on slide 7, "verify price", "to test", "not yet timed"): say "in progress" out loud, do not hide them.

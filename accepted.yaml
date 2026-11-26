@@ -1,1 +1,13 @@
-entries: []
+entries:
+- scope: petstore [separate datasets]
+  key: GET /pet/findByStatus -> GET /pet/findByStatus | $[*].name | missing_in_new
+  endpoint: GET /pet/findByStatus
+  path: $[*].name
+  kind: missing_in_new
+  decision: accept
+  by: Stephen
+  at: '2026-11-26T20:21:23.063213+02:00'
+  note: Format is same, some missing fields in records
+  run: 2026-11-26T195755-petstore-d148bdddd3fb
+  model_label: unsure
+  model_p: 0.7714200822780606
