@@ -8,7 +8,7 @@ from urllib.parse import urljoin
 
 import httpx
 import yaml
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 from nparity.headers import parse as parse_header
 
@@ -24,10 +24,17 @@ class InputError(ValueError):
 
 
 class SourceInput(BaseModel):
-    kind: Literal["api", "spec", "manifest"]
-    source: str = Field(min_length=1, max_length=4096, pattern=r"\S")
+    kind: Literal["api", "endpoint", "spec", "manifest"]
     base_url: str = Field(default="", max_length=4096)
+    source: str = Field(default="", max_length=4096, validate_default=True)
     headers: list[str] = Field(default_factory=list, max_length=20)   # "Name: env:VAR" only
+
+    @field_validator("source")
+    @classmethod
+    def _source(cls, value: str, info: ValidationInfo) -> str:
+        if not value.strip() and not (info.data.get("kind") == "spec" and info.data.get("base_url", "").strip()):
+            raise ValueError("Enter a source URL or file path.")
+        return value
 
     @field_validator("headers")
     @classmethod
@@ -41,7 +48,7 @@ class SourceInput(BaseModel):
 @dataclass(frozen=True)
 class Source:
     base_url: str
-    spec: dict
+    spec: dict | None = None
     capture: tuple[int, object] | None = None
     label: str | None = None
 
@@ -144,22 +151,29 @@ def resolve_source(client: httpx.Client, target: SourceInput, side: str,
     source, override = target.source.strip(), target.base_url.strip()
     if target.kind == "manifest":
         return from_manifest(source, override, side)
+    if target.kind == "endpoint" or not source:
+        return Source(str(http_url(source or override)))
     if target.kind == "api":
-        base = str(http_url(source, base=True))
+        url = http_url(source)
+        base = str(url)
+        if url.query:
+            return Source(base)
         for filename in ("openapi.json", "swagger.json"):
             try:
                 data, _ = read_document(client, f"{base.rstrip('/')}/{filename}", headers)
             except httpx.HTTPStatusError as exc:
-                if exc.response.status_code not in {404, 405}:
+                if exc.response.status_code not in {401, 403, 404, 405}:
                     raise
                 continue
             except InputError:
                 continue
             if is_spec(data):
                 return Source(base, data)
-        raise InputError("No OpenAPI document found. Choose Swagger / OpenAPI and enter the spec location.")
+        return Source(base)
     data, document_url = read_document(client, source, headers)
     if not is_spec(data):
-        raise InputError("The document must be a Swagger or OpenAPI spec with a paths section.")
+        if override or document_url:
+            return Source(str(http_url(override or source)))
+        raise InputError("Enter an endpoint URL to compare responses without an OpenAPI spec.")
     base = str(http_url(override, base=True)) if override else server_url(data, document_url)
     return Source(base, data)

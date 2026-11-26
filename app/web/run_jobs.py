@@ -133,7 +133,6 @@ def compare(job_id: str, inputs: RunInput, directory: Path, progress: Callable[[
     seeds = load_seeds(seeds_path)
     if not inputs.seeds:
         seeds.methods = ["GET"]
-    ev = FakeBackend(AnswerKey()) if inputs.backend == "fake" and not inputs.score else None
 
     try:
         old_h = headers.resolve(inputs.before.headers, "before")
@@ -143,20 +142,44 @@ def compare(job_id: str, inputs: RunInput, directory: Path, progress: Callable[[
     if old_h or new_h:
         progress(f"Headers: before {', '.join(old_h) or 'none'} · after {', '.join(new_h) or 'none'} (values from environment)")
 
-    with httpx.Client(timeout=30, verify=tls_verify(), follow_redirects=True) as client:
+    with httpx.Client(timeout=30, verify=tls_verify(), follow_redirects=True,
+                      headers={"User-Agent": headers.API_USER_AGENT}) as client:
         progress("Loading before source")
         before = resolve_source(client, inputs.before, "old", old_h)
         progress("Loading after source")
         after = resolve_source(client, inputs.after, "new", new_h)
+        limited = before.spec is None or after.spec is None
+        score = inputs.score and not limited
+        ev = FakeBackend(AnswerKey()) if inputs.backend == "fake" and not score else None
         config = pipeline.RunConfig(
             before.base_url, after.base_url, intent=intent_path, seeds=seeds_path,
             old_headers=inputs.before.headers, new_headers=inputs.after.headers,
-            answer_key=defaults.answer_key if inputs.score else None,
+            answer_key=defaults.answer_key if score else None,
             backend=inputs.backend, name=f"{inputs.name}-{job_id[:12]}",
         )
         options = {"specs": (before.spec, after.spec), "request_seeds": seeds, "progress": progress}
         if before.capture is None and after.capture is None:
-            run = pipeline.run(config, client, ev, **options)
+            if limited:
+                progress("Warning: Without OpenAPI specs for both sides, comparing one GET response per URL.")
+                targets = {"old.response.invalid": (before.base_url, old_h),
+                           "new.response.invalid": (after.base_url, new_h)}
+
+                def serve_endpoint(request: httpx.Request) -> httpx.Response:
+                    url, request_headers = targets[request.url.host]
+                    return client.get(url, headers=request_headers)
+
+                config.old, config.new = "http://old.response.invalid", "http://new.response.invalid"
+                response_spec = {"paths": {"/response": {"get": {}}}}
+                with httpx.Client(transport=httpx.MockTransport(serve_endpoint)) as single_response:
+                    run = pipeline.run(config, single_response, ev, specs=(response_spec, response_spec),
+                                       request_seeds=Seeds(), progress=progress)
+                run.config.update(
+                    old=str(httpx.URL(before.base_url).copy_with(query=None)),
+                    new=str(httpx.URL(after.base_url).copy_with(query=None)),
+                    limited_comparison=True,
+                )
+            else:
+                run = pipeline.run(config, client, ev, **options)
         elif before.capture is not None and after.capture is not None:
             captures = {"old.capture.invalid": before.capture, "new.capture.invalid": after.capture}
 

@@ -4,4 +4,4 @@ params:
   petId: [1, 2, 10]
   status: [available, sold]
   orderId: [1, 2]
-  username: [user1]
+  username: [admin]

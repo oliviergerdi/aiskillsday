@@ -72,7 +72,8 @@ def run(
         headers.resolve(cfg.new_headers, "new")
     except headers.HeaderError as exc:
         raise typer.BadParameter(str(exc)) from exc
-    with httpx.Client(timeout=30, verify=tls_verify(), follow_redirects=True) as client:
+    with httpx.Client(timeout=30, verify=tls_verify(), follow_redirects=True,
+                      headers={"User-Agent": headers.API_USER_AGENT}) as client:
         r = pipeline.run(cfg, client)
     path = store.save(r, runs_dir)
     typer.echo(summary(r))

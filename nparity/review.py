@@ -123,6 +123,8 @@ def verdict(run: Run, ledger: Ledger) -> tuple[str, str]:
     """(text, css class). Ready only when nothing is open: no rejects, nothing unreviewed, no errors."""
     c = open_counts(run, ledger)
     if c["open"] == 0:
+        if run.config.get("limited_comparison"):
+            return "No open items in the sampled responses", "uns"
         return "Ready to cut over", "int"
     text = (f"{_n(c['open'], 'open item')}: {_n(c['rejected'], 'confirmed regression')}, "
             f"{c['needs_review']} need review")

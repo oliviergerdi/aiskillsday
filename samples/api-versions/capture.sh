@@ -2,7 +2,8 @@
 # Re-captures the sample responses in this folder. Run from anywhere; writes next to the script.
 set -euo pipefail
 cd "$(dirname "$0")"
-f(){ curl -sSL -m 20 -H 'Accept: application/json' -o "$1" -w "$1 %{http_code}\n" "$2"; }
+f(){ curl -sSL -m 20 -A 'nParity/0.1 (https://github.com/oliviergerdi/aiskillsday)' \
+  -H 'Accept: application/json' -o "$1" -w "$1 %{http_code}\n" "$2"; }
 f petstore_v2_spec.json          https://petstore.swagger.io/v2/swagger.json
 f petstore_v3_spec.json          https://petstore3.swagger.io/api/v3/openapi.json
 f petstore_v2_findByStatus.json  "https://petstore.swagger.io/v2/pet/findByStatus?status=available"

@@ -36,7 +36,8 @@
       <label for="{{ side }}-kind">Source type</label>
       <select id="{{ side }}-kind" name="{{ side }}_kind">
         <option value="api">API base URL</option>
-        <option value="spec">Swagger / OpenAPI</option>
+        <option value="endpoint">Endpoint URL (no spec)</option>
+        <option value="spec">Swagger / OpenAPI (optional)</option>
         <option value="manifest">JSON manifest</option>
       </select>
       <label for="{{ side }}-source">Source</label>
@@ -45,7 +46,7 @@
       <small class="sub" id="{{ side }}-hint" data-source-hint></small>
       <small class="field-error" role="alert" data-error-for="{{ side }}_source" hidden></small>
       <div class="run-field" data-base-field hidden>
-        <label for="{{ side }}-base">API base URL override <span class="sub">(optional)</span></label>
+        <label for="{{ side }}-base">API URL <span class="sub" data-base-hint>(optional)</span></label>
         <input id="{{ side }}-base" name="{{ side }}_base" type="url" maxlength="4096"
                placeholder="https://example.com/api" spellcheck="false" disabled>
         <small class="field-error" role="alert" data-error-for="{{ side }}_base" hidden></small>

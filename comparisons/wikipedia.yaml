@@ -1,0 +1,15 @@
+before:
+  kind: spec
+  base_url: ''
+  source: https://en.wikipedia.org/api/rest_v1/page/summary/Cat
+  headers: []
+after:
+  kind: spec
+  base_url: ''
+  source: https://en.wikipedia.org/w/rest.php/v1/page/Cat/bare
+  headers: []
+seeds: ''
+intent: ''
+backend: flash
+name: wikipedia
+score: false

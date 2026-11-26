@@ -14,6 +14,10 @@
   </div>
 </div>
 
+{% if run.config.limited_comparison %}
+<p class="limited-comparison"><strong>Limited comparison.</strong> Without OpenAPI specs for both sides, this run compares one GET response per URL. It cannot discover endpoints, generate test cases, or check declared schemas.</p>
+{% endif %}
+
 <form class="baseline-line" method="get">
   <span class="sub">Scope <code>{{ scope }}</code> ·</span>
   {% if comparison %}

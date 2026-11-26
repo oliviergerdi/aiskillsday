@@ -82,6 +82,8 @@ def test_verdict(runs, ledger):
         if f.status in ("shown", "unsure"):
             ledger.record(run, f, "accept", "T")
     assert verdict(run, ledger) == ("Ready to cut over", "int")
+    limited = run.model_copy(update={"config": {**run.config, "limited_comparison": True}})
+    assert verdict(limited, ledger) == ("No open items in the sampled responses", "uns")
     ledger.record(run, by_path(run, "$.total"), "reject", "T")
     assert verdict(run, ledger) == ("1 open item: 1 confirmed regression, 0 need review", "reg")
     errored = run.model_copy(update={"errors": [run.findings[0]]})

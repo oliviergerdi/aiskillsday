@@ -10,6 +10,7 @@ import os
 import re
 from collections.abc import Mapping
 
+API_USER_AGENT = "nParity/0.1 (https://github.com/oliviergerdi/aiskillsday)"
 HEADER = re.compile(r"^\s*([A-Za-z0-9!#$%&'*+.^_`|~-]+)\s*:\s*env:([A-Za-z_][A-Za-z0-9_]*)\s*$")
 FORM = "Use the form `Name: env:VAR`, e.g. `Authorization: env:OLD_TOKEN`. Literal header values are not allowed."
 

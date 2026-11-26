@@ -35,10 +35,13 @@ def wait_for_job(client, job_url, predicate):
 @pytest.mark.parametrize("after_kind", ["spec_url", "spec_file", "manifest"])
 def test_api_and_spec_run_streams_progress_and_saves_report(client, tmp_path, after_kind):
     release = threading.Event()
+    user_agents = set()
 
     async def serve_toys(scope, receive, send):
-        if scope["type"] == "http" and scope["path"] == "/v1/openapi.json":
-            assert await asyncio.to_thread(release.wait, 5)
+        if scope["type"] == "http":
+            user_agents.add(dict(scope["headers"])[b"user-agent"].decode())
+            if scope["path"] == "/v1/openapi.json":
+                assert await asyncio.to_thread(release.wait, 5)
         await app(scope, receive, send)
 
     config = uvicorn.Config(serve_toys, host="127.0.0.1", port=0, log_level="warning")
@@ -77,6 +80,7 @@ def test_api_and_spec_run_streams_progress_and_saves_report(client, tmp_path, af
             server.should_exit = True
             thread.join(timeout=5)
     assert job["state"] == "complete", job
+    assert user_agents == {"nParity/0.1 (https://github.com/oliviergerdi/aiskillsday)"}
     assert any("Replaying" in line for line in job["lines"])
     report = client.get(job["report_url"])
     assert report.status_code == 200
@@ -93,6 +97,48 @@ def test_capture_manifest_compares_saved_responses(client):
     report = store.load(job["report_url"].rsplit("/", 1)[1], app.state.runs_dir)
     assert report.config["requests"] == 1
     assert report.findings
+
+
+def test_run_without_specs_compares_the_supplied_endpoints(client):
+    requests = []
+
+    async def endpoints(scope, receive, send):
+        if scope["type"] != "http":
+            return
+        path, query = scope["path"], scope["query_string"]
+        requests.append((scope["method"], path, query))
+        is_endpoint = (path, query) in {("/old/cat", b"lang=en"), ("/new/cat", b"")}
+        status = 200 if is_endpoint else 404
+        body = json.dumps({"title": "Cat" if path == "/old/cat" else "Domestic cat"}).encode()
+        await send({"type": "http.response.start", "status": status, "headers": [(b"content-type", b"application/json")]})
+        await send({"type": "http.response.body", "body": body})
+
+    config = uvicorn.Config(endpoints, host="127.0.0.1", port=0, log_level="warning", lifespan="off")
+    server = uvicorn.Server(config)
+    with config.bind_socket() as listener:
+        thread = threading.Thread(target=server.run, kwargs={"sockets": [listener]}, daemon=True)
+        thread.start()
+        base = f"http://127.0.0.1:{listener.getsockname()[1]}"
+        try:
+            response = client.post("/run-jobs", json={
+                "before": {"kind": "spec", "source": "", "base_url": base + "/old/cat?lang=en"},
+                "after": {"kind": "api", "source": base + "/new/cat"},
+            })
+            assert response.status_code == 202, response.text
+            job = wait_for_job(client, response.json()["job_url"], lambda s: s["state"] in {"complete", "failed"})
+        finally:
+            server.should_exit = True
+            thread.join(timeout=5)
+
+    assert job["state"] == "complete", job
+    assert any("Without OpenAPI" in line for line in job["lines"])
+    assert ("GET", "/old/cat", b"lang=en") in requests
+    assert ("GET", "/new/cat", b"") in requests
+    report = store.load(job["report_url"].rsplit("/", 1)[1], app.state.runs_dir)
+    assert report.config["requests"] == 1
+    assert [(f.path, f.kind) for f in report.findings] == [("$.title", "changed")]
+    page = client.get(job["report_url"]).text
+    assert "Without OpenAPI" in page and "one GET response" in page
 
 
 def test_new_run_form_has_intent_textarea_outside_settings(client):

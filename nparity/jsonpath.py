@@ -52,25 +52,30 @@ MISSING = _MISSING
 _TOKEN = re.compile(r"([^.\[\]]+)|\[(\d+)\]|\[([^=\]]+)=([^\]]*)\]")
 
 
-def value_at(obj: Any, path: str) -> Any:
-    """Like get(), but also walks list indexes: $.items[0].id. Returns MISSING when absent."""
-    if path in ("$", ""):
-        return obj
+def locate(obj: Any, path: str) -> tuple[Any, list[str | int]] | None:
+    """Return the value and its concrete keys and indexes, or None if absent."""
     cur = obj
+    positions: list[str | int] = []
     for name, idx, kname, kval in _TOKEN.findall(path.removeprefix("$")):
-        if kname:
-            if not isinstance(cur, list):
-                return MISSING
-            cur = next((i for i in cur if isinstance(i, dict) and str(i.get(kname)) == kval), MISSING)
-            if cur is MISSING:
-                return MISSING
-        elif idx:
-            i = int(idx)
-            if not isinstance(cur, list) or i >= len(cur):
-                return MISSING
-            cur = cur[i]
-        else:
+        if name:
             if not isinstance(cur, dict) or name not in cur:
-                return MISSING
-            cur = cur[name]
-    return cur
+                return None
+            key = name
+        elif isinstance(cur, list):
+            key = int(idx) if idx else next(
+                (i for i, item in enumerate(cur) if isinstance(item, dict) and str(item.get(kname)) == kval),
+                len(cur),
+            )
+            if key >= len(cur):
+                return None
+        else:
+            return None
+        positions.append(key)
+        cur = cur[key]
+    return cur, positions
+
+
+def value_at(obj: Any, path: str) -> Any:
+    """Like get(), with support for list indexes and keys. Returns MISSING when absent."""
+    result = locate(obj, path)
+    return result[0] if result is not None else MISSING

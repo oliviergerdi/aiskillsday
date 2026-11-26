@@ -59,3 +59,15 @@ entries:
   run: 2026-11-26T150322-petstore-d840b8332559
   model_label: regression
   model_p: 0.9998512510642201
+- scope: petstore
+  key: GET /user/logout -> GET /user/logout | $ | type_changed
+  endpoint: GET /user/logout
+  path: $
+  kind: type_changed
+  decision: accept
+  by: Stephen
+  at: '2026-11-26T16:33:13.812225+02:00'
+  note: Same input, check output handling
+  run: 2026-11-26T162918-petstore-2d33bdb53980
+  model_label: regression
+  model_p: 0.9999918900328859

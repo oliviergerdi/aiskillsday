@@ -9,7 +9,8 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from nparity.config import Thresholds
-from nparity.jsonpath import MISSING, value_at
+from nparity.findings import renames_for
+from nparity.jsonpath import MISSING, child, locate, value_at
 from nparity.lists import keys_text, membership
 from nparity.models import Finding, Run, Sample
 from nparity.replay import fill
@@ -86,17 +87,58 @@ def request_line(s: Sample, side: str) -> str:
     return f"{req.method} {path}{qs}"
 
 
-def _leaf(path: str) -> str | None:
-    if path in ("status", "endpoint", "request", "$"):
-        return None
-    return re.sub(r"\[\d+\]", "", path.rsplit(".", 1)[-1])
+def _sample_paths(run: Run, f: Finding) -> tuple[str | None, str | None]:
+    if not f.path.startswith(("$.", "$[")):
+        return None, None
+    old_path = new_path = f.path
+    field = re.match(r"^\$\.([^.\[]+)(.*)$", f.path)
+    if field:
+        root_key, rest = field.groups()
+        renames = renames_for(f.endpoint, run.fields)
+        if f.source == "diff":
+            # Diffs use the new field name after normalising the old response.
+            old_key = next((old for old, new in renames.items() if new == root_key), root_key)
+            old_path = child("$", old_key) + rest
+        elif f.kind == "renamed" or f.source == "types":
+            new_key = f.type_info.get("new_field") or renames.get(root_key) or root_key
+            new_path = child("$", new_key) + rest
+    return (
+        None if f.kind == "added_in_new" else old_path,
+        None if f.kind in ("missing_in_new", "dropped") else new_path,
+    )
 
 
-def _lines(body: Any, key: str | None) -> list[Line]:
+def _json_line_count(value: Any) -> int:
+    if isinstance(value, dict) and value:
+        return 2 + sum(_json_line_count(item) for item in value.values())
+    if isinstance(value, list) and value:
+        return 2 + sum(_json_line_count(item) for item in value)
+    return 1
+
+
+def _lines(body: Any, path: str | None) -> list[Line]:
     if body is None:
         return [Line("(no body)")]
-    text = json.dumps(body, indent=2, ensure_ascii=False) if not isinstance(body, str) else body
-    return [Line(t, bool(key) and f'"{key}":' in t) for t in text.splitlines()]
+    if isinstance(body, str):
+        return [Line(line) for line in body.splitlines()]
+
+    line_index = None
+    target = locate(body, path) if path is not None else None
+    if target is not None:
+        _, positions = target
+        line_index = 0
+        current = body
+        for key in positions:
+            siblings = current if isinstance(current, dict) else range(len(current))
+            line_index += 1  # Move past this container's opening line.
+            for sibling in siblings:
+                if sibling == key:
+                    break
+                line_index += _json_line_count(current[sibling])
+            current = current[key]
+
+    text = json.dumps(body, indent=2, ensure_ascii=False)
+    return [Line(line, index == line_index) for index, line in enumerate(text.split("\n"))]
 
 
 def _kind_text(f: Finding, s: Sample | None) -> str:
@@ -142,16 +184,12 @@ def finding_view(run: Run, f: Finding, th: Thresholds) -> FindingView:
         distribution=dist, conf_text=_pct(f.p) if f.p is not None else "—",
     )
     if s is not None:
-        old_key = new_key = _leaf(f.path)
-        if f.kind == "renamed":
-            new_key = next((m.new for m in run.fields if m.endpoint == f.endpoint and m.old == old_key), None)
-        elif f.kind == "dropped":
-            new_key = None
+        old_path, new_path = _sample_paths(run, f)
         v.sample_label = (f"Sample {idx + 1} of {len(f.samples)} · "
                           f"{request_line(s, 'old')} → {request_line(s, 'new')}")
         v.old_head = str(s.old.status) if s.old.status is not None else (s.old.error or "error")
         v.new_head = str(s.new.status) if s.new.status is not None else (s.new.error or "error")
-        v.old_lines, v.new_lines = _lines(s.old.body, old_key), _lines(s.new.body, new_key)
+        v.old_lines, v.new_lines = _lines(s.old.body, old_path), _lines(s.new.body, new_path)
     for i, smp in enumerate(f.samples):
         if f.source == "diff":
             state = "differs" if i in f.differs_in else "same"

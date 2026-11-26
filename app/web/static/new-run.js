@@ -11,8 +11,9 @@ const toyDemo = {
 };
 const toyIntent = document.querySelector('[data-preset="toy"]').dataset.intent.trim();
 const sourceTypes = {
-  api: ["https://example.com/api", "nParity looks for openapi.json or swagger.json at this URL."],
-  spec: ["https://example.com/openapi.json", "Enter a URL or local JSON or YAML path. Set an override if the spec cannot locate its API."],
+  api: ["https://example.com/api", "nParity looks for a spec at this URL. Without specs for both sides, it compares one GET response per URL."],
+  endpoint: ["https://example.com/api/items/1", "Limited comparison. nParity compares one GET response per URL and cannot discover endpoints or check schemas."],
+  spec: ["https://example.com/openapi.json", "Enter a spec URL or a local JSON or YAML path. Leave it blank and give an endpoint URL below to compare a single response."],
   manifest: ["samples/api-versions/manifest.json#openfoodfacts_product", "Enter a local JSON manifest path. Add #pair_name to select a pair. For saved responses, use a manifest on both sides."],
 };
 
@@ -22,8 +23,11 @@ function updateSource(panel) {
   const [placeholder, hint] = sourceTypes[kind];
   form.elements[side + "_source"].placeholder = placeholder;
   panel.querySelector("[data-source-hint]").textContent = hint;
-  panel.querySelector("[data-base-field]").hidden = kind === "api";
-  form.elements[side + "_base"].disabled = kind === "api";
+  const showBase = kind === "spec" || kind === "manifest";
+  panel.querySelector("[data-base-field]").hidden = !showBase;
+  panel.querySelector("[data-base-hint]").textContent = kind === "spec" ? "(required if the spec is blank)" : "(optional)";
+  form.elements[side + "_base"].disabled = !showBase;
+  form.elements[side + "_source"].required = kind !== "spec";
 }
 
 const panels = Array.from(form.querySelectorAll("[data-side]"));
@@ -94,7 +98,7 @@ async function loadConfig(name) {
   loadedConfig = data.config;
   hasPreviousRuns = data.runs.length > 0;
   const c = data.config;
-  rerunSummary.textContent = `${c.before.source} → ${c.after.source} · ${c.backend}${c.score ? " · scored" : ""}`;
+  rerunSummary.textContent = `${c.before.source || c.before.base_url} → ${c.after.source || c.after.base_url} · ${c.backend}${c.score ? " · scored" : ""}`;
   const choices = [option("auto", hasPreviousRuns ? `Latest: ${when(data.runs[0].started_at)} (${data.runs[0].open} open)` : "Latest (no runs yet)")];
   for (const r of data.runs) choices.push(option(r.id, `${when(r.started_at)} · ${r.open} open · ${r.id}`));
   choices.push(option("", "None"));
@@ -298,8 +302,8 @@ form.addEventListener("submit", (event) => {
   const name = values.get("name").trim() || "comparison";
   clearFieldErrors();
   const missing = [
-    ["before_source", before.source, "Enter a source URL or file path."],
-    ["after_source", after.source, "Enter a source URL or file path."],
+    ["before_source", before.source || (before.kind === "spec" && before.base_url), "Enter a source URL or file path."],
+    ["after_source", after.source || (after.kind === "spec" && after.base_url), "Enter a source URL or file path."],
     ["intent_text", intentText.trim(), "Describe what this change was meant to do. Without it every difference is flagged as a regression."],
   ].filter(([, value]) => !value);
   for (const [field, , message] of missing) showFieldError(field, message);

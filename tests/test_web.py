@@ -10,7 +10,8 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.web import views
 from nparity import pipeline, store
-from nparity.models import Finding, Run
+from nparity.config import load_thresholds
+from nparity.models import FieldMap, Finding, HttpResult, Request, Run, Sample
 from nparity.retry import RetryPolicy
 
 
@@ -113,6 +114,35 @@ def test_no_dead_controls(setup):
 
 def _finding(i, status):
     return Finding(id=f"f-{i}", endpoint="GET /x", path=f"$.f{i}", kind="changed", source="diff", status=status)
+
+
+@pytest.mark.parametrize(("path", "before", "after", "old_line", "new_line", "fields"), [
+    ("$.name",
+     {"name": "Sea Serpent", "category": {"name": "Dogs"}},
+     {"category": {"name": "Dogs"}, "name": "doggie", "tags": [{"name": "other"}]},
+     '"name": "Sea Serpent"', '"name": "doggie"', []),
+    ("$.items[id=2].name",
+     {"items": [{"id": 2, "name": "old"}, {"id": 1, "name": "other"}]},
+     {"items": [{"id": 1, "name": "other"}, {"id": 2, "name": "new"}]},
+     '"name": "old"', '"name": "new"', []),
+    ("$.items[1]", {"items": [10, 20]}, {"items": [10, 30]}, "20", "30", []),
+    ("$.profile.name",
+     {"customer": {"name": "old"}, "name": "unrelated"},
+     {"profile": {"name": "new"}, "name": "unrelated"},
+     '"name": "old"', '"name": "new"',
+     [FieldMap(endpoint="GET /x", old="customer", new="profile", source="rule", status="accepted")]),
+])
+def test_finding_highlights_only_the_reported_path(path, before, after, old_line, new_line, fields):
+    request = Request(method="GET", path="/x")
+    sample = Sample(old_request=request, new_request=request,
+                    old=HttpResult(status=200, body=before), new=HttpResult(status=200, body=after))
+    finding = Finding(id="finding", endpoint=request.endpoint, path=path, kind="changed",
+                      source="diff", samples=[sample], differs_in=[0])
+    run = Run(id="paths", started_at=datetime.now(timezone.utc), fields=fields)
+    view = views.finding_view(run, finding, load_thresholds())
+
+    assert [line.text.strip().rstrip(",") for line in view.old_lines if line.hl] == [old_line]
+    assert [line.text.strip().rstrip(",") for line in view.new_lines if line.hl] == [new_line]
 
 
 def _table(page):
