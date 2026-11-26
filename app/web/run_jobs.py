@@ -11,7 +11,7 @@ from uuid import uuid4
 
 import httpx
 import yaml
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import ValidationError
 
 from app.web.configs import DEFAULT_DIR as CONFIGS_DIR, RunInput, config_path, save_config
 from app.web.run_sources import InputError, local_file, resolve_source
@@ -32,6 +32,8 @@ class Job:
     state: str = "running"
     lines: list[str] = field(default_factory=lambda: ["Starting comparison"])
     report_url: str | None = None
+    field: str | None = None
+    error_message: str | None = None
 
 
 class RunJobs:
@@ -54,7 +56,8 @@ class RunJobs:
         with self.lock:
             job = self.jobs.get(job_id)
             if job is not None:
-                return {"state": job.state, "lines": list(job.lines), "report_url": job.report_url}
+                error = {"field": job.field, "message": job.error_message} if job.field else None
+                return {"state": job.state, "lines": list(job.lines), "report_url": job.report_url, "error": error}
         return None
 
     def run(self, job_id: str, job: Job, inputs: RunInput, directory: Path, configs: Path = CONFIGS_DIR) -> None:
@@ -66,6 +69,10 @@ class RunJobs:
             report_id = compare(job_id, inputs, directory, progress, configs)
         except InputError as exc:
             message = str(exc)
+            if exc.field:
+                with self.lock:
+                    job.field, job.error_message, job.state = exc.field, message, "failed"
+                return
         except httpx.HTTPStatusError as exc:
             message = f"The API document returned HTTP {exc.response.status_code}. Check the source URL."
         except httpx.RequestError:
@@ -89,10 +96,22 @@ class RunJobs:
 def compare(job_id: str, inputs: RunInput, directory: Path, progress: Callable[[str], None],
             configs: Path = CONFIGS_DIR) -> str:
     if inputs.backend == "flash" and not os.environ.get("FIREWORKS_API_KEY"):
-        raise InputError("Set FIREWORKS_API_KEY in the server environment to use Flash.")
+        raise InputError("Set FIREWORKS_API_KEY in the server environment to use Flash.", "backend")
     defaults = pipeline.RunConfig("", "")
-    seeds_path = local_file(inputs.seeds, {".yaml", ".yml"}) if inputs.seeds else defaults.seeds
-    intent_path = local_file(inputs.intent, {".md", ".txt"}) if inputs.intent else None
+    try:
+        seeds_path = local_file(inputs.seeds, {".yaml", ".yml"}) if inputs.seeds else defaults.seeds
+    except InputError as exc:
+        raise InputError(str(exc), "seeds") from exc
+    if inputs.intent_text.strip():
+        intent_dir = directory / f"{inputs.name}-{job_id[:12]}"
+        intent_dir.mkdir(parents=True, exist_ok=True)
+        intent_path = intent_dir / "intent.md"
+        intent_path.write_text(inputs.intent_text, encoding="utf-8")
+    else:
+        try:
+            intent_path = local_file(inputs.intent, {".md", ".txt"}) if inputs.intent else None
+        except InputError as exc:
+            raise InputError(str(exc), "intent") from exc
     seeds = load_seeds(seeds_path)
     if not inputs.seeds:
         seeds.methods = ["GET"]
@@ -134,6 +153,8 @@ def compare(job_id: str, inputs: RunInput, directory: Path, progress: Callable[[
     run.config["baseline"] = resolve_baseline(inputs.baseline, run, directory)
     if run.config["baseline"]:
         progress(f"Baseline: {run.config['baseline']}")
+    if intent_path:
+        run.config["intent_source"] = "form" if inputs.intent_text.strip() else "file"
     progress(f"Saving report with {len(run.findings)} findings and {len(run.errors)} errors")
     store.save(run, directory)
     return run.id

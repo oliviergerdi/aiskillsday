@@ -19,6 +19,7 @@ class RunInput(BaseModel):
     after: SourceInput
     seeds: str = Field(default="", max_length=4096)
     intent: str = Field(default="", max_length=4096)
+    intent_text: str = Field(default="", max_length=20000)   # pasted note wins over the `intent` file
     backend: Literal["fake", "flash"] = "fake"
     name: str = Field(default="comparison", max_length=50, pattern=r"^[a-zA-Z0-9_-]+$")
     score: bool = False

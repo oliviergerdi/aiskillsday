@@ -22,6 +22,8 @@ from pydantic import BaseModel, Field
 from nparity.review import Ledger, compare, finding_key, open_counts, review_states, scope_of, stale, verdict
 
 TEMPLATES = Jinja2Templates(directory=Path(__file__).parent / "templates")
+TEMPLATES.env.filters["run_name"] = views.run_name
+TEMPLATES.env.filters["backend_label"] = views.backend_label
 router = APIRouter()
 jobs = RunJobs()
 
@@ -59,7 +61,14 @@ def local_run_request(request: Request) -> None:
 
 @router.get("/compare", response_class=HTMLResponse)
 def new_run(request: Request):
-    return TEMPLATES.TemplateResponse(request, "new_run.html", {"nav": "new"})
+    fixtures = Path(__file__).parents[2] / "fixtures"
+
+    def intent_text(path: Path) -> str:
+        return path.read_text(encoding="utf-8") if path.is_file() else ""
+
+    presets = {"toy": intent_text(fixtures / "intent.md"),
+               "petstore": intent_text(fixtures / "petstore" / "intent.md")}
+    return TEMPLATES.TemplateResponse(request, "new_run.html", {"nav": "new", "presets": presets})
 
 
 @router.post("/run-jobs", status_code=202, dependencies=[Depends(local_run_request)])
@@ -120,13 +129,14 @@ def run_page(request: Request, run_id: str, baseline: str | None = None):
     comparison = compare(run, base) if base else None
     states = review_states(run, led)
     sections = views.build_sections(run, states, th, comparison)
+    groups = {k: views.group_findings(v) for k, v in sections.items()}
     first = (sections["regression"] or sections["rejected"] or [None])[0]
     if first is not None:                      # first open regression opens server-side, the rest via HTMX
         first.body_html = TEMPLATES.get_template("_finding_body.html").render(v=first)
     rule_maps = sum(m.source == "rule" for m in run.endpoints) + sum(m.source == "rule" for m in run.fields)
     return TEMPLATES.TemplateResponse(request, "run.html", {
         "run": run, "nav": "run", "c": views.review_counts(sections, run), "sections": sections,
-        "verdict": verdict(run, led), "empty": not run.findings,
+        "groups": groups, "verdict": verdict(run, led), "empty": not run.findings,
         "missed": [d for d in (run.score.details if run.score else []) if not d["ok"]],
         "n_fields": len(run.fields), "rule_maps": rule_maps,
         "comparison": comparison, "baseline": base, "candidates": candidates,

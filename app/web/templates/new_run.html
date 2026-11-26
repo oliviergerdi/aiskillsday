@@ -20,10 +20,15 @@
     <button type="button" class="run-button" id="rerun-edit">Edit in form</button>
   </div>
 </section>
+
 <div class="run-head">
-  <h2>New comparison</h2>
+  <h1>New comparison</h1>
+  <div class="run-presets" aria-label="Comparison presets">
+    <button type="button" class="run-button" data-preset="toy" data-intent="{{ presets.toy }}">Load toy demo</button>
+    <button type="button" class="run-button" data-preset="petstore" data-intent="{{ presets.petstore }}">Load Petstore</button>
+  </div>
 </div>
-<form id="comparison-form" class="comparison-form">
+<form id="comparison-form" class="comparison-form" novalidate>
   <div class="source-grid">
     {% for side in ["before", "after"] %}
     <fieldset class="source-panel" data-side="{{ side }}">
@@ -38,13 +43,21 @@
       <input id="{{ side }}-source" name="{{ side }}_source" type="text" required
              maxlength="4096" spellcheck="false" aria-describedby="{{ side }}-hint">
       <small class="sub" id="{{ side }}-hint" data-source-hint></small>
+      <small class="field-error" role="alert" data-error-for="{{ side }}_source" hidden></small>
       <div class="run-field" data-base-field hidden>
         <label for="{{ side }}-base">API base URL override <span class="sub">(optional)</span></label>
         <input id="{{ side }}-base" name="{{ side }}_base" type="url" maxlength="4096"
                placeholder="https://example.com/api" spellcheck="false" disabled>
+        <small class="field-error" role="alert" data-error-for="{{ side }}_base" hidden></small>
       </div>
     </fieldset>
     {% endfor %}
+  </div>
+  <div class="run-field">
+    <label for="run-intent-text">What was this change meant to do?</label>
+    <textarea id="run-intent-text" name="intent_text" required maxlength="20000" rows="6" aria-describedby="intent-hint" placeholder="Example: Customers move from GET /customers/{id} to GET /clients/{clientId}. The field fullName is renamed to name. Nothing else should change."></textarea>
+    <small class="sub" id="intent-hint">Required for now: without an intent note every difference is flagged as a regression.</small>
+    <small class="field-error" role="alert" data-error-for="intent_text" hidden></small>
   </div>
   <details class="run-settings">
     <summary>Run settings</summary>
@@ -52,6 +65,7 @@
       <div class="run-field">
         <label for="run-name">Name</label>
         <input id="run-name" name="name" type="text" value="comparison" maxlength="50" pattern="[a-zA-Z0-9_\-]+">
+        <small class="field-error" role="alert" data-error-for="name" hidden></small>
       </div>
       <div class="run-field">
         <label for="run-backend">Evaluator</label>
@@ -59,15 +73,21 @@
           <option value="fake">Fake (offline)</option>
           <option value="flash">Flash (Fireworks)</option>
         </select>
+        <small class="sub">Fake answers from the answer key and is for testing.</small>
+        <small class="sub">Flash calls the Fireworks model and needs FIREWORKS_API_KEY.</small>
+        <small class="field-error" role="alert" data-error-for="backend" hidden></small>
       </div>
       <div class="run-field">
         <label for="run-seeds">Seeds file <span class="sub">(optional)</span></label>
         <input id="run-seeds" name="seeds" type="text" maxlength="4096" placeholder="fixtures/petstore/seeds.yaml">
         <small class="sub">The default seeds cover <code>id</code> and <code>page</code> on GET requests.</small>
+        <small class="field-error" role="alert" data-error-for="seeds" hidden></small>
       </div>
       <div class="run-field">
-        <label for="run-intent">Intent file <span class="sub">(optional)</span></label>
+        <label for="run-intent">Or use a file <span class="sub">(optional)</span></label>
         <input id="run-intent" name="intent" type="text" maxlength="4096" placeholder="fixtures/petstore/intent.md">
+        <small class="sub">Text pasted above wins over this file.</small>
+        <small class="field-error" role="alert" data-error-for="intent" hidden></small>
       </div>
       <div class="run-field">
         <label class="check"><input id="run-save" name="save_config" type="checkbox"> Save as configuration</label>
@@ -75,6 +95,7 @@
       </div>
     </div>
   </details>
+  <small class="field-error" role="alert" data-error-for="form" hidden></small>
   <button class="run-button primary" type="submit">Start comparison</button>
 </form>
 <section class="run-output" aria-labelledby="console-title" hidden>

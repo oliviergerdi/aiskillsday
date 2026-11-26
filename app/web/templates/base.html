@@ -13,12 +13,12 @@
 <body>
 <header class="top">
   <div class="wrap">
-    <div class="brand">nParity<span>Will we break anything?</span></div>
+    <div class="brand"><a href="/">nParity<span>Will we break anything?</span></a></div>
     <nav class="views">
       <a href="/" class="{{ 'active' if nav == 'runs' }}">Runs</a>
       <a href="/compare" class="{{ 'active' if nav == 'new' }}">New run</a>
       {% if run %}
-      <a href="/runs/{{ run.id }}" class="{{ 'active' if nav == 'run' }}">Run</a>
+      <a href="/runs/{{ run.id }}" class="{{ 'active' if nav == 'run' }}">Findings</a>
       <a href="/runs/{{ run.id }}/mapping" class="{{ 'active' if nav == 'mapping' }}">Mapping</a>
       {% endif %}
     </nav>
