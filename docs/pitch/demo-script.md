@@ -1,69 +1,86 @@
 # nParity: demo script (Fri 27 Nov 2026)
 
-Slot: 5 to 10 min plus about 2 min questions. Target **8:45**, which leaves a 75 s buffer. Main path is slides 1 to 12. Appendix (13 to 18) is for questions only.
+Slot: 5 to 10 min plus about 2 min questions. Target **7:00** including transitions. The slides carry the facts. This script only adds what the slide does not say: the story, the emphasis and the hand-offs. Do not read a slide aloud.
 
-| Time | Slides | Who | Beat |
+Judges score nine things (see the scoring sheet). Slide that carries each: problem clarity 2 to 4; opportunity and why now 5; success definition 7; problem-solution fit and working product 8; cost 12; risk 13 to 14; value proposition 2 and 5; pitch 1 to 15; AI use 10.
+
+| Time | Slide | Who | Add this (not on the slide) |
 |---|---|---|---|
-| 0:00 | 1 to 2 | Stephen | Hook and value |
-| 1:00 | 3 to 4 | Stephen | User, buyer, evidence |
-| 2:15 | 5 | Gerdi | How it works |
-| 3:00 | 6 | Stephen + Gerdi | **Live demo** (3:00) |
-| 6:00 | 7 | Gerdi | Why trust it |
-| 6:45 | 8 to 11 | Temba | Commercial case |
-| 8:15 | 12 | Stephen | Close and ask |
-| 8:45 | | | Questions |
+| 0:00 | 1 | Stephen | The story, then the slogan (0:15) |
+| 0:15 | 2 | Stephen | "Intended or not" is the gap (0:20) |
+| 0:35 | 3 | Stephen | Two people, and what we are not (0:15) |
+| 0:50 | 4 | Stephen | The CSOM to Mesh story (0:30) |
+| 1:20 | 5 | Stephen | Why a copy does not stop us (0:25) |
+| 1:45 | 6 | Gerdi | Where the model sits (0:20) |
+| 2:05 | 7 | Gerdi | One line on targets (0:15) |
+| 2:20 | 8 | Stephen + Gerdi | **Live demo** (2:00) |
+| 4:20 | 9 | Gerdi | Why the thresholds differ (0:15) |
+| 4:35 | 10 | Gerdi | One sentence (0:10) |
+| 4:45 | 11 | Temba | Why a hosted tier exists (0:25) |
+| 5:10 | 12 | Temba | The one number to remember (0:15) |
+| 5:25 | 13 | Temba | The honest read (0:20) |
+| 5:45 | 14 | Temba | Two risks, named (0:15) |
+| 6:00 | 15 | Stephen | The close (0:15) |
+| 6:15 | | | Questions (about 45 s of spare in the 7:00) |
 
-## Script
+## Talking points
 
-**Slide 1 (Stephen, 0:15).** "Every engineer on an API migration asks one question: will we break anything? We are Team Chai-GPT, and nParity answers it."
+**Slide 1 (Stephen).** One engineer, one migration: "An engineer we interviewed moved an integration from one version of a vendor API to its successor. The endpoints did not line up, so he compared them by hand, hunting for errors." Then the slogan. We are Team Chai-GPT.
 
-**Slide 2 (Stephen, 0:45).** "From the first prototype to sign-off, nParity tells the engineer which differences between the old and new API are regressions, with a probability and a one-line reason. Today the check happens once, by hand, near the end, when a regression costs the most. Replay tools show what differs, not whether it was intended." *Pause after "not whether it was intended".*
+**Slide 2 (Stephen).** "Other tools tell you what differs. Nothing tells you whether it was meant to." *Pause there.*
 
-**Slide 3 (Stephen, 0:30).** "Two people matter. The backend engineer who has to prove parity, and the manager who signs off the cutover and needs a short list with a probability on each item. What we are not: we do not do the migration. We find and rank the differences."
+**Slide 3 (Stephen).** "We find and rank the differences. We do not do the migration."
 
-**Slide 4 (Stephen, 0:45).** "This pain is documented. GitHub's rewrite with Scientist was mostly noise, and took about five days even with a purpose-built tool. Twitter built Diffy because separating noise from regressions by hand is very hard. We also interviewed an engineer who moved from one version of a vendor API to its successor: same vendor, new process, endpoints that cannot be paired one to one. His trust came from references to the actual documentation."
+**Slide 4 (Stephen).** Tell the interview in one breath: new process, same vendor, no one-to-one pairing, and trust came from seeing the source. Say plainly: "That is one interview. We are not claiming more."
 
-**Slide 5 (Gerdi, 0:45).** "Five steps. Replay the same requests against both. Strain out noise with fixed rules, no model. Match endpoints and fields, rules first, the model only for leftovers. Compare every JSON path. Then taste: intended, regression or unsure, against your intent note. The model does only the two jobs that need judgement. Flow grouping is in progress and not in today's demo."
+**Slide 5 (Stephen).** Moat, honestly: "The code is open and a copy is possible. What is hard to copy is judging intent with a probability, and the answer keys and thresholds we calibrate it against." Market: "We have not sized it. We count the labour saved instead."
 
-**Slide 6 (Stephen drives, Gerdi narrates, 3:00).**
-1. (0:15) "Ten differences in, four for a human." Point at the 2 noise, 4 intended, 3 regressions, 1 unsure split.
-2. (0:45) Run the **toy APIs**. Show the output.
-3. (0:45) Open one regression: the rounding one, "10.005 now rounds to 10.00". "It never asks the model about rounding. The differ catches it, the model judges intent."
-4. (0:30) Point at the rename found without being told: `/customers/{id}` to `/clients/{clientId}`.
-5. (0:45) Run **Petstore v2 against v3**. "Two real public APIs. About 20 endpoints, 39 findings, roughly 20 seconds."
+**Slide 6 (Gerdi).** "The model does two jobs only: leftover matches and the verdict. Everything else is fixed rules." Flow grouping is in progress and not in the demo.
 
-*Fallback if a live run fails:* say "this is the saved output from this morning", show the toy output already on screen, and move on. Do not debug live.
+**Slide 7 (Gerdi).** "These are the promises we test live. The safety rules cannot be changed: no regression is dismissed automatically."
 
-**Slide 7 (Gerdi, 0:45).** "Why trust it? Each verdict is read from the model's token probabilities, not a score it makes up. The costlier the mistake, the higher the bar: 0.95 to accept a match, 0.98 to accept a difference as intended. Regressions are never dismissed automatically. On our test APIs every run is scored against an answer key, and the score is on screen."
+**Slide 8 (Stephen drives, Gerdi narrates, 2:00).**
+1. (0:35) Run the **toy APIs**. "Ten differences in, four for a human."
+2. (0:30) Open the rounding regression (10.005 now rounds to 10.00). "The differ catches the number. The model judges whether it was intended."
+3. (0:15) Point at the rename found without being told.
+4. (0:40) Run **Petstore v2 against v3**. "Two real public APIs. About 20 seconds. By hand we estimate two hours, which we have not timed."
 
-**Slide 8 (Temba, 0:30).** "The engineering manager pays. Self-host is free under MIT. Hosted is a Migration Pass, US$149 for 60 days. One migration's parity passes cost about US$3,800 of senior time, so that is about 4%. We charge once because a migration happens once. The true cost of a regression is unknown, so we price it as developer time: one caught early pays for the pass about three times."
+*Fallback if a live run fails:* say "this is the saved output from this morning", show the toy output already on screen, and move on. Do not debug live. Do not run the Wikipedia pair live unless the User-Agent fix is in.
 
-**Slide 9 (Temba, 0:30).** "94% gross margin per pass. Model fees are 2% of the price. Support is the real cost. Hosting is serverless, about US$3 a month idle. Even if the model costs ten times more, margin is 74%."
+**Slide 9 (Gerdi).** "The costlier the mistake, the higher the bar. That is why a difference needs 0.98 and a match needs 0.95."
 
-**Slide 10 (Temba, 0:30).** "Honest view: one pass covers hosting, but the build only pays back with volume. At four passes a month a lean build pays back in month 52. At US$299 a pass, month 23. The free core is the funnel. No hockey stick."
+**Slide 10 (Gerdi).** "It is a developer tool, and an AI agent can drive it too. In progress, not in the demo."
 
-**Slide 11 (Temba, 0:30).** "What if we are wrong? Accuracy: the unsure bucket and no automatic dismissal. No probabilities on the model route: run the CLI on any model that has them. Model price: cache or switch engine. Data: redact before any model call, self-host is free. One-off demand: test a higher price and use the CLI as the funnel."
+**Slide 11 (Temba).** Why hosted exists: "Self-host is free for anyone who can run a model with token probabilities. The hosted pass is for teams who cannot, or would rather not. We charge once because a migration happens once."
 
-**Slide 12 (Stephen, 0:30).** "Will we break anything? Know before it ships. The same engine runs before, during and after the migration, on whichever model your company has approved. Our ask: a pilot on one real migration, with two engineers, next quarter."
+**Slide 12 (Temba).** "Model fees are 2% of the price. Support is the real cost."
+
+**Slide 13 (Temba).** "The honest read: the hosted tier is modest on its own. The free core builds the audience, and the pass pays for itself."
+
+**Slide 14 (Temba).** Name two risks only: accuracy (the unsure bucket), and the model route not returning probabilities (run the CLI on a model that does).
+
+**Slide 15 (Stephen).** "Know what changed. Know what broke. Know before you build." Stop. Questions.
 
 ## If you run long (cut in this order)
-1. Slide 4: drop the Twitter line (save 10 s).
-2. Slide 9: say only "94% margin, model fees are 2%" (save 20 s).
-3. Slide 11: name two risks, not five (save 15 s).
-4. Slide 6: skip the Petstore run and say it is in the repo (save 45 s).
+1. Slide 10: skip it (10 s).
+2. Slide 14: name one risk (10 s).
+3. Slide 8: skip the Petstore run and say it is in the repo (40 s).
 
-## Likely questions (use appendix slides)
-- **Why trust the AI?** Slide 7. Probabilities, thresholds, no regression auto-dismissed.
-- **How big is the market?** Not sized yet. Say so. Appendix 16 is a placeholder.
-- **How do you know the 20 hours?** Illustrative (200 endpoints x 3 samples x 2 min). Timed baseline still to do (appendix 14).
-- **Alternatives?** Appendix 15: Diffy archived, oasdiff spec-only, Speedscale and Keploy replay but do not judge intent.
-- **What if there is no OpenAPI spec?** Optional by design: static mode from docs or samples, never labels "regression" (PRD 0006, in progress).
-- **Authenticated APIs?** Not built for the demo, public APIs only. A token option is a release requirement, kept run-time only when hosted.
-- **Data leaving the company?** Hosted tier redacts before any model call. Self-host keeps everything local.
-- **Why not just use a model API directly?** Fixed rules do the numbers. The model only matches leftovers and judges intent, with a probability.
+## Likely questions (appendix slides 16 to 19)
+- **Why trust the AI?** Slide 9. Probabilities, thresholds, no regression auto-dismissed.
+- **Who has committed or paid?** No one yet. We have one interview and a working prototype. Say so.
+- **What stops a copy?** See slide 5: judging intent with a probability, plus the calibration.
+- **Why pay when the CLI is free?** The hosted tier is for people who cannot or will not run a model themselves.
+- **How big is the market?** Not sized yet. Slide 18 is a placeholder with the wrong slice.
+- **How do you know the two hours?** An estimate (20 endpoints x 3 samples x 2 min), not yet timed. Slide 17.
+- **What if there is no OpenAPI spec?** Optional by design. Without one we do basic checks only, and the report says so (PRD 0006, PRD 0008).
+- **Authenticated APIs?** Not built for the demo, public APIs only. A token option is a release requirement.
+- **POST or DELETE endpoints?** The spec gives contract differences for every method with no calls. Behaviour is replayed for GET by default, other methods opt-in (PRD 0008).
+- **Can an AI agent use it?** Yes, a developer CLI with YAML run output. The agent options (`--format json`, `--compact`, `--detach`, `--dry-run`, `--fail-on`) are in progress and not in the demo. It is not meant for CI builds.
+- **Data leaving the company?** Hosted tier redacts before any model call (specified, not built). Self-host keeps everything local.
+- **CSOM to Mesh?** Our worked example. The key is our draft from vendor docs, how our integration calls each API, and one engineer's answer. It has not been reviewed.
 
 ## Checks before you go on
 - Toy APIs and Petstore both run once this morning. Save the output.
-- Slides open at 1280x768 or larger, on the file in `docs/pitch/nparity-pitch.html` from `main`.
-- Chips marked "in progress" and "TO FILL" on slides 5, 6 and 14: say "in progress" out loud, do not hide them.
-- Slide 14 still has X hours and N differences placeholders. Keep it in the appendix.
+- Deck: `docs/pitch/nparity-pitch.html`, 1280x768 or larger.
+- Chips ("in progress", "verify price", "to test", "not yet timed"): say "in progress" out loud, do not hide them.
