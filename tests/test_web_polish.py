@@ -60,7 +60,7 @@ def _render_row(in_group, **over):
                         entry=SimpleNamespace(decision="accept", by="ann"), kind_text="changed",
                         p_text="0.900", p_pct=90, color="#000", thr_pct=50, conf_text="90%")
     for k, val in over.items():
-        setattr(v if k != "f" else v, k, val)
+        setattr(v, k, val)
     ctx = {"run": SimpleNamespace(id="r1"), "v": v}
     if in_group:
         ctx["in_group"] = True
