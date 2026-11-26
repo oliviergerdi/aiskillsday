@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_time.html" import local_time %}
 {% block title %}{{ run.id }} · nParity{% endblock %}
 {% block content %}
 <div class="crumbs"><a href="/">Runs</a> / {{ run.id }}</div>
@@ -6,7 +7,8 @@
   <div>
     <h1>{{ run.id }}</h1>
     <div class="sub">{{ run.config.old }} → {{ run.config.new }} · {% if run.config.intent %}intent <code>{{ run.config.intent }}</code> · {% endif %}backend <span class="badge b-llm">{{ run.config.backend }}</span>
-      · {{ run.config.requests }} requests across {{ run.config.endpoints }} endpoints</div>
+      · {{ run.config.requests }} requests across {{ run.config.endpoints }} endpoints
+      · Started {{ local_time(run.started_at, year=true) }}</div>
   </div>
   <div class="head-links">
     <a href="/runs/{{ run.id }}/signoff">Sign-off page →</a>
@@ -25,14 +27,14 @@
 <form class="baseline-line" method="get">
   <span class="sub">Scope <code>{{ scope }}</code> ·</span>
   {% if comparison %}
-  <span>vs <a href="/runs/{{ baseline.id }}">{{ baseline.started_at.astimezone().strftime("%d %b %H:%M") }} run</a>:
+  <span>vs <a href="/runs/{{ baseline.id }}">{{ local_time(baseline.started_at) }} run</a>:
     <b>{{ comparison.counts.new }}</b> new · <b>{{ comparison.counts.unchanged }}</b> unchanged · <b>{{ comparison.counts.resolved }}</b> resolved</span>
   {% else %}<span class="sub">No baseline</span>{% endif %}
   {% if candidates %}
   <label class="sub" for="baseline-pick">compare with</label>
   <select id="baseline-pick" name="baseline" onchange="this.form.submit()">
     <option value="">None</option>
-    {% for r in candidates %}<option value="{{ r.id }}"{% if baseline and baseline.id == r.id %} selected{% endif %}>{{ r.started_at.astimezone().strftime("%d %b %H:%M") }} · {{ r.id }}</option>{% endfor %}
+    {% for r in candidates %}<option value="{{ r.id }}" data-local-time="{{ r.started_at.isoformat() }}"{% if baseline and baseline.id == r.id %} selected{% endif %}>{{ r.started_at.strftime("%d %b %H:%M %z")|trim }} · {{ r.id }}</option>{% endfor %}
   </select>
   {% endif %}
 </form>

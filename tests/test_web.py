@@ -219,6 +219,15 @@ def test_runs_page_needs_review(one_run):
     assert ">51<" in re.sub(r"\s+", "", cell)
 
 
+def test_report_pages_expose_offset_aware_start_time(one_run):
+    client, run = one_run
+    for url in ("/", f"/runs/{run.id}", f"/runs/{run.id}/signoff"):
+        response = client.get(url)
+        assert response.status_code == 200
+        assert '<time datetime="2026-03-14T09:30:00+00:00" data-local-time' in response.text
+        assert 'src="/static/report-time.js"' in response.text
+
+
 def test_runs_page_zero_counts_muted(one_run):
     client, run = one_run
     run.findings += [_finding(100, "accepted"), _finding(101, "accepted")]

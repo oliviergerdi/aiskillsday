@@ -101,10 +101,6 @@ for (const button of presets) {
   });
 }
 
-function when(iso) {
-  return new Date(iso).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
-}
-
 async function loadConfig(name) {
   loadedConfig = null;
   rerunBaseline.replaceChildren();
@@ -115,8 +111,8 @@ async function loadConfig(name) {
   hasPreviousRuns = data.runs.length > 0;
   const c = data.config;
   rerunSummary.textContent = `${c.before.source || c.before.base_url} → ${c.after.source || c.after.base_url} · ${c.backend}${c.flow_mapping ? " · flow mapping" : c.score ? " · scored" : ""}`;
-  const choices = [option("auto", hasPreviousRuns ? `Latest: ${when(data.runs[0].started_at)} (${data.runs[0].open} open)` : "Latest (no runs yet)")];
-  for (const r of data.runs) choices.push(option(r.id, `${when(r.started_at)} · ${r.open} open · ${r.id}`));
+  const choices = [option("auto", hasPreviousRuns ? `Latest: ${formatReportTime(data.runs[0].started_at)} (${data.runs[0].open} open)` : "Latest (no runs yet)")];
+  for (const r of data.runs) choices.push(option(r.id, `${formatReportTime(r.started_at)} · ${r.open} open · ${r.id}`));
   choices.push(option("", "None"));
   rerunBaseline.replaceChildren(...choices);
   updateRunLabel();

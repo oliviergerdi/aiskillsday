@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_time.html" import local_time %}
 {% block title %}Flow mapping · {{ run.id }} · nParity{% endblock %}
 {% block content %}
 {% set mapping = run.flow_mapping %}
@@ -6,7 +7,8 @@
 <div class="run-head">
   <div>
     <h1>Flow mapping</h1>
-    <div class="sub">{{ run.config.old }} → {{ run.config.new }} · {{ run.config.backend|backend_label }}</div>
+    <div class="sub">{{ run.config.old }} → {{ run.config.new }} · {{ run.config.backend|backend_label }}
+      · Started {{ local_time(run.started_at, year=true) }}</div>
   </div>
   <div class="head-links"><a href="/runs/{{ run.id }}/report.md" download="{{ run.id }}.md">Download Markdown</a></div>
 </div>

@@ -1,7 +1,8 @@
+{% from "_time.html" import local_time %}
 <div class="decision" id="{{ v.f.id }}-review" tabindex="-1" data-run="{{ v.run_id }}" data-finding="{{ v.f.id }}">
 {% if v.entry %}
   <p class="decided {{ 'acc' if v.entry.decision == 'accept' else 'rej' }}">
-    <b>{{ "Accepted" if v.entry.decision == "accept" else "Rejected as a regression" }}</b> by {{ v.entry.by }}, {{ v.entry.at.strftime("%d %b %H:%M") }}{% if v.entry.note %}: “{{ v.entry.note }}”{% endif %}
+    <b>{{ "Accepted" if v.entry.decision == "accept" else "Rejected as a regression" }}</b> by {{ v.entry.by }}, {{ local_time(v.entry.at) }}{% if v.entry.note %}: “{{ v.entry.note }}”{% endif %}
     <span class="sub">· model said {{ v.entry.model_label or "—" }}{% if v.entry.model_p is not none %} p={{ "%.3f"|format(v.entry.model_p) }}{% endif %}{% if v.entry.run != v.run_id %} · decided in run {{ v.entry.run }}{% endif %}</span>
   </p>
   <button type="button" class="run-button" data-undo>Undo</button>

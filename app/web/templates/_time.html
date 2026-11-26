@@ -1,0 +1,3 @@
+{% macro local_time(value, year=false) -%}
+<time datetime="{{ value.isoformat() }}" data-local-time{% if year %} data-with-year{% endif %}>{{ value.strftime("%d %b " ~ ("%Y " if year else "") ~ "%H:%M %z")|trim }}</time>
+{%- endmacro %}

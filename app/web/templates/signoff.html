@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_time.html" import local_time %}
 {% block title %}Sign-off · {{ run.id }} · nParity{% endblock %}
 {% block content %}
 <div class="crumbs noprint"><a href="/">Runs</a> / <a href="/runs/{{ run.id }}">{{ run.id }}</a> / sign-off</div>
@@ -6,8 +7,8 @@
   <div>
     <h1>Cutover sign-off</h1>
     <div class="sub">{{ run.config.old }} → {{ run.config.new }} · scope <code>{{ scope }}</code> · run {{ run.id }},
-      {{ run.started_at.astimezone().strftime("%d %b %Y %H:%M") }} · backend {{ run.config.backend }}</div>
-    {% if comparison %}<div class="sub">vs {{ baseline.started_at.astimezone().strftime("%d %b %H:%M") }} run ({{ baseline.id }}):
+      {{ local_time(run.started_at, year=true) }} · backend {{ run.config.backend }}</div>
+    {% if comparison %}<div class="sub">vs {{ local_time(baseline.started_at) }} run ({{ baseline.id }}):
       {{ comparison.counts.new }} new · {{ comparison.counts.unchanged }} unchanged · {{ comparison.counts.resolved }} resolved</div>{% endif %}
   </div>
   <button type="button" class="run-button noprint" onclick="window.print()">Print</button>
@@ -28,7 +29,7 @@
       <td>{% if v.state == "rejected" %}<span class="badge b-reg">confirmed regression</span>{% else %}<span class="badge {{ 'b-reg' if v.f.status == 'shown' else 'b-uns' }}">needs review</span>{% endif %}</td>
       <td><code>{{ v.f.endpoint }}</code></td><td><code>{{ v.f.path }}</code></td><td>{{ v.f.kind }}</td>
       <td>{{ v.f.label or "—" }}</td><td class="num">{{ v.p_text }}</td>
-      <td>{% if v.entry %}Rejected by {{ v.entry.by }}, {{ v.entry.at.strftime("%d %b %H:%M") }}{% if v.entry.note %}: “{{ v.entry.note }}”{% endif %}{% else %}{{ v.f.reason or "" }}{% endif %}</td>
+      <td>{% if v.entry %}Rejected by {{ v.entry.by }}, {{ local_time(v.entry.at) }}{% if v.entry.note %}: “{{ v.entry.note }}”{% endif %}{% else %}{{ v.f.reason or "" }}{% endif %}</td>
     </tr>
   {% endfor %}
   {% for e in run.errors %}
@@ -46,7 +47,7 @@
   <tbody>
   {% for v in accepted %}
     <tr><td><code>{{ v.f.endpoint }}</code></td><td><code>{{ v.f.path }}</code></td><td>{{ v.f.kind }}</td>
-      <td>{{ v.entry.by }}</td><td>{{ v.entry.at.strftime("%d %b %H:%M") }}</td><td>{{ v.entry.note }}</td>
+      <td>{{ v.entry.by }}</td><td>{{ local_time(v.entry.at) }}</td><td>{{ v.entry.note }}</td>
       <td>{{ v.entry.model_label or "—" }}{% if v.entry.model_p is not none %} p={{ "%.3f"|format(v.entry.model_p) }}{% endif %}{% if v.entry.run != run.id %} <span class="sub">(run {{ v.entry.run }})</span>{% endif %}</td></tr>
   {% endfor %}
   </tbody>
@@ -60,7 +61,7 @@
 
 {% if stale %}
 <h2>No longer seen <span class="sub">ledger entries in this scope with no matching finding</span></h2>
-<ul class="plain">{% for e in stale %}<li>{{ e.decision }} · <code>{{ e.endpoint }}</code> <code>{{ e.path }}</code> · {{ e.kind }} · by {{ e.by }}, {{ e.at.strftime("%d %b %H:%M") }}</li>{% endfor %}</ul>
+<ul class="plain">{% for e in stale %}<li>{{ e.decision }} · <code>{{ e.endpoint }}</code> <code>{{ e.path }}</code> · {{ e.kind }} · by {{ e.by }}, {{ local_time(e.at) }}</li>{% endfor %}</ul>
 {% endif %}
 
 <h2>How this was decided</h2>
