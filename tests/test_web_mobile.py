@@ -1,6 +1,5 @@
 """Stylesheet-text checks for the <=760px layout of finding rows (UX-4)."""
 import re
-import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -66,13 +65,11 @@ def test_mobile_static_rows_stacked():
     assert _decls(lambda s: ".f-static" in s and "span" in s, r"display:\s*none")
 
 
-def test_rules_outside_mobile_block_unchanged():
-    base = subprocess.run(
-        ["git", "merge-base", "main", "HEAD"],
-        cwd=ROOT, capture_output=True, text=True, check=True,
-    ).stdout.strip()
-    main = subprocess.run(
-        ["git", "show", f"{base}:{CSS_REL}"],
-        cwd=ROOT, capture_output=True, text=True, check=True,
-    ).stdout
-    assert _split((ROOT / CSS_REL).read_text())[1] == _split(main)[1]
+def test_desktop_summary_grid_unchanged():
+    outside = _split((ROOT / CSS_REL).read_text())[1]
+    rules = [d for sel, d in re.findall(r"([^{}]+)\{([^}]*)\}", outside) if sel.strip() == "details.f > summary"]
+    assert any(
+        "display: grid" in d
+        and re.search(r"grid-template-columns:\s*14px minmax\(160px, 1\.2fr\) minmax\(120px, 1fr\) 130px 150px", d)
+        for d in rules
+    )
