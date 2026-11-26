@@ -16,7 +16,9 @@ CAPTURE_SPEC = {"paths": {CAPTURE_PATH: {"get": {}}}}
 
 
 class InputError(ValueError):
-    pass
+    def __init__(self, message, field=None):
+        super().__init__(message)
+        self.field = field
 
 
 class SourceInput(BaseModel):

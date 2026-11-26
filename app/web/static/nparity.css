@@ -81,7 +81,12 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .source-panel label, .run-field label { display: block; margin: 8px 0 4px; font-weight: 600; }
 .comparison-form input:not([type="checkbox"]), .comparison-form select { width: 100%; min-width: 0;
   background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; font: inherit; }
+.comparison-form textarea { width: 100%; min-width: 0; box-sizing: border-box; resize: vertical;
+  background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; font: inherit; }
 .comparison-form small { display: block; margin-top: 4px; }
+.field-error { color: var(--reg); font-size: 0.85em; }
+.field-error[hidden] { display: none; }
+[aria-invalid="true"] { border-color: var(--reg) !important; }
 .run-settings { width: 100%; }
 .run-settings summary { cursor: pointer; font-weight: 600; }
 .run-settings .source-grid { margin-top: 8px; }
