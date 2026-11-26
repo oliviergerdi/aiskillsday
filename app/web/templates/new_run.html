@@ -103,7 +103,20 @@
     <h2 id="console-title">Run console</h2>
     <span id="run-status" class="sub" role="status"></span>
   </div>
-  <pre id="run-console" role="log" tabindex="0" aria-labelledby="console-title"></pre>
+  <ol id="run-steps" class="run-steps">
+    <li data-step="load"><span class="run-step-marker"></span> <span>Load sources</span><small class="run-step-error" hidden></small></li>
+    <li data-step="read"><span class="run-step-marker"></span> <span>Read endpoints</span><small class="run-step-error" hidden></small></li>
+    <li data-step="map"><span class="run-step-marker"></span> <span>Map endpoints and fields</span><small class="run-step-error" hidden></small></li>
+    <li data-step="replay"><span class="run-step-marker"></span> <span>Replay requests</span><small class="run-step-error" hidden></small></li>
+    <li data-step="compare"><span class="run-step-marker"></span> <span>Compare responses</span><small class="run-step-error" hidden></small></li>
+    <li data-step="triage"><span class="run-step-marker"></span> <span>Triage findings</span><small class="run-step-error" hidden></small></li>
+    <li data-step="save"><span class="run-step-marker"></span> <span>Save report</span><small class="run-step-error" hidden></small></li>
+  </ol>
+  <details class="run-details">
+    <summary>Details</summary>
+    <pre id="run-console" role="log" tabindex="0" aria-labelledby="console-title"></pre>
+  </details>
+  <p id="run-opening" class="sub" hidden>Opening report…</p>
   <a class="run-button primary" id="run-report" hidden>Open report</a>
 </section>
 <script src="/static/new-run.js" defer></script>
