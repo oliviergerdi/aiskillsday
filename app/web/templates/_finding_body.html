@@ -20,5 +20,3 @@
   <ul>{% for req, state in v.samples %}<li><code>{{ req }}</code> · {% if state == "differs" %}<b>differs</b>{% else %}{{ state }}{% endif %}</li>{% endfor %}</ul>
 </div>
 {% endif %}
-{% if v.f.reason %}<div class="reasonbox"><span class="k">Reason</span>{{ v.f.reason }}</div>{% endif %}
-<div class="actions"><button class="btn" disabled>Confirm</button><button class="btn" disabled>Override</button><span class="sub">ledger: stretch</span></div>

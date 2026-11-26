@@ -4,13 +4,14 @@
 <div class="crumbs"><a href="/">Runs</a> / {{ run.id }}</div>
 <div class="run-head">
   <div>
-    <h1>{{ run.config.old }} → {{ run.config.new }}</h1>
-    <div class="sub">{% if run.config.intent %}intent <code>{{ run.config.intent }}</code> · {% endif %}backend <span class="badge b-llm">{{ run.config.backend }}</span>
+    <h1>{{ run.id }}</h1>
+    <div class="sub">{{ run.config.old }} → {{ run.config.new }} · {% if run.config.intent %}intent <code>{{ run.config.intent }}</code> · {% endif %}backend <span class="badge b-llm">{{ run.config.backend }}</span>
       · {{ run.config.requests }} requests across {{ run.config.endpoints }} endpoints</div>
   </div>
   <a href="/runs/{{ run.id }}/mapping">Mapping: {{ run.endpoints|length }} endpoints, {{ n_fields }} fields →</a>
 </div>
 
+<div class="verdict {{ verdict[1] }}">{{ verdict[0] }}</div>
 <div class="counts">
   <div class="count reg"><div class="n">{{ c.regression }}</div><div class="l">Regressions</div></div>
   <div class="count uns"><div class="n">{{ c.unsure }}</div><div class="l">Unsure</div></div>
@@ -24,11 +25,13 @@
   <span>Answer key: <b>{{ run.score.correct }}/{{ run.score.total }} correct</b></span>
   <span><b>{{ run.score.unsure }}</b> flagged unsure</span>
   <span><b>{{ run.score.false_regressions }}</b> false regressions</span>
-  <span><b>{{ run.endpoints|selectattr("new")|rejectattr("source", "equalto", "rule")|list|length }}</b> endpoint decisions by LLM</span>
 </div>
 {% for d in missed %}<p class="missed">Missed #{{ d.n }}: {{ d.endpoint }} <code>{{ d.path }}</code> expected {{ d.expect }}, got {{ d.got }}</p>{% endfor %}
 {% endif %}
 
+{% if empty %}
+<div class="findings"><div class="empty">Nothing to review</div></div>
+{% else %}
 <h2><span class="badge b-reg">Regressions</span> always shown, never auto-dismissed</h2>
 <div class="findings">
   {% for v in sections.shown %}{% include "_row.html" %}{% else %}<div class="empty">None.</div>{% endfor %}
@@ -44,6 +47,9 @@
   {% for v in sections.accepted %}{% include "_row.html" %}{% else %}<div class="empty">None.</div>{% endfor %}
 </div>
 
+{% endif %}
+
+{% if run.noise %}
 <h2><span class="badge b-noi">Noise removed</span> by normaliser rules, no LLM</h2>
 <div class="findings">
   {% for n in run.noise %}
@@ -52,8 +58,9 @@
     <div class="f-path"><code>{{ n.path }}</code></div>
     <div class="f-kind">rule: {{ n.rule }}</div><span></span>
   </div>
-  {% else %}<div class="empty">None.</div>{% endfor %}
+  {% endfor %}
 </div>
+{% endif %}
 
 {% if run.errors %}
 <h2><span class="badge b-err">Errors</span> requests that failed after retries</h2>
