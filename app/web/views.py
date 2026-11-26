@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 import re
 from dataclasses import dataclass, field
 from typing import Any
@@ -112,7 +113,7 @@ def _kind_text(f: Finding, s: Sample | None) -> str:
 
 
 def _pct(p: float) -> str:
-    return f"{p * 100:.1f}".rstrip("0").rstrip(".") + "%"
+    return f"{math.floor(round(p * 1000, 6)) / 10:.1f}".rstrip("0").rstrip(".") + "%"  # floor: never show 100% for 0.9996
 
 
 def finding_view(run: Run, f: Finding, th: Thresholds) -> FindingView:

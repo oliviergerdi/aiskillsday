@@ -90,7 +90,7 @@ def test_row_summary_shows_percent_with_raw_value_in_tooltip(setup):
 def test_conf_text_percent():
     from nparity.models import Finding
     th = load_thresholds(backend_id=None)
-    for p, want in ((0.999, "99.9%"), (1.0, "100%")):
+    for p, want in ((0.999, "99.9%"), (1.0, "100%"), (0.9996, "99.9%"), (0.5, "50%")):
         f = Finding(id="x", endpoint="GET /a", path="$.a", kind="changed", source="diff", p=p, label="regression")
         v = views.finding_view(None, f, th)    # no samples, so run is never read
         assert v.conf_text == want
