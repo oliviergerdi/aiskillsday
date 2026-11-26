@@ -21,6 +21,7 @@ class RunInput(BaseModel):
     samples: str = Field(default="", max_length=4096)
     discover_from: list[str] = Field(default_factory=list, max_length=20)
     contract_only: bool = False
+    flow_mapping: bool = False
     intent: str = Field(default="", max_length=4096)
     intent_text: str = Field(default="", max_length=20000)   # pasted note wins over the `intent` file
     backend: Literal["fake", "flash"] = "fake"
@@ -31,7 +32,8 @@ class RunInput(BaseModel):
     baseline: str = Field(default="auto", max_length=200)   # "auto", "" for none, or a run id
 
 
-SAVED_FIELDS = {"before", "after", "seeds", "samples", "discover_from", "contract_only", "intent", "backend", "name", "score"}
+SAVED_FIELDS = {"before", "after", "seeds", "samples", "discover_from", "contract_only", "flow_mapping",
+                "intent", "backend", "name", "score"}
 
 
 NAME = re.compile(r"^[a-zA-Z0-9_-]{1,50}$")

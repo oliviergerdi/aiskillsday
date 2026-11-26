@@ -19,8 +19,10 @@
       <a href="/" class="{{ 'active' if nav == 'runs' }}">Runs</a>
       <a href="/compare" class="{{ 'active' if nav == 'new' }}">New run</a>
       {% if run %}
-      <a href="/runs/{{ run.id }}" class="{{ 'active' if nav == 'run' }}">Findings</a>
+      <a href="/runs/{{ run.id }}" class="{{ 'active' if nav == 'run' }}">{{ "Flow mapping" if run.flow_mapping else "Findings" }}</a>
+      {% if not run.flow_mapping %}
       <a href="/runs/{{ run.id }}/mapping" class="{{ 'active' if nav == 'mapping' }}">Mapping</a>
+      {% endif %}
       {% endif %}
     </nav>
     <button class="theme-toggle" type="button" hidden>Dark mode</button>

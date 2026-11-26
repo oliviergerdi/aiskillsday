@@ -116,7 +116,7 @@ def compact_run(run: Run, filters: list[FindingFilter] | None = None, endpoint: 
         "noise": len(run.noise),
         "declared_differences": len(run.contract),
     }
-    return {
+    result = {
         "id": run.id, "started_at": run.started_at.isoformat(), "backend": run.config.get("backend"),
         "counts": counts, "telemetry": json.loads(run.telemetry.model_dump_json()),
         "coverage": {
@@ -129,6 +129,9 @@ def compact_run(run: Run, filters: list[FindingFilter] | None = None, endpoint: 
         "page": {"total": len(selected), "limit": limit, "offset": offset,
                  "next_offset": offset + limit if offset + limit < len(selected) else None},
     }
+    if run.flow_mapping is not None:
+        result["flow_mapping"] = run.flow_mapping.model_dump(mode="json")
+    return result
 
 
 def _finding_summary(finding: Finding) -> dict:

@@ -16,10 +16,10 @@
   </tr></thead>
   <tbody>
   {% for r, c in runs %}
-    {% set review = c.regression + c.unsure %}
+    {% set review = r.flow_mapping.flows|length if r.flow_mapping else c.regression + c.unsure %}
     <tr>
       <td><a href="/runs/{{ r.id }}" title="{{ r.id }}">{{ r.id|run_name }} · {{ r.started_at.strftime("%d %b %H:%M") }}</a><br>
-        <span class="sub">{{ r.config.old }} → {{ r.config.new }}</span></td>
+        <span class="sub">{% if r.flow_mapping %}Flow mapping · {% endif %}{{ r.config.old }} → {{ r.config.new }}</span></td>
       <td><span class="badge b-llm" title="{{ r.config.backend }}">{{ r.config.backend|backend_label }}</span></td>
       <td class="num{{ ' zero' if not review }}">{% if review %}<span class="badge b-reg">{{ review }}</span>{% else %}0{% endif %}</td>
       <td class="num{{ ' zero' if not c.regression }}">{{ c.regression }}</td>

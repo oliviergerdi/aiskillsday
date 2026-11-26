@@ -30,6 +30,8 @@ def finding_key(f: Finding) -> str:
 def scope_of(run: Run) -> str:
     """The configuration a run came from, else its old -> new base URLs."""
     scope = run.config.get("config") or f"{run.config.get('old')} -> {run.config.get('new')}"
+    if run.flow_mapping is not None:
+        return f"{scope} [flow mapping]"
     return f"{scope} [separate datasets]" if run.config.get("independent_data") else scope
 
 
@@ -122,6 +124,8 @@ def open_counts(run: Run, ledger: Ledger) -> dict[str, int]:
 
 def verdict(run: Run, ledger: Ledger) -> tuple[str, str]:
     """(text, css class). Ready only when nothing is open: no rejects, nothing unreviewed, no errors."""
+    if run.flow_mapping is not None:
+        return "Flow mapping needs review. No operations were replayed.", "uns"
     c = open_counts(run, ledger)
     if c["open"] == 0:
         if run.config.get("limited_comparison"):

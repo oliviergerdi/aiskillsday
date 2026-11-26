@@ -221,6 +221,19 @@ Use `--samples` with the `seeds` command, or `--seed-samples` with `run`, to sup
 
 The report lists coverage per endpoint, including request seed sources and reasons a sample did not count. Declared differences have their own section. Use `--contract-only` or **Compare specs only** in the web form to skip endpoint replay.
 
+### Operation flow mapping
+
+Select **toy-flow** from the run menu to see how one screening call becomes an ordered set of new operations. For your own Swagger or OpenAPI specs, select **Map operation flows** in Run settings and use the Flash evaluator. Review the suggested roles and quoted spec evidence before using the flow in a migration.
+
+```bash
+uv run python -m nparity.cli run --flow-mapping --backend flash --name migration \
+  --old-spec before.yaml --new-spec after.yaml
+uv run python -m nparity.cli report RUN_ID
+uv run python -m nparity.cli key RUN_ID --out flow.key.yaml
+```
+
+Review the draft key and fill in `confirmed_by` before passing it to `run --flow-mapping --flow-key flow.key.yaml`.
+
 ### Basic checks without specs
 
 Use **Endpoint URL (no spec)** on both sides to compare two GET responses, or supply a YAML or JSON file of paired GET requests. Basic checks compare status codes, JSON keys and value types. The report states how many endpoints provided usable responses.

@@ -36,6 +36,17 @@ for (const panel of panels) {
   updateSource(panel);
 }
 
+function updateFlowSettings() {
+  const flowMapping = form.elements.flow_mapping.checked;
+  for (const name of ["contract_only", "seeds", "samples", "discover_from"]) {
+    form.elements[name].disabled = flowMapping;
+  }
+  form.elements.intent_text.required = !flowMapping;
+}
+
+form.elements.flow_mapping.addEventListener("change", updateFlowSettings);
+updateFlowSettings();
+
 const rerunSelect = document.querySelector("#rerun-config");
 const rerunBaseline = document.querySelector("#rerun-baseline");
 const rerunSummary = document.querySelector("#rerun-summary");
@@ -83,6 +94,8 @@ for (const button of presets) {
     };
     for (const [name, value] of Object.entries(values)) form.elements[name].value = value;
     form.elements.contract_only.checked = false;
+    form.elements.flow_mapping.checked = false;
+    updateFlowSettings();
     for (const panel of panels) updateSource(panel);
     form.querySelector(".run-settings").open = true;
   });
@@ -101,7 +114,7 @@ async function loadConfig(name) {
   loadedConfig = data.config;
   hasPreviousRuns = data.runs.length > 0;
   const c = data.config;
-  rerunSummary.textContent = `${c.before.source || c.before.base_url} → ${c.after.source || c.after.base_url} · ${c.backend}${c.score ? " · scored" : ""}`;
+  rerunSummary.textContent = `${c.before.source || c.before.base_url} → ${c.after.source || c.after.base_url} · ${c.backend}${c.flow_mapping ? " · flow mapping" : c.score ? " · scored" : ""}`;
   const choices = [option("auto", hasPreviousRuns ? `Latest: ${when(data.runs[0].started_at)} (${data.runs[0].open} open)` : "Latest (no runs yet)")];
   for (const r of data.runs) choices.push(option(r.id, `${when(r.started_at)} · ${r.open} open · ${r.id}`));
   choices.push(option("", "None"));
@@ -135,6 +148,8 @@ rerunEdit.addEventListener("click", () => {
   };
   for (const [name, value] of Object.entries(values)) form.elements[name].value = value;
   form.elements.contract_only.checked = Boolean(c.contract_only);
+  form.elements.flow_mapping.checked = Boolean(c.flow_mapping);
+  updateFlowSettings();
   for (const panel of panels) updateSource(panel);
   form.querySelector(".run-settings").open = true;
   form.scrollIntoView({ block: "start" });
@@ -301,16 +316,17 @@ form.addEventListener("submit", (event) => {
   const before = source("before");
   const after = source("after");
   const backend = values.get("backend");
-  const seeds = values.get("seeds").trim();
+  const seeds = (values.get("seeds") || "").trim();
   const intent = values.get("intent").trim();
   const intentText = values.get("intent_text") ?? "";
   const contractOnly = values.has("contract_only");
+  const flowMapping = values.has("flow_mapping");
   const name = values.get("name").trim() || "comparison";
   clearFieldErrors();
   const missing = [
     ["before_source", before.source || (before.kind === "spec" && before.base_url), "Enter a source URL or file path."],
     ["after_source", after.source || (after.kind === "spec" && after.base_url), "Enter a source URL or file path."],
-    ["intent_text", contractOnly || intentText.trim(), "Describe what this change was meant to do. Without it every difference is flagged as a regression."],
+    ["intent_text", contractOnly || flowMapping || intentText.trim(), "Describe what this change was meant to do. Without it every difference is flagged as a regression."],
   ].filter(([, value]) => !value);
   for (const [field, , message] of missing) showFieldError(field, message);
   if (missing.length) {
@@ -323,9 +339,10 @@ form.addEventListener("submit", (event) => {
   const fromConfig = loadedConfig && loadedConfig.name === name ? loadedConfig.score : false;
   startJob({
     before, after, backend, name, seeds, intent, intent_text: intentText,
-    samples: values.get("samples").trim(),
-    discover_from: values.get("discover_from").split(";").map(value => value.trim()).filter(Boolean),
+    samples: (values.get("samples") || "").trim(),
+    discover_from: (values.get("discover_from") || "").split(";").map(value => value.trim()).filter(Boolean),
     contract_only: contractOnly,
+    flow_mapping: flowMapping,
     score: scoreDemo || fromConfig,
     save_config: values.get("save_config") === "on",
     baseline: "auto",

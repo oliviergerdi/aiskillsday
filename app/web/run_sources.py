@@ -147,7 +147,7 @@ def from_manifest(value: str, override: str, side: str) -> Source:
 
 
 def resolve_source(client: httpx.Client, target: SourceInput, side: str,
-                   headers: dict[str, str] | None = None) -> Source:
+                   headers: dict[str, str] | None = None, *, spec_only: bool = False) -> Source:
     source, override = target.source.strip(), target.base_url.strip()
     if target.kind == "manifest":
         return from_manifest(source, override, side)
@@ -175,5 +175,8 @@ def resolve_source(client: httpx.Client, target: SourceInput, side: str,
         if override or document_url:
             return Source(str(http_url(override or source)))
         raise InputError("Enter an endpoint URL to compare responses without an OpenAPI spec.")
-    base = str(http_url(override, base=True)) if override else server_url(data, document_url)
+    if override:
+        base = str(http_url(override, base=True))
+    else:
+        base = (document_url or source) if spec_only else server_url(data, document_url)
     return Source(base, data)

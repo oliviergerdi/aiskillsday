@@ -100,14 +100,18 @@ class RunJobs:
 
 def compare(job_id: str, inputs: RunInput, directory: Path, progress: Callable[[str], None],
             configs: Path = CONFIGS_DIR) -> str:
-    if inputs.backend == "flash" and not inputs.contract_only and not os.environ.get("FIREWORKS_API_KEY"):
+    contract_only = inputs.contract_only and not inputs.flow_mapping
+    if inputs.backend == "flash" and not contract_only and not os.environ.get("FIREWORKS_API_KEY"):
         raise InputError("Set FIREWORKS_API_KEY in the server environment to use Flash.", "backend")
     defaults = pipeline.RunConfig("", "")
     try:
-        seeds_path = local_file(inputs.seeds, {".yaml", ".yml"}) if inputs.seeds and not inputs.contract_only else None
+        seeds_path = (local_file(inputs.seeds, {".yaml", ".yml"})
+                      if inputs.seeds and not (contract_only or inputs.flow_mapping) else None)
     except InputError as exc:
         raise InputError(str(exc), "seeds") from exc
-    if inputs.intent_text.strip():
+    if inputs.flow_mapping:
+        intent_path = None
+    elif inputs.intent_text.strip():
         intent_dir = directory / f"{inputs.name}-{job_id[:12]}"
         intent_dir.mkdir(parents=True, exist_ok=True)
         intent_path = intent_dir / "intent.md"
@@ -119,8 +123,8 @@ def compare(job_id: str, inputs: RunInput, directory: Path, progress: Callable[[
             raise InputError(str(exc), "intent") from exc
     seeds = load_seeds(seeds_path) if seeds_path else Seeds()
     samples = None
-    if inputs.samples:
-        if inputs.contract_only:
+    if inputs.samples and not inputs.flow_mapping:
+        if contract_only:
             raise InputError("Choose either a sample requests file or contract only.", "samples")
         try:
             samples = load_request_pairs(local_file(inputs.samples, {".json", ".yaml", ".yml"}))
@@ -139,22 +143,29 @@ def compare(job_id: str, inputs: RunInput, directory: Path, progress: Callable[[
                       headers={"User-Agent": headers.API_USER_AGENT}) as client:
         progress("Loading before source")
         before = (Source(str(http_url(inputs.before.base_url or inputs.before.source, base=True)))
-                  if samples is not None else resolve_source(client, inputs.before, "old", old_h))
+                  if samples is not None else resolve_source(client, inputs.before, "old", old_h,
+                                                            spec_only=inputs.flow_mapping))
         progress("Loading after source")
         after = (Source(str(http_url(inputs.after.base_url or inputs.after.source, base=True)))
-                 if samples is not None else resolve_source(client, inputs.after, "new", new_h))
+                 if samples is not None else resolve_source(client, inputs.after, "new", new_h,
+                                                           spec_only=inputs.flow_mapping))
         limited = before.spec is None or after.spec is None or (before.capture is not None and after.capture is not None)
-        score = inputs.score and not limited
-        ev = FakeBackend(AnswerKey()) if inputs.backend == "fake" and not score else None
+        score = inputs.score and not limited and not inputs.flow_mapping
+        ev = FakeBackend(AnswerKey()) if inputs.backend == "fake" and not score and not inputs.flow_mapping else None
         config = pipeline.RunConfig(
             before.base_url, after.base_url, intent=intent_path, seeds=seeds_path,
             old_headers=inputs.before.headers, new_headers=inputs.after.headers,
             answer_key=defaults.answer_key if score else None,
             backend=inputs.backend, name=f"{inputs.name}-{job_id[:12]}",
-            discover_from=inputs.discover_from, sample_requests=samples, contract_only=inputs.contract_only,
+            discover_from=inputs.discover_from, sample_requests=samples, contract_only=contract_only,
+            flow_mapping=inputs.flow_mapping,
         )
         options = {"specs": (before.spec, after.spec), "request_seeds": seeds, "progress": progress}
-        if samples is not None or inputs.contract_only and limited:
+        if inputs.flow_mapping:
+            if limited:
+                raise InputError("Flow mapping requires an OpenAPI or Swagger spec on each side.", "form")
+            run = pipeline.run(config, client, **options)
+        elif samples is not None or contract_only and limited:
             run = pipeline.run(config, client, ev, specs=(None, None), progress=progress)
         elif before.capture is None and after.capture is None:
             if limited:
@@ -199,12 +210,15 @@ def compare(job_id: str, inputs: RunInput, directory: Path, progress: Callable[[
         progress(f"Saved configuration {inputs.name}")
     if config_path(inputs.name, configs).is_file():
         run.config["config"] = inputs.name
-    run.config["baseline"] = resolve_baseline(inputs.baseline, run, directory)
+    run.config["baseline"] = None if inputs.flow_mapping else resolve_baseline(inputs.baseline, run, directory)
     if run.config["baseline"]:
         progress(f"Baseline: {run.config['baseline']}")
     if intent_path:
         run.config["intent_source"] = "form" if inputs.intent_text.strip() else "file"
-    progress(f"Saving report with {len(run.findings)} findings and {len(run.errors)} errors")
+    if run.flow_mapping is not None:
+        progress(f"Saving report with {len(run.flow_mapping.flows)} suggested flows")
+    else:
+        progress(f"Saving report with {len(run.findings)} findings and {len(run.errors)} errors")
     store.save(run, directory)
     return run.id
 

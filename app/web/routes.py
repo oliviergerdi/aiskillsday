@@ -6,7 +6,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.responses import HTMLResponse, Response
+from fastapi.responses import HTMLResponse, PlainTextResponse, Response
 from fastapi.templating import Jinja2Templates
 
 from app.web import views
@@ -14,6 +14,7 @@ from app.web.configs import list_configs, load_config
 from app.web.run_jobs import RunInput, RunJobs
 from nparity import store
 from nparity.config import load_thresholds
+from nparity.flow_report import markdown
 from nparity.models import Run
 from typing import Literal
 
@@ -133,6 +134,8 @@ def baseline_for(request: Request, run: Run, requested: str | None):
 @router.get("/runs/{run_id}", response_class=HTMLResponse)
 def run_page(request: Request, run_id: str, baseline: str | None = None):
     run = load(request, run_id)
+    if run.flow_mapping is not None:
+        return TEMPLATES.TemplateResponse(request, "flow_run.html", {"run": run, "nav": "run"})
     th = thresholds(run)
     led = ledger(request)
     base, candidates = baseline_for(request, run, baseline)
@@ -166,6 +169,14 @@ def finding_partial(request: Request, run_id: str, fid: str):
     run = load(request, run_id)
     v = views.review_view(run, find(run, fid), thresholds(run), review_states(run, ledger(request)))
     return TEMPLATES.TemplateResponse(request, "_finding_body.html", {"v": v})
+
+
+@router.get("/runs/{run_id}/report.md", response_class=PlainTextResponse)
+def flow_report(request: Request, run_id: str) -> str:
+    run = load(request, run_id)
+    if run.flow_mapping is None:
+        raise HTTPException(status_code=404, detail="This run has no flow mapping.")
+    return markdown(run)
 
 
 @router.get("/runs/{run_id}/signoff", response_class=HTMLResponse)

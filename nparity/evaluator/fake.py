@@ -9,27 +9,36 @@ A null mapping target answers "none". Anything not in the key gets a uniform, of
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any
 
 from nparity.config import load_yaml
 from nparity.evaluator.base import Answer, Choice, one_hot, uniform
-from nparity.models import AnswerKey
+from nparity.models import AnswerKey, FlowKey
 
 
 class FakeBackend:
     id = "fake"
     max_options = 255
 
-    def __init__(self, key: AnswerKey):
+    def __init__(self, key: AnswerKey, flow_key: FlowKey | None = None):
         self.key = key
+        self.flow_key = flow_key
 
     @classmethod
     def from_file(cls, path: str | Path) -> "FakeBackend":
         return cls(AnswerKey.model_validate(load_yaml(path)))
 
     def expected(self, qid: str) -> str | None:
-        if qid.startswith("map:endpoint:"):
+        if qid.startswith("flow:") and self.flow_key is not None:
+            old, new = json.loads(qid.removeprefix("flow:"))
+            for flow in self.flow_key.flows:
+                if flow.old_op == old:
+                    return next((step.role for step in flow.paths()[0].steps if new in (step.new_op, step.alt)), "none")
+            if any(old == (item if isinstance(item, str) else item.op) for item in self.flow_key.unmatched_old):
+                return "none"
+        elif qid.startswith("map:endpoint:"):
             old = qid.removeprefix("map:endpoint:")
             for m in self.key.mapping:
                 if m.get("old") == old:

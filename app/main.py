@@ -7,7 +7,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from app.toys import v1, v2
+from app.toys import flows, v1, v2
 from app.web.routes import router
 
 class NoCacheStatic(StaticFiles):
@@ -25,5 +25,7 @@ app.state.comparisons_dir = Path("comparisons")
 app.state.ledger_path = Path("accepted.yaml")
 app.mount("/v1", v1.app)
 app.mount("/v2", v2.app)
+app.mount("/flow/v1", flows.before)
+app.mount("/flow/v2", flows.after)
 app.mount("/static", NoCacheStatic(directory=Path(__file__).parent / "web" / "static"), name="static")
 app.include_router(router)

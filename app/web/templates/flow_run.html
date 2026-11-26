@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Flow mapping · {{ run.id }} · nParity{% endblock %}
+{% block content %}
+{% set mapping = run.flow_mapping %}
+<div class="crumbs"><a href="/">Runs</a> / {{ run.id }}</div>
+<div class="run-head">
+  <div>
+    <h1>Flow mapping</h1>
+    <div class="sub">{{ run.config.old }} → {{ run.config.new }} · {{ run.config.backend|backend_label }}</div>
+  </div>
+  <div class="head-links"><a href="/runs/{{ run.id }}/report.md" download="{{ run.id }}.md">Download Markdown</a></div>
+</div>
+<p>Review these suggested steps against the specifications before using them in a migration.</p>
+<p class="sub">{{ mapping.none_count }} candidates classified as unrelated. Evidence comes from the specifications.</p>
+
+{% for flow in mapping.flows %}
+<section>
+  <h2><code>{{ flow.old_op }}</code> <span class="badge b-uns">Needs review</span></h2>
+  {% if flow.ordering_warning %}<p class="limited-comparison">{{ flow.ordering_warning }}</p>{% endif %}
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th scope="col">Step</th><th scope="col">After operation</th><th scope="col">Role</th><th scope="col">Probability</th><th scope="col">Status</th><th scope="col">Evidence from the after spec</th></tr></thead>
+      <tbody>
+      {% for step in flow.steps %}
+        <tr>
+          <td>{{ loop.index }}</td><td><code>{{ step.new_op }}</code></td><td>{{ step.role }}</td>
+          <td>{{ "%.3f"|format(step.p) }}</td>
+          <td><span class="badge {{ 'b-uns' if step.status == 'unsure' else 'b-llm' }}">{{ step.status|capitalize }}</span></td>
+          <td>
+            {% if step.source %}<q>{{ step.source.quote }}</q><br><small class="sub"><code>{{ step.source.reference }}</code></small>{% endif %}
+            {% if step.warning %}<div class="sub">{{ step.warning }}</div>{% endif %}
+            {% if not step.source and not step.warning %}—{% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endfor %}
+
+{% for heading, operations in [("No counterpart before", mapping.unmatched_old), ("No counterpart after", mapping.unmatched_new)] %}
+<section>
+  <h2>{{ heading }} <small class="g-count">{{ operations|length }}</small></h2>
+  {% if operations %}<ul class="plain">{% for operation in operations %}<li><code>{{ operation }}</code></li>{% endfor %}</ul>
+  {% else %}<p class="sub">None.</p>{% endif %}
+</section>
+{% endfor %}
+
+{% if mapping.score %}
+<section>
+  <h2>Answer key score</h2>
+  <ul class="plain">
+    {% for label, score in [("Operation recall", mapping.score.op_recall), ("Step precision", mapping.score.step_precision), ("Order and roles", mapping.score.order_and_roles)] %}
+      <li>{{ label }} · {{ "%.1f%%"|format(score * 100) if score is not none else "unavailable" }}</li>
+    {% endfor %}
+    <li>Unmatched before · {{ "matches" if mapping.score.unmatched_old else "differs" }}</li>
+    <li>Unmatched after · {{ "matches" if mapping.score.unmatched_new else "differs" }}</li>
+  </ul>
+</section>
+{% endif %}
+<div class="footer-tele">
+  <span>Evaluator calls <b>{{ run.telemetry.llm_calls }}</b></span>
+  <span>Time <b>{{ "%.1f"|format(run.telemetry.seconds) }} s</b></span>
+</div>
+{% endblock %}

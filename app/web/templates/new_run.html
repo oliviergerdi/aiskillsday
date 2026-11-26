@@ -114,6 +114,10 @@
         <small class="sub">Skip live requests to the endpoints.</small>
       </div>
       <div class="run-field">
+        <label class="check"><input id="run-flow-mapping" name="flow_mapping" type="checkbox"> Map operation flows</label>
+        <small class="sub">Use two specs to suggest which calls replace each old operation. This takes precedence over contract-only and replay settings. Choose Flash for your own specs.</small>
+      </div>
+      <div class="run-field">
         <label class="check"><input id="run-save" name="save_config" type="checkbox"> Save as configuration</label>
         <small class="sub">Saved under the run name in <code>comparisons/</code>, so it appears in the rerun menu.</small>
       </div>

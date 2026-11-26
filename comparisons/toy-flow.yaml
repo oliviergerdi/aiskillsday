@@ -1,0 +1,11 @@
+before:
+  kind: spec
+  source: http://localhost:8000/flow/v1/openapi.json
+  base_url: http://localhost:8000/flow/v1
+after:
+  kind: spec
+  source: http://localhost:8000/flow/v2/openapi.json
+  base_url: http://localhost:8000/flow/v2
+flow_mapping: true
+backend: fake
+name: toy-flow

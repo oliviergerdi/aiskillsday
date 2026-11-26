@@ -142,6 +142,76 @@ class EndpointCoverage(BaseModel):
     reason: str | None = None
 
 
+FlowRole = Literal["direct", "auth", "configure", "start", "await", "read", "page", "none"]
+
+
+class FlowCitation(BaseModel):
+    reference: str
+    quote: str
+
+
+class FlowStep(BaseModel):
+    new_op: str
+    role: FlowRole
+    p: float = Field(ge=0, le=1)
+    status: Literal["suggested", "unsure"]
+    source: FlowCitation | None = None
+    warning: str | None = None
+
+
+class FlowMap(BaseModel):
+    old_op: str
+    steps: list[FlowStep] = Field(default_factory=list)
+    status: Literal["needs_review"] = "needs_review"
+    ordering_warning: str | None = None
+
+
+class FlowScores(BaseModel):
+    op_recall: float | None
+    step_precision: float | None
+    order_and_roles: float | None
+    unmatched_old: bool
+    unmatched_new: bool
+
+
+class FlowMapping(BaseModel):
+    flows: list[FlowMap] = Field(default_factory=list)
+    unmatched_old: list[str] = Field(default_factory=list)
+    unmatched_new: list[str] = Field(default_factory=list)
+    none_count: int = 0
+    score: FlowScores | None = None
+
+
+class FlowKeyStep(BaseModel):
+    new_op: str
+    role: FlowRole
+    alt: str | None = None
+
+
+class FlowVariant(BaseModel):
+    steps: list[FlowKeyStep] = Field(default_factory=list)
+
+
+class FlowKeyEntry(FlowVariant):
+    old_op: str
+    variants: list[FlowVariant] = Field(default_factory=list)
+
+    def paths(self) -> list[FlowVariant]:
+        return self.variants or [self]
+
+
+class FlowKeyUnmatched(BaseModel):
+    op: str
+
+
+class FlowKey(BaseModel):
+    version: Literal[1] = 1
+    confirmed_by: str | None = None
+    flows: list[FlowKeyEntry] = Field(default_factory=list)
+    unmatched_old: list[str | FlowKeyUnmatched] = Field(default_factory=list)
+    unmatched_new: list[str | FlowKeyUnmatched] = Field(default_factory=list)
+
+
 class Run(BaseModel):
     id: str
     started_at: datetime
@@ -155,6 +225,7 @@ class Run(BaseModel):
     telemetry: Telemetry = Field(default_factory=Telemetry)
     contract: list[ContractChange] = Field(default_factory=list)
     coverage: list[EndpointCoverage] = Field(default_factory=list)
+    flow_mapping: FlowMapping | None = None
 
     def basic_checks_summary(self) -> str | None:
         if self.config.get("limited_comparison"):

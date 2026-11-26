@@ -12,14 +12,15 @@ from pathlib import Path
 import httpx
 import yaml
 
-from nparity import contract, coverage, headers, seed_generation, seed_samples
+from nparity import contract, coverage, flow, headers, seed_generation, seed_samples
 from nparity.config import Seeds, load_noise, load_seeds, load_thresholds, load_yaml
 from nparity.evaluator.base import Backend, build
 from nparity.evaluator.fake import FakeBackend
 from nparity.findings import build_findings
+from nparity.flow_score import require_confirmation, score_flows
 from nparity.generate import allowed_methods, generate
 from nparity.map import map_endpoints, map_fields
-from nparity.models import AnswerKey, EndpointMap, RequestPair, Run, Telemetry
+from nparity.models import AnswerKey, EndpointMap, FlowKey, RequestPair, Run, Telemetry
 from nparity.openapi import Endpoint, endpoints, load_spec
 from nparity.replay import replay, replay_pairs, to_new
 from nparity.retry import RetryPolicy
@@ -30,6 +31,7 @@ STAGES = (
     ("Loading ", "load"),
     ("Reading API endpoints", "read"),
     ("Mapping endpoints and fields", "map"),
+    ("Mapping operation flows", "map"),
     ("Replaying ", "replay"),
     ("Comparing responses and schemas", "compare"),
     ("Triaging ", "triage"),
@@ -63,6 +65,8 @@ class RunConfig:
     sample_requests: list[RequestPair] | None = None
     contract_only: bool = False
     run_id: str | None = None
+    flow_mapping: bool = False
+    flow_key: Path | None = None
 
 
 def _optional_spec(client, base, location, request_headers):
@@ -93,7 +97,7 @@ def _toy_seeds(cfg: RunConfig, old_spec: dict, new_spec: dict) -> Path | None:
 
 
 def _specs(cfg, client, old_headers, new_headers):
-    if cfg.sample_requests is not None:
+    if cfg.sample_requests is not None and not cfg.flow_mapping:
         return None, None
     return (
         _optional_spec(client, cfg.old, cfg.old_spec, old_headers),
@@ -117,6 +121,13 @@ def plan(cfg: RunConfig, client: httpx.Client) -> dict:
     old_h = headers.resolve(cfg.old_headers, "old")
     new_h = headers.resolve(cfg.new_headers, "new")
     old_spec, new_spec = _specs(cfg, client, old_h, new_h)
+    if cfg.flow_mapping:
+        if old_spec is None or new_spec is None:
+            raise ValueError("Flow mapping requires an OpenAPI or Swagger spec on each side.")
+        after = flow.operations(new_spec)
+        return {"dry_run": True, "limited_comparison": False, "requests": 0, "endpoints": [],
+                "flow_candidates": {op.key: [candidate.key for candidate in flow.candidates(op, after)]
+                                    for op in flow.operations(old_spec)}}
     basic = old_spec is None or new_spec is None
     rows = []
     if basic:
@@ -165,11 +176,32 @@ def run(
 
     old_h = headers.resolve(cfg.old_headers, "old")     # before any request: a missing variable fails fast
     new_h = headers.resolve(cfg.new_headers, "new")
-    intent = Path(cfg.intent).read_text(encoding="utf-8") if cfg.intent is not None and not cfg.contract_only else ""
+    intent = (Path(cfg.intent).read_text(encoding="utf-8")
+              if cfg.intent is not None and not (cfg.contract_only or cfg.flow_mapping) else "")
     independent_data = intent_declares_independent_data(intent)
 
     progress("Reading API endpoints")
     old_spec, new_spec = specs or _specs(cfg, client, old_h, new_h)
+    if cfg.flow_mapping:
+        if old_spec is None or new_spec is None:
+            raise ValueError("Flow mapping requires an OpenAPI or Swagger spec on each side.")
+        key = FlowKey.model_validate(load_yaml(cfg.flow_key)) if cfg.flow_key else None
+        if key is not None:
+            require_confirmation(key)
+        if ev is None:
+            if cfg.backend == "fake":
+                fake_key = key or FlowKey.model_validate(load_yaml("fixtures/flows/toy.key.yaml"))
+                ev = FakeBackend(AnswerKey(), flow_key=fake_key)
+            else:
+                ev = build(cfg.backend)
+        progress("Mapping operation flows from specifications")
+        report = flow.map_flows(old_spec, new_spec, ev, load_thresholds(cfg.thresholds, ev.id), tel, cfg.workers)
+        if key is not None:
+            report.score = score_flows(report, key)
+        tel.seconds = round(time.perf_counter() - t0, 2)
+        return Run(id=cfg.run_id or f"{started.astimezone():%Y-%m-%dT%H%M%S}-{cfg.name}", started_at=started,
+                   config={"old": cfg.old, "new": cfg.new, "backend": ev.id, "requests": 0},
+                   flow_mapping=report, telemetry=tel)
     basic = old_spec is None or new_spec is None
     if ev is None:
         ev = (FakeBackend(AnswerKey()) if cfg.contract_only or (cfg.backend == "fake" and (basic or cfg.answer_key is None))

@@ -18,6 +18,8 @@ from nparity.cli_output import (
 )
 from nparity.config import Seeds, load_seeds
 from nparity.evaluator.profiles import load_profile
+from nparity.flow_report import markdown
+from nparity.flow_score import key_skeleton
 from nparity.openapi import endpoints, load_spec
 from nparity.request_samples import load_request_pairs
 from nparity.tls import tls_verify
@@ -61,6 +63,8 @@ def _line(f) -> str:
 
 
 def summary(r: Run) -> str:
+    if r.flow_mapping is not None:
+        return markdown(r).rstrip()
     by = lambda status: [f for f in r.findings if f.status == status]  # noqa: E731
     reg, uns, acc = by("shown"), by("unsure"), by("accepted")
     out = [
@@ -129,8 +133,8 @@ def write_seeds(
 @app.command()
 def run(
     ctx: typer.Context,
-    old: str = typer.Option(..., help="Old service base URL, e.g. http://localhost:8000/v1"),
-    new: str = typer.Option(..., help="New service base URL"),
+    old: str | None = typer.Option(None, help="Old service base URL, e.g. http://localhost:8000/v1"),
+    new: str | None = typer.Option(None, help="New service base URL"),
     old_spec: str | None = typer.Option(None, help="Old OpenAPI/Swagger spec: URL or file (default <old>/openapi.json)"),
     new_spec: str | None = typer.Option(None, help="New spec: URL or file (default <new>/openapi.json)"),
     old_header: list[str] = typer.Option([], "--old-header", help="Repeatable. 'Name: env:VAR', value read from the environment"),
@@ -141,6 +145,8 @@ def run(
     seed_examples: Path | None = typer.Option(None, "--seed-samples", help="Saved request examples or captures to use as seeds"),
     samples: Path | None = typer.Option(None, "--samples", help="YAML/JSON file of explicit GET request pairs for basic checks"),
     contract_only: bool = typer.Option(False, "--contract-only", help="Compare specs without replaying API calls"),
+    flow_mapping: bool = typer.Option(False, "--flow-mapping", help="Suggest operation flows from two specs"),
+    flow_key: Path | None = typer.Option(None, "--flow-key", help="Score against a confirmed flow answer key"),
     answer_key: Path | None = typer.Option(Path("fixtures/answer_key.yaml")),
     backend: str = typer.Option(os.environ.get("NPARITY_LLM", "fake"), help="fake | flash"),
     name: str = typer.Option("toy"),
@@ -154,15 +160,26 @@ def run(
     output_format: FormatOption = None,
 ) -> None:
     as_json = _as_json(ctx, output_format)
-    cfg = pipeline.RunConfig(old=old, new=new, old_spec=old_spec, new_spec=new_spec, intent=intent, seeds=seeds,
-                             answer_key=answer_key if score else None, backend=backend, name=name,
-                             old_headers=list(old_header), new_headers=list(new_header),
-                             discover_from=discover_from, seed_samples=seed_examples, contract_only=contract_only)
     try:
         cli_jobs.validate_id(name)
+        old_source = old or (old_spec if flow_mapping else None)
+        new_source = new or (new_spec if flow_mapping else None)
+        if not old_source or not new_source:
+            raise ValueError("Supply --old and --new, or give both spec locations with --flow-mapping.")
+        cfg = pipeline.RunConfig(
+            old=old_source, new=new_source, old_spec=old_spec, new_spec=new_spec, intent=intent, seeds=seeds,
+            answer_key=answer_key if score else None, backend=backend, name=name,
+            old_headers=list(old_header), new_headers=list(new_header), discover_from=discover_from,
+            seed_samples=seed_examples, contract_only=contract_only and not flow_mapping,
+            flow_mapping=flow_mapping, flow_key=flow_key,
+        )
         if backend not in {"fake", "flash"}:
             raise ValueError("Choose fake or flash for --backend.")
-        if backend == "flash" and not dry_run and not contract_only:
+        if flow_key is not None and not flow_mapping:
+            raise ValueError("--flow-key requires --flow-mapping.")
+        if flow_mapping and fail_on:
+            raise ValueError("--fail-on applies to replay findings. Flow mappings require review.")
+        if backend == "flash" and not dry_run and not cfg.contract_only:
             key_env = load_profile("config/profiles/flash.yaml").provider.api_key_env
             if not os.environ.get(key_env):
                 raise ValueError(f"Set {key_env} to use Flash.")
@@ -170,8 +187,8 @@ def run(
             raise ValueError("Choose either --dry-run or --detach.")
         headers.resolve(cfg.old_headers, "old")
         headers.resolve(cfg.new_headers, "new")
-        if samples is not None:
-            if contract_only:
+        if samples is not None and not flow_mapping:
+            if cfg.contract_only:
                 raise ValueError("Choose either --samples or --contract-only.")
             cfg.sample_requests = load_request_pairs(samples)
     except (ValueError, OSError, yaml.YAMLError) as exc:
@@ -188,6 +205,8 @@ def run(
                 sources = ", ".join(row["seed_sources"]) or "no seeds needed"
                 details = row["reason"] or f"{row['requests']} requests · {sources}"
                 typer.echo(f"{row['endpoint']} · {details}")
+            for old_op, candidates in plan.get("flow_candidates", {}).items():
+                typer.echo(f"{old_op} · {len(candidates)} flow candidates")
         return
 
     job = cli_jobs.start(runs_dir, name) if detach or progress == ProgressFormat.JSONL else None
@@ -278,6 +297,34 @@ def show(ctx: typer.Context, run_id: str, runs_dir: Path = typer.Option(store.DE
             emit_json(_saved_run(r, path))
     else:
         typer.echo(summary(r))
+
+
+@app.command()
+def report(ctx: typer.Context, run_id: str, runs_dir: Path = typer.Option(store.DEFAULT_DIR),
+           output_format: FormatOption = None) -> None:
+    """Export a saved flow report as Markdown or JSON."""
+    saved = store.load(cli_jobs.validate_id(run_id), runs_dir)
+    if _as_json(ctx, output_format):
+        emit_json(_saved_run(saved, runs_dir / f"{run_id}.yaml"))
+    else:
+        typer.echo(markdown(saved), nl=False)
+
+
+@app.command("key")
+def write_flow_key(ctx: typer.Context, run_id: str, out: Path = typer.Option(..., "--out"),
+                   runs_dir: Path = typer.Option(store.DEFAULT_DIR), output_format: FormatOption = None) -> None:
+    """Write a draft flow answer key for engineer review."""
+    result = store.load(cli_jobs.validate_id(run_id), runs_dir).flow_mapping
+    if result is None:
+        raise typer.BadParameter("Choose a saved flow mapping run.")
+    data = key_skeleton(result).model_dump(mode="json", exclude_defaults=True)
+    data = {"version": 1, "confirmed_by": None, **data}
+    with out.open("x", encoding="utf-8") as file:
+        yaml.safe_dump(data, file, sort_keys=False, allow_unicode=True)
+    if _as_json(ctx, output_format):
+        emit_json({"saved_to": str(out), "key": data})
+    else:
+        typer.echo(f"Saved {out}")
 
 
 @app.command()
