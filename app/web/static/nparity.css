@@ -113,6 +113,16 @@ details.f > summary::-webkit-details-marker { display: none; }
 details.f > summary::before { content: "▸"; color: var(--muted); font-size: 12px; }
 details.f[open] > summary::before { content: "▾"; }
 details.f > summary:hover { background: var(--code-bg); }
+details.g { border-bottom: 1px solid var(--line); }
+details.g:last-child { border-bottom: 0; }
+details.g > summary { list-style: none; cursor: pointer; display: flex; flex-wrap: wrap; gap: 4px 12px;
+  justify-content: space-between; padding: 10px 14px; background: var(--code-bg); font-weight: 600; }
+details.g > summary::-webkit-details-marker { display: none; }
+details.g > summary::before { content: "▸"; color: var(--muted); font-size: 12px; }
+details.g[open] > summary::before { content: "▾"; }
+.g-ep { flex: 1 1 200px; overflow-wrap: anywhere; }
+.g-meta, .g-count { font-size: 13px; font-weight: 400; color: var(--muted); }
+details.g > details.f { margin-left: 14px; border-left: 1px solid var(--line); }
 .f-ep { font-weight: 600; }
 .f-ep small { display: block; font-weight: 400; color: var(--muted); }
 .f-path code { background: var(--code-bg); padding: 1px 6px; border-radius: 4px; }

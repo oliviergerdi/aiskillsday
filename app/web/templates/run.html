@@ -32,20 +32,26 @@
 {% if empty %}
 <div class="findings"><div class="empty">Nothing to review</div></div>
 {% else %}
-<h2><span class="badge b-reg">Regressions</span> always shown, never auto-dismissed</h2>
+{% macro grouped(gs, first_open=False) %}
 <div class="findings">
-  {% for v in sections.shown %}{% include "_row.html" %}{% else %}<div class="empty">None.</div>{% endfor %}
+  {% for g in gs %}
+  <details class="g"{% if g.count <= 3 or (first_open and loop.first) %} open{% endif %}>
+    <summary><span class="g-ep">{{ g.endpoint }} → {{ g.new_endpoint or "unmapped" }}</span>
+      <span class="g-meta">{{ g.count }} finding{{ "s" if g.count != 1 }} · lowest p {{ "%.3f"|format(g.min_p) if g.min_p is not none else "—" }}</span></summary>
+    {% for v in g.items %}{% include "_row.html" %}{% endfor %}
+  </details>
+  {% else %}<div class="empty">None.</div>{% endfor %}
 </div>
+{% endmacro %}
 
-<h2><span class="badge b-uns">Unsure</span> below threshold, needs a human</h2>
-<div class="findings">
-  {% for v in sections.unsure %}{% include "_row.html" %}{% else %}<div class="empty">None.</div>{% endfor %}
-</div>
+<h2><span class="badge b-reg">Regressions</span> always shown, never auto-dismissed <small class="g-count">{{ groups.shown|length }} group{{ "s" if groups.shown|length != 1 }}</small></h2>
+{{ grouped(groups.shown, true) }}
 
-<h2><span class="badge b-int">Intended</span> matches the intent note</h2>
-<div class="findings">
-  {% for v in sections.accepted %}{% include "_row.html" %}{% else %}<div class="empty">None.</div>{% endfor %}
-</div>
+<h2><span class="badge b-uns">Unsure</span> below threshold, needs a human <small class="g-count">{{ groups.unsure|length }} group{{ "s" if groups.unsure|length != 1 }}</small></h2>
+{{ grouped(groups.unsure) }}
+
+<h2><span class="badge b-int">Intended</span> matches the intent note <small class="g-count">{{ groups.accepted|length }} group{{ "s" if groups.accepted|length != 1 }}</small></h2>
+{{ grouped(groups.accepted) }}
 
 {% endif %}
 
