@@ -50,6 +50,7 @@
 {% if empty %}
 <div class="findings"><div class="empty">Nothing to review</div></div>
 {% else %}
+<p class="conf-legend">Bar = confidence in the label. Line = confidence needed to accept without review.</p>
 {% macro grouped(gs, first_open=False) %}
 <div class="findings">
   {% for g in gs %}
