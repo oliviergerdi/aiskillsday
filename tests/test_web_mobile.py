@@ -67,8 +67,12 @@ def test_mobile_static_rows_stacked():
 
 
 def test_rules_outside_mobile_block_unchanged():
+    base = subprocess.run(
+        ["git", "merge-base", "main", "HEAD"],
+        cwd=ROOT, capture_output=True, text=True, check=True,
+    ).stdout.strip()
     main = subprocess.run(
-        ["git", "show", f"main:{CSS_REL}"],
+        ["git", "show", f"{base}:{CSS_REL}"],
         cwd=ROOT, capture_output=True, text=True, check=True,
     ).stdout
     assert _split((ROOT / CSS_REL).read_text())[1] == _split(main)[1]
