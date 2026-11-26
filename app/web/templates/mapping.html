@@ -9,13 +9,13 @@
 <h2>Endpoints <span class="sub">{{ by_rule }} by rule · {{ run.endpoints|length - by_rule }} by LLM</span></h2>
 <div class="table-scroll">
 <table>
-  <thead><tr><th>Old</th><th></th><th>New</th><th>Source</th><th class="num">p(winner)</th><th>Status</th><th>Runners-up</th></tr></thead>
+  <thead><tr><th>Old</th><th></th><th>New</th><th>Source</th><th class="num">Confidence</th><th>Status</th><th>Next best matches</th></tr></thead>
   <tbody>
   {% for m in run.endpoints %}
     <tr>
       <td><code>{{ m.old }}</code></td><td class="arrow">→</td>
       <td>{% if m.new %}<code>{{ m.new }}</code>{% else %}<span class="sub">none</span>{% endif %}</td>
-      <td><span class="badge {{ 'b-rule' if m.source == 'rule' else 'b-llm' }}">{{ m.source }}</span></td>
+      <td><span class="badge {{ 'b-rule' if m.source == 'rule' else 'b-llm' }}">{{ "rule" if m.source == "rule" else "model" }}</span></td>
       <td class="num">{{ "%.3f"|format(m.p) if m.p is not none else "—" }}</td>
       <td>{% if m.error %}<span class="badge b-err" title="{{ m.error }}">error</span>{% else %}<span class="badge {{ {'accepted': 'b-int', 'review': 'b-uns', 'unmapped': 'b-reg'}[m.status] }}">{{ m.status }}</span>{% endif %}</td>
       <td class="top3">{% for k, p in m.top3[1:] %}{{ k }} {{ "%.3f"|format(p) }}{% if not loop.last %} · {% endif %}{% else %}—{% endfor %}</td>
@@ -30,14 +30,14 @@
 <h2>Fields <span class="sub">{{ ep }} → {{ new_of.get(ep) }} · {{ fr }} by rule · {{ fms|length - fr }} by LLM</span></h2>
 <div class="table-scroll">
 <table>
-  <thead><tr><th>Old field</th><th></th><th>New field</th><th>Source</th><th class="num">p(winner)</th><th>Status</th><th>Declared type</th></tr></thead>
+  <thead><tr><th>Old field</th><th></th><th>New field</th><th>Source</th><th class="num">Confidence</th><th>Status</th><th>Type in the spec</th></tr></thead>
   <tbody>
   {% for x in fms %}
     {% set dt = declared.get((ep, "$." ~ x.old)) %}
     <tr>
       <td><code>{{ x.old }}</code></td><td class="arrow">→</td>
       <td>{% if x.new %}<code>{{ x.new }}</code>{% else %}<span class="sub">none (dropped)</span>{% endif %}</td>
-      <td><span class="badge {{ 'b-rule' if x.source == 'rule' else 'b-llm' }}">{{ x.source }}</span></td>
+      <td><span class="badge {{ 'b-rule' if x.source == 'rule' else 'b-llm' }}">{{ "rule" if x.source == "rule" else "model" }}</span></td>
       <td class="num">{{ "%.3f"|format(x.p) if x.p is not none else "—" }}</td>
       <td><span class="badge {{ {'accepted': 'b-int', 'review': 'b-uns', 'unmapped': 'b-reg'}[x.status] }}">{{ x.status }}</span></td>
       <td>{% if dt %}<span class="badge b-reg">{{ dt }}</span>{% else %}<span class="sub">no change</span>{% endif %}</td>

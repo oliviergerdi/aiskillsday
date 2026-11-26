@@ -3,7 +3,7 @@
     <div class="f-ep">{{ v.f.endpoint }}{% if v.baseline_status == "new" %} <span class="badge b-uns">new</span>{% endif %}{% if v.entry %} <span class="badge {{ 'b-int' if v.entry.decision == 'accept' else 'b-reg' }}">{{ "accepted" if v.entry.decision == "accept" else "rejected" }} · {{ v.entry.by }}</span>{% endif %}<small>→ {{ v.f.new_endpoint or "unmapped" }}</small></div>
     <div class="f-path"><code>{{ v.f.path }}</code></div>
     <div class="f-kind">{{ v.kind_text }}</div>
-    <div class="pbar"><div class="track"><div class="fill" style="width:{{ v.p_pct }}%;background:{{ v.color }}"></div>{% if v.thr_pct is not none %}<div class="thr" style="left:{{ v.thr_pct }}%"></div>{% endif %}</div>{{ v.p_text }}</div>
+    <div class="pbar" title="{{ v.p_text }}"><div class="track"><div class="fill" style="width:{{ v.p_pct }}%;background:{{ v.color }}"></div>{% if v.thr_pct is not none %}<div class="thr" style="left:{{ v.thr_pct }}%"></div>{% endif %}</div>{{ v.conf_text }}</div>
     {% if v.f.reason %}<div class="f-reason">{{ v.f.reason }}</div>{% endif %}
   </summary>
   <div class="f-body">{% if v.body_html %}{{ v.body_html|safe }}{% else %}<p class="sub">Loading…</p>{% endif %}</div>

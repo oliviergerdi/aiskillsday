@@ -141,6 +141,8 @@ details.g > details.f { margin-left: 14px; border-left: 1px solid var(--line); }
 .pbar .track { position: relative; flex: 1; height: 6px; background: var(--code-bg); border-radius: 3px; min-width: 60px; }
 .pbar .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; }
 .pbar .thr { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); opacity: 0.6; }
+/* UX-3 legend */
+.conf-legend { font-size: 13px; color: var(--muted); margin: 8px 0; }
 
 .f-body { padding: 4px 14px 18px 40px; }
 .meta-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 8px 0 14px; }

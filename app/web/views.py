@@ -50,6 +50,7 @@ class FindingView:
     state: str | None = None          # review state (PRD 0001): needs_review | intended_model | accepted | rejected
     entry: Any = None                 # ledger Entry when a human decided
     baseline_status: str | None = None   # new | unchanged, when compared with a baseline
+    conf_text: str = ""
 
 
 @dataclass
@@ -110,6 +111,10 @@ def _kind_text(f: Finding, s: Sample | None) -> str:
     return text
 
 
+def _pct(p: float) -> str:
+    return f"{p * 100:.1f}".rstrip("0").rstrip(".") + "%"
+
+
 def finding_view(run: Run, f: Finding, th: Thresholds) -> FindingView:
     label = f.label or "unsure"
     leans = f.type_info.get("leans")
@@ -123,8 +128,8 @@ def finding_view(run: Run, f: Finding, th: Thresholds) -> FindingView:
         p_text=f"{f.p:.3f}" if f.p is not None else "—",
         p_pct=round((f.p or 0) * 100, 1), color=COLOR.get(label, "var(--noi)"),
         thr_pct=round(thr * 100, 1) if thr is not None else None, badge=BADGE.get(label, "b-noi"),
-        threshold_text=(f"{leans or label} needs {thr}" if thr is not None else "always shown"),
-        distribution=dist,
+        threshold_text=(f"{leans or label} needs {_pct(thr)} to be dismissed" if thr is not None else "always shown"),
+        distribution=dist, conf_text=_pct(f.p) if f.p is not None else "—",
     )
     if s is not None:
         old_key = new_key = _leaf(f.path)
