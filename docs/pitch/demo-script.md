@@ -20,7 +20,7 @@ Judges score nine things (see the scoring sheet). The slide that carries each on
 
 ## Script
 
-**Slide 1 (Stephen, 0:15).** "Every engineer on an API migration asks one question: will we break anything? We are Team Chai-GPT, and nParity answers it."
+**Slide 1 (Stephen, 0:15).** "Every engineer on an API migration asks one question: will we break anything? We are Team Chai-GPT, and nParity's answer is: know what changed, know what broke."
 
 **Slide 2 (Stephen, 0:35).** "From the first prototype to sign-off, nParity tells the engineer which differences between the old and new API are regressions, with a probability and a one-line reason. Today the check happens once, by hand, near the end. Replay tools show what differs, not whether it was intended." *Pause after "not whether it was intended".*
 
@@ -55,7 +55,7 @@ Judges score nine things (see the scoring sheet). The slide that carries each on
 
 **Slide 14 (Temba, 0:25).** "What if we are wrong? Accuracy: the unsure bucket and no automatic dismissal. No probabilities on the model route: run the CLI on any model that has them. Model price: cache or switch engine. Data: redact before any model call. One-off demand: test a higher price."
 
-**Slide 15 (Stephen, 0:30).** "Will we break anything? Know before it ships. The same engine runs before, during and after the migration, on whichever model your company has approved. Our ask: a pilot on one real migration, with two engineers, next quarter."
+**Slide 15 (Stephen, 0:30).** "Know what changed. Know what broke. The same engine runs before, during and after the migration, on whichever model your company has approved. Our ask: a pilot on one real migration, with two engineers, next quarter."
 
 ## If you run long (cut in this order)
 0. Slide 10: drop it to one sentence, or skip it (20 s).
