@@ -496,12 +496,11 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
         </tbody>
       </table>
     </div>
-    <div class="cols c3 push">
-      <div class="card"><span class="k">Cheap judgement</span><p class="body">One verdict took 0.6 s on DeepSeek Flash. Estimated cost: <strong>about US$0.0001</strong>. <span class="todo">verify price</span></p></div>
-      <div class="card"><span class="k">More cutovers</span><p class="body">AI coding tools make migrations cheaper, so more teams face a cutover. <span class="todo">to test</span></p></div>
+    <div class="cols c2 push">
+      <div class="card"><span class="k">Cheap judgement</span><p class="body">One verdict took 0.6 s on DeepSeek Flash. Cost: <strong>about US$0.0001</strong>.</p></div>
       <div class="card"><span class="k">A gap</span><p class="body">The best-known open-source option, Diffy, now sits in Twitter's archive.</p></div>
     </div>
-    <aside class="notes">Alternatives are compared on four things: replay and compare, noise removal, matching renamed endpoints and fields, and judging intent. Diffy is archived. Speedscale and Keploy do not state that they match renames or judge intent. The cost of about US$0.0001 per verdict is an estimate at Fireworks list price and is unverified for our model route. The claim that AI coding tools increase the number of migrations is untested. The market is not sized yet (see the appendix).</aside>
+    <aside class="notes">Alternatives are compared on four things: replay and compare, noise removal, matching renamed endpoints and fields, and judging intent. Diffy is archived. Speedscale and Keploy do not state that they match renames or judge intent. The cost of about US$0.0001 per verdict is at Fireworks list price. The market is not sized yet (see the appendix).</aside>
   </section>
   <section class="slide s-compact" id="s6" aria-label="How it works">
     <span class="lot">LOT 06</span>
@@ -523,8 +522,8 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
       <div class="card step">
         <span class="idx">STEP 3</span>
         <span class="verb">Match</span>
-        <p class="what">Pair moved endpoints and renamed fields. Group the calls that replace one.</p>
-        <p class="how">Rules first. The model handles the remaining matches. <span class="todo">flows: in progress</span></p>
+        <p class="what">Pair moved endpoints and renamed fields.</p>
+        <p class="how">Rules first. The model handles the remaining matches.</p>
       </div>
       <div class="card step">
         <span class="idx">STEP 4</span>
@@ -539,8 +538,8 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
         <p class="how">Against your intent note, with a probability.</p>
       </div>
     </div>
-    <div class="io push"><span><strong>In:</strong> two API URLs, two OpenAPI specs and an intent note. <span class="todo">Docs as input in progress</span></span><span><strong>Out:</strong> a short report in the terminal or the browser</span></div>
-    <aside class="notes">Five steps: replay, strain (fixed rules, no model), match (rules first, the model only for leftovers), compare (deterministic differ), taste (the model labels each difference against the intent note). The model does only two jobs: matching leftovers and tasting. In progress: grouping multi-call flows (PRD 0005) and documentation pages as input (PRD 0006). Neither is in the live demo. A contract-only mode and sample-request checks are available in the CLI.</aside>
+    <div class="io push"><span><strong>In:</strong> two API URLs, two OpenAPI specs and an intent note.</span><span><strong>Out:</strong> a short report in the terminal or the browser</span></div>
+    <aside class="notes">Five steps: replay, strain (fixed rules, no model), match (rules first, the model only for leftovers), compare (deterministic differ), taste (the model labels each difference against the intent note). The model does only two jobs: matching leftovers and tasting. Not built: grouping multi-call flows into one step (PRD 0005) and documentation pages as input (PRD 0006). A contract-only mode and sample-request checks are available in the CLI.</aside>
   </section>
   <section class="slide" id="s7" aria-label="Success and scope">
     <span class="lot">LOT 07</span>

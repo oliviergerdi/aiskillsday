@@ -35,7 +35,7 @@ Judges score nine things (see the scoring sheet). Slide that carries each: probl
 
 **Slide 5 (Stephen).** Moat, honestly: "The code is open and a copy is possible. What is hard to copy is judging intent with a probability, and the answer keys and thresholds we calibrate it against." Market: "We have not sized it. We count the labour saved instead."
 
-**Slide 6 (Gerdi).** "The model does two jobs only: leftover matches and the verdict. Everything else is fixed rules." Flow grouping is in progress and not in the demo.
+**Slide 6 (Gerdi).** "The model does two jobs only: leftover matches and the verdict. Everything else is fixed rules."
 
 **Slide 7 (Gerdi).** "These are the promises we test live. The safety rules cannot be changed: no regression is dismissed automatically."
 
