@@ -627,7 +627,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     <p class="eyebrow">Built for people and AI agents</p>
     <h2 class="wide">An agent can run it, read it and act on it. <span class="todo">in progress</span></h2>
     <div class="cols c2">
-      <div class="card"><span class="k">Machine-readable</span><ul class="ticks"><li><span><code>--format json</code>: one JSON document on stdout, errors on stderr.</span></li><li><span>Fixed exit codes, so a script knows what failed.</span></li></ul></div>
+      <div class="card"><span class="k">Machine-readable</span><ul class="ticks"><li><span><code>--format json</code>: one JSON document on stdout, errors on stderr.</span></li><li><span>Fixed exit codes. <code>--fail-on regression</code> exits 5, so an agent knows to stop and look.</span></li></ul></div>
       <div class="card"><span class="k">Small answers</span><ul class="ticks"><li><span><code>--compact</code>: counts, coverage, cost and finding keys.</span></li><li><span>Fetch one finding with its samples, not the whole report.</span></li></ul></div>
       <div class="card"><span class="k">Long runs</span><ul class="ticks"><li><span><code>--detach</code> returns a run ID at once.</span></li><li><span><code>status</code> polls progress events.</span></li></ul></div>
       <div class="card"><span class="k">Plan first</span><ul class="ticks"><li><span><code>--dry-run</code> shows the calls, seed sources and skipped endpoints.</span></li><li><span>No replay and no model calls.</span></li></ul></div>
