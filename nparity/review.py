@@ -124,7 +124,13 @@ def verdict(run: Run, ledger: Ledger) -> tuple[str, str]:
     c = open_counts(run, ledger)
     if c["open"] == 0:
         if run.config.get("limited_comparison"):
+            if "contract_only" in run.config and not any(row.compared for row in run.coverage):
+                return "No usable response comparisons", "uns"
             return "No open items in the sampled responses", "uns"
+        if run.config.get("contract_only"):
+            return "Contract checked. Behaviour was not replayed.", "uns"
+        if run.coverage and not any(row.compared for row in run.coverage):
+            return "No usable behaviour comparisons", "uns"
         return "Ready to cut over", "int"
     text = (f"{_n(c['open'], 'open item')}: {_n(c['rejected'], 'confirmed regression')}, "
             f"{c['needs_review']} need review")

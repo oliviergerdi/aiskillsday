@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections import defaultdict
 
 from nparity.config import NoiseRules
+from nparity.coverage import DATA_DIFFERS, sample_issue
 from nparity.diff import diff
 from nparity.jsonpath import generic
 from nparity.models import EndpointMap, FieldMap, Finding, Noise, Sample
@@ -25,7 +26,8 @@ def _fmt(types: set[str]) -> str:
 
 
 def build_findings(emap: list[EndpointMap], fmap: list[FieldMap], samples: list[Sample], rules: NoiseRules,
-                   old_eps: list[Endpoint], new_eps: list[Endpoint]
+                   old_eps: list[Endpoint], new_eps: list[Endpoint], *, shape_only: bool = False,
+                   include_declared: bool = True,
                    ) -> tuple[list[Finding], list[Noise], list[Finding]]:
     """Returns (findings, noise, errors). Finding ids are stable: sorted by (endpoint, path, kind)."""
     by_old = {m.old: m for m in emap}
@@ -39,6 +41,7 @@ def build_findings(emap: list[EndpointMap], fmap: list[FieldMap], samples: list[
     groups: dict[tuple[str, str, str], Finding] = {}
     noise: dict[tuple[str, str, str], Noise] = {}
     errors: list[Finding] = []
+    replayed_endpoints: set[str] = set()
 
     for endpoint, eps_samples in per_endpoint.items():
         shown = eps_samples[:MAX_SAMPLES]
@@ -52,10 +55,15 @@ def build_findings(emap: list[EndpointMap], fmap: list[FieldMap], samples: list[
                                       kind="changed", source="diff", samples=[s], differing=1, differs_in=[0],
                                       status="error", reason=s.old.error or s.new.error))
                 continue
-            o, n, ns = normalise(endpoint, s.old, s.new, rules, renames)
+            issue = sample_issue(s)
+            if issue is None:
+                replayed_endpoints.add(endpoint)
+            if issue == DATA_DIFFERS or (issue == "both errors" and (shape_only or s.old.body == s.new.body)):
+                continue
+            o, n, ns = (s.old, s.new, []) if shape_only else normalise(endpoint, s.old, s.new, rules, renames)
             for x in ns:
                 noise.setdefault((x.endpoint, x.path, x.rule), x)
-            for d in diff(o, n, rules.list_keys(endpoint)):
+            for d in diff(o, n, rules.list_keys(endpoint), shape_only=shape_only):
                 key = (endpoint, d.path, d.kind)
                 f = groups.get(key)
                 if f is None:
@@ -81,20 +89,25 @@ def build_findings(emap: list[EndpointMap], fmap: list[FieldMap], samples: list[
         fm = [f for f in fmap if f.endpoint == m.old]
         for d in declared_diffs(old_by_key[m.old].response_schema, new_by_key[m.new].response_schema, fm):
             target = next((f for f in findings if f.endpoint == m.old and f.path == d.path), None)
-            if target is None:
+            if target is None and include_declared:
                 target = Finding(id="", endpoint=m.old, new_endpoint=m.new, path=d.path,
                                  kind="declared_type_changed", source="types",
                                  samples=per_endpoint.get(m.old, [])[:MAX_SAMPLES])
                 findings.append(target)
-            target.type_info["declared"] = f"{d.old} → {d.new}"
+            if target is not None:
+                target.type_info["declared"] = f"{d.old} → {d.new}"
 
     # mapping decisions are findings too: moved endpoints, renamed and dropped fields
     for m in emap:
+        if not include_declared and m.old not in replayed_endpoints:
+            continue
         if m.new is not None and m.status != "unmapped" and m.new != m.old:
             findings.append(Finding(id="", endpoint=m.old, new_endpoint=m.new, path="endpoint", kind="moved",
                                     source="mapping", samples=per_endpoint.get(m.old, [])[:MAX_SAMPLES],
                                     type_info={"mapping": f"{m.old} → {m.new} ({m.source})"}))
     for f in fmap:
+        if not include_declared and f.endpoint not in replayed_endpoints:
+            continue
         if f.status == "unmapped" or f.new == f.old:
             continue
         kind = "dropped" if f.new is None else "renamed"

@@ -1,4 +1,5 @@
 # Values by parameter name (v1 names). The generator crosses them per endpoint, capped.
+methods: [GET, POST]  # POST is safe in the bundled toy service.
 params:
   id: [1, 2, 999]      # 999 = not found
   page: [1, 2]

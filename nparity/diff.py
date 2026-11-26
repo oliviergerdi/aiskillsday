@@ -36,18 +36,30 @@ def json_class(v: Any) -> str:
     return "object"
 
 
-def _walk(a: Any, b: Any, path: str, out: list[Diff], keys: dict[str, Any]) -> None:
+def _shape(value: Any) -> Any:
+    if isinstance(value, dict):
+        return tuple((name, _shape(item)) for name, item in sorted(value.items()))
+    if isinstance(value, list):
+        return frozenset(_shape(item) for item in value)
+    return "integer" if type(value) is int else json_class(value)
+
+
+def _walk(a: Any, b: Any, path: str, out: list[Diff], keys: dict[str, Any], shape_only: bool) -> None:
     if isinstance(a, dict) and isinstance(b, dict):
         for k in a:
             if k not in b:
                 out.append(Diff(child(path, k), "missing_in_new", a[k], None))
             else:
-                _walk(a[k], b[k], child(path, k), out, keys)
+                _walk(a[k], b[k], child(path, k), out, keys, shape_only)
         for k in b:
             if k not in a:
                 out.append(Diff(child(path, k), "added_in_new", None, b[k]))
         return
     if isinstance(a, list) and isinstance(b, list):
+        if shape_only:
+            if a and b and _shape(a) != _shape(b):
+                out.append(Diff(path, "type_changed", a, b))
+            return
         k = stable_key(a, b, keys.get(generic(path)))
         if k:
             ma, mb = by_key(a, k), by_key(b, k)
@@ -59,25 +71,26 @@ def _walk(a: Any, b: Any, path: str, out: list[Diff], keys: dict[str, Any]) -> N
                 out.append(Diff(path, "items_added", None, added))
             for x in ma:
                 if x in mb:
-                    _walk(ma[x], mb[x], path + key_segment(k, x), out, keys)
+                    _walk(ma[x], mb[x], path + key_segment(k, x), out, keys, shape_only)
             return
         if len(a) != len(b):
             out.append(Diff(path, "list_length_changed", len(a), len(b)))
             return
         for i, (x, y) in enumerate(zip(a, b)):
-            _walk(x, y, child(path, i), out, keys)
+            _walk(x, y, child(path, i), out, keys, shape_only)
         return
-    if json_class(a) != json_class(b):
+    if (shape_only and _shape(a) != _shape(b)) or json_class(a) != json_class(b):
         out.append(Diff(path, "type_changed", a, b))
-    elif a != b:
+    elif not shape_only and a != b:
         out.append(Diff(path, "changed", a, b))
 
 
-def diff(old: HttpResult, new: HttpResult, list_keys: dict[str, Any] | None = None) -> list[Diff]:
+def diff(old: HttpResult, new: HttpResult, list_keys: dict[str, Any] | None = None, *,
+         shape_only: bool = False) -> list[Diff]:
     if old.error or new.error:
         return []
     out: list[Diff] = []
     if old.status != new.status:
         out.append(Diff("status", "status_changed", old.status, new.status))
-    _walk(old.body, new.body, "$", out, list_keys or {})
+    _walk(old.body, new.body, "$", out, list_keys or {}, shape_only)
     return out

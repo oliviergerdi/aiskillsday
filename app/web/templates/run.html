@@ -11,11 +11,12 @@
   <div class="head-links">
     <a href="/runs/{{ run.id }}/signoff">Sign-off page →</a>
     <a href="/runs/{{ run.id }}/mapping">Mapping: {{ run.endpoints|length }} endpoints, {{ n_fields }} fields →</a>
+    {% if run.coverage %}<a href="#coverage-title">Endpoint coverage ↓</a>{% endif %}
   </div>
 </div>
 
-{% if run.config.limited_comparison %}
-<p class="limited-comparison"><strong>Limited comparison.</strong> Without OpenAPI specs for both sides, this run compares one GET response per URL. It cannot discover endpoints, generate test cases, or check declared schemas.</p>
+{% if run.basic_checks_summary() %}
+<p class="limited-comparison"><strong>{{ run.basic_checks_summary() }}</strong> Only status codes and response shapes are checked for the supplied GET requests.</p>
 {% endif %}
 
 <form class="baseline-line" method="get">
@@ -131,6 +132,44 @@
   </div>
   {% endfor %}
 </div>
+{% endif %}
+
+{% if run.coverage %}
+<section aria-labelledby="coverage-title">
+  <h2 id="coverage-title">Endpoint coverage</h2>
+  <div class="table-scroll">
+    <table>
+      <thead><tr><th>Endpoint</th><th>Seed source</th><th>Contract compared</th><th>Behaviour compared</th></tr></thead>
+      <tbody>
+      {% for row in run.coverage %}
+        <tr>
+          <td><code>{{ row.endpoint }}</code></td>
+          <td>{{ row.seed_sources|join(", ") or ("None needed" if row.attempted else "—") }}</td>
+          <td>{{ "Yes" if row.contract_compared else "No" }}</td>
+          <td>{{ row.compared }} of {{ row.attempted }}{% if row.reason %} · {{ row.reason }}{% endif %}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+{% if run.contract %}
+<section aria-labelledby="contract-title">
+  <h2 id="contract-title">Declared differences <span class="badge">{{ run.contract|length }}</span></h2>
+  <p class="sub">These differences come from the specs. Behaviour findings use replayed responses.</p>
+  <div class="findings">
+  {% for change in run.contract %}
+    <details class="contract-change">
+      <summary><code>{{ change.endpoint }}</code>{% if change.new_endpoint and change.new_endpoint != change.endpoint %} → <code>{{ change.new_endpoint }}</code>{% endif %} · {{ change.section }} {% if change.before is none %}added{% elif change.after is none %}removed{% else %}changed{% endif %}</summary>
+      <div class="sbs">
+        <div class="pane"><div class="ph">Before spec</div><pre>{{ change.before|tojson(indent=2) if change.before is not none else "Absent" }}</pre></div>
+        <div class="pane"><div class="ph">After spec</div><pre>{{ change.after|tojson(indent=2) if change.after is not none else "Absent" }}</pre></div>
+      </div>
+    </details>
+  {% endfor %}
+  </div>
+</section>
 {% endif %}
 
 <div class="footer-tele">

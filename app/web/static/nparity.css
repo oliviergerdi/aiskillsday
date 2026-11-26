@@ -80,6 +80,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .run-button:hover { filter: brightness(0.92); }
 .run-button:disabled { opacity: 0.55; cursor: wait; }
 .comparison-form { display: grid; justify-items: start; gap: 16px; margin: 20px 0; }
+.seed-guidance { margin: 0; max-width: 85ch; }
 .source-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; gap: 16px; }
 .source-panel, .run-settings { min-width: 0; margin: 0; padding: 14px 16px; border: 1px solid var(--line);
   border-radius: 8px; background: var(--surface); }
@@ -185,6 +186,11 @@ details.g > details.f { margin-left: 14px; border-left: 1px solid var(--line); }
 .verdict { font-size: 18px; font-weight: 600; margin: 0 0 12px; }
 .verdict.reg { color: var(--reg); } .verdict.uns { color: var(--uns); } .verdict.int { color: var(--int); }
 .limited-comparison { margin: 12px 0; padding: 10px 12px; border-left: 3px solid var(--uns); background: var(--uns-bg); border-radius: 4px; }
+.contract-change { padding: 8px 12px; border-bottom: 1px solid var(--line); }
+.contract-change:last-child { border-bottom: 0; }
+.contract-change summary { cursor: pointer; }
+.contract-change .sbs { margin-top: 8px; }
+.contract-change pre { padding-inline: 10px; }
 
 .footer-tele { margin-block: 32px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; display: flex; gap: 20px; flex-wrap: wrap; }
 .footer-tele b { color: var(--ink); font-variant-numeric: tabular-nums; }

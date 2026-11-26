@@ -7,7 +7,7 @@ from typing import Any
 
 import httpx
 
-METHODS = ("get", "post", "put", "patch", "delete")
+METHODS = ("get", "post", "put", "patch", "delete", "options", "head", "trace")
 
 
 @dataclass
@@ -19,6 +19,9 @@ class Endpoint:
     required: set[str] = field(default_factory=set)
     response_schema: dict[str, Any] | None = None
     has_body: bool = False
+    parameters: list[dict] = field(default_factory=list)
+    request_body: dict = field(default_factory=dict)
+    responses: dict = field(default_factory=dict)
 
     @property
     def key(self) -> str:
@@ -57,7 +60,7 @@ def resolve(node: Any, spec: dict[str, Any], _seen: frozenset[str] = frozenset()
                 return node
             target: Any = spec
             for part in ref[2:].split("/"):
-                target = target[part]
+                target = target[part.replace("~1", "/").replace("~0", "~")]
             return resolve(target, spec, _seen | {ref})
         return {k: resolve(v, spec, _seen) for k, v in node.items()}
     if isinstance(node, list):
@@ -87,16 +90,22 @@ def endpoints(spec: dict[str, Any]) -> list[Endpoint]:
             if op is None:
                 continue
             ep = Endpoint(method=method.upper(), path=path)
-            for p in op.get("parameters", []) + item.get("parameters", []):
+            parameters = {}
+            for p in item.get("parameters", []) + op.get("parameters", []):
                 p = resolve(p, spec)
+                parameters[p["in"], p["name"]] = p
+            ep.parameters = list(parameters.values())
+            for p in ep.parameters:
                 if p["in"] == "path":
                     ep.path_params.append(p["name"])
                 elif p["in"] == "query":
                     ep.query_params.append(p["name"])
-                if p.get("required") or p["in"] == "path":
+                if p["in"] == "path" or (p["in"] == "query" and p.get("required")):
                     ep.required.add(p["name"])
-            ep.has_body = "requestBody" in op or any(
-                resolve(p, spec).get("in") == "body" for p in op.get("parameters", []))
+            body_param = next((p for p in ep.parameters if p["in"] == "body"), {})
+            ep.request_body = resolve(op.get("requestBody") or body_param, spec)
+            ep.has_body = bool(ep.request_body)
+            ep.responses = resolve(op.get("responses", {}), spec)
             ep.response_schema = _response_schema(op, spec)
             out.append(ep)
     return sorted(out, key=lambda e: (e.path, e.method))

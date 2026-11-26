@@ -65,6 +65,9 @@
     <small class="sub" id="intent-hint">Required for now: without an intent note every difference is flagged as a regression.</small>
     <small class="field-error" role="alert" data-error-for="intent_text" hidden></small>
   </div>
+  <p class="sub seed-guidance">
+    <strong>Running without a seeds file.</strong> With OpenAPI specs on both sides, nParity uses OpenAPI examples, defaults, enums and bounds to prepare GET requests. It may guess query values. If a required path value is unavailable, nParity skips live replay for that endpoint and still checks its contract. Use <strong>Run settings</strong> to supply seeds or opt in to GET discovery. The report shows which endpoints were compared.
+  </p>
   <details class="run-settings">
     <summary>Run settings</summary>
     <div class="source-grid">
@@ -86,7 +89,7 @@
       <div class="run-field">
         <label for="run-seeds">Seeds file <span class="sub">(optional)</span></label>
         <input id="run-seeds" name="seeds" type="text" maxlength="4096" placeholder="fixtures/petstore/seeds.yaml">
-        <small class="sub">The default seeds cover <code>id</code> and <code>page</code> on GET requests.</small>
+        <small class="sub">Your seeds override values from the spec. With no method list, only GET requests are replayed.</small>
         <small class="field-error" role="alert" data-error-for="seeds" hidden></small>
       </div>
       <div class="run-field">
@@ -94,6 +97,21 @@
         <input id="run-intent" name="intent" type="text" maxlength="4096" placeholder="fixtures/petstore/intent.md">
         <small class="sub">Text pasted above wins over this file.</small>
         <small class="field-error" role="alert" data-error-for="intent" hidden></small>
+      </div>
+      <div class="run-field">
+        <label for="run-discover">Discover seeds from GET endpoints <span class="sub">(optional)</span></label>
+        <input id="run-discover" name="discover_from" type="text" maxlength="4096" placeholder="GET /pets; GET /orders">
+        <small class="sub">List only safe endpoints on the before API, separated by semicolons.</small>
+      </div>
+      <div class="run-field">
+        <label for="run-samples">Sample requests file <span class="sub">(optional)</span></label>
+        <input id="run-samples" name="samples" type="text" maxlength="4096">
+        <small class="sub">Use two API base URLs and a YAML or JSON file of before/after GET requests for basic checks without specs.</small>
+        <small class="field-error" role="alert" data-error-for="samples" hidden></small>
+      </div>
+      <div class="run-field">
+        <label class="check"><input id="run-contract-only" name="contract_only" type="checkbox"> Compare specs only</label>
+        <small class="sub">Skip live requests to the endpoints.</small>
       </div>
       <div class="run-field">
         <label class="check"><input id="run-save" name="save_config" type="checkbox"> Save as configuration</label>

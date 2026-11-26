@@ -174,8 +174,8 @@ Then open `http://localhost:8000/runs/demo`. `runs/demo.yaml` alone is enough to
 You need:
 
 1. **Two base URLs**, old and new.
-2. **An OpenAPI 3 or Swagger 2.0 spec** for each, served at `<base>/openapi.json` or passed with `--old-spec/--new-spec`.
-3. **A seeds file**: values for path and query parameters (and request bodies). Use real IDs that exist. **On servers you don't own, set `methods: [GET]`** so nothing is created or deleted.
+2. **An OpenAPI 3 or Swagger 2.0 spec** for each side enables contract checks and request generation. Serve the specs at `<base>/openapi.json` or pass them with `--old-spec/--new-spec`.
+3. **An optional seeds file** overrides generated values for parameters and request bodies. Use IDs that exist on both sides. Replay defaults to GET. Add other methods explicitly to `methods:` to enable them.
    ```yaml
    methods: [GET]
    params:
@@ -192,6 +192,26 @@ You need:
    ```
    Runs and configurations store header **names** only. A missing variable fails the run before any request, naming the variable.
 6. Optional: **noise rules** (`config/noise.yaml`: masked paths, unordered lists) and an **answer key** to score against.
+
+### Seed generation and coverage
+
+Generate a seeds file from a spec with `uv run python -m nparity.cli seeds openapi.yaml --out generated-seeds.yaml`. Each generated value includes its source. Pass `--manual seeds.yaml` to preserve your overrides.
+
+Use `--samples` with the `seeds` command, or `--seed-samples` with `run`, to supply a curl file, Postman collection, capture manifest, or request pairs. The importer reads these files locally. Use `--discover-from 'GET /pets'` with `run` to fetch seeds from an explicitly allowed endpoint on the old API. Repeat the option for each endpoint. Discovery skips runs that use custom headers on the old API.
+
+The report lists coverage per endpoint, including request seed sources and reasons a sample did not count. Declared differences have their own section. Use `--contract-only` or **Compare specs only** in the web form to skip endpoint replay.
+
+### Basic checks without specs
+
+Use **Endpoint URL (no spec)** on both sides to compare two GET responses, or supply a YAML or JSON file of paired GET requests. Basic checks compare status codes, JSON keys and value types. The report states how many endpoints provided usable responses.
+
+```yaml
+requests:
+  - old: {method: GET, path: /cats/42}
+    new: {method: GET, path: /pets/42}
+```
+
+Set the two API base URLs and select **Sample requests file** in the web form, or pass `--samples samples.yaml` to `nparity.cli run`. Put query values in each request's optional `params` map.
 
 ## How it works
 

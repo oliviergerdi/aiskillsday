@@ -76,10 +76,13 @@ for (const button of presets) {
       name: toy ? "toy" : "petstore",
       backend: toy ? "fake" : "flash",
       seeds: toy ? toyDemo.seeds : "fixtures/petstore/seeds.yaml",
+      samples: "",
+      discover_from: "",
       intent_text: button.dataset.intent,
       intent: "",
     };
     for (const [name, value] of Object.entries(values)) form.elements[name].value = value;
+    form.elements.contract_only.checked = false;
     for (const panel of panels) updateSource(panel);
     form.querySelector(".run-settings").open = true;
   });
@@ -128,8 +131,10 @@ rerunEdit.addEventListener("click", () => {
     after_kind: c.after.kind, after_source: c.after.source, after_base: c.after.base_url || "",
     before_headers: (c.before.headers || []).join("; "), after_headers: (c.after.headers || []).join("; "),
     name: c.name, backend: c.backend, seeds: c.seeds, intent: c.intent,
+    samples: c.samples || "", discover_from: (c.discover_from || []).join("; "),
   };
   for (const [name, value] of Object.entries(values)) form.elements[name].value = value;
+  form.elements.contract_only.checked = Boolean(c.contract_only);
   for (const panel of panels) updateSource(panel);
   form.querySelector(".run-settings").open = true;
   form.scrollIntoView({ block: "start" });
@@ -299,12 +304,13 @@ form.addEventListener("submit", (event) => {
   const seeds = values.get("seeds").trim();
   const intent = values.get("intent").trim();
   const intentText = values.get("intent_text") ?? "";
+  const contractOnly = values.has("contract_only");
   const name = values.get("name").trim() || "comparison";
   clearFieldErrors();
   const missing = [
     ["before_source", before.source || (before.kind === "spec" && before.base_url), "Enter a source URL or file path."],
     ["after_source", after.source || (after.kind === "spec" && after.base_url), "Enter a source URL or file path."],
-    ["intent_text", intentText.trim(), "Describe what this change was meant to do. Without it every difference is flagged as a regression."],
+    ["intent_text", contractOnly || intentText.trim(), "Describe what this change was meant to do. Without it every difference is flagged as a regression."],
   ].filter(([, value]) => !value);
   for (const [field, , message] of missing) showFieldError(field, message);
   if (missing.length) {
@@ -317,6 +323,9 @@ form.addEventListener("submit", (event) => {
   const fromConfig = loadedConfig && loadedConfig.name === name ? loadedConfig.score : false;
   startJob({
     before, after, backend, name, seeds, intent, intent_text: intentText,
+    samples: values.get("samples").trim(),
+    discover_from: values.get("discover_from").split(";").map(value => value.trim()).filter(Boolean),
+    contract_only: contractOnly,
     score: scoreDemo || fromConfig,
     save_config: values.get("save_config") === "on",
     baseline: "auto",

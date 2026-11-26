@@ -85,6 +85,8 @@ def test_api_and_spec_run_streams_progress_and_saves_report(client, tmp_path, af
     report = client.get(job["report_url"])
     assert report.status_code == 200
     assert "10/10 correct" in report.text
+    assert "Endpoint coverage" in report.text
+    assert "Declared differences" in report.text
 
 
 def test_capture_manifest_compares_saved_responses(client):
@@ -109,7 +111,7 @@ def test_run_without_specs_compares_the_supplied_endpoints(client):
         requests.append((scope["method"], path, query))
         is_endpoint = (path, query) in {("/old/cat", b"lang=en"), ("/new/cat", b"")}
         status = 200 if is_endpoint else 404
-        body = json.dumps({"title": "Cat" if path == "/old/cat" else "Domestic cat"}).encode()
+        body = json.dumps({"title": "Cat"} if path == "/old/cat" else {"title": "Domestic cat", "id": 7}).encode()
         await send({"type": "http.response.start", "status": status, "headers": [(b"content-type", b"application/json")]})
         await send({"type": "http.response.body", "body": body})
 
@@ -136,9 +138,10 @@ def test_run_without_specs_compares_the_supplied_endpoints(client):
     assert ("GET", "/new/cat", b"") in requests
     report = store.load(job["report_url"].rsplit("/", 1)[1], app.state.runs_dir)
     assert report.config["requests"] == 1
-    assert [(f.path, f.kind) for f in report.findings] == [("$.title", "changed")]
+    assert [(f.path, f.kind) for f in report.findings] == [("$.id", "added_in_new")]
     page = client.get(job["report_url"]).text
-    assert "Without OpenAPI" in page and "one GET response" in page
+    assert "No API spec: basic checks only. 1 of 1 endpoints compared. This is not a full comparison." in page
+    assert "Endpoint coverage" in page
 
 
 def test_new_run_form_has_intent_textarea_outside_settings(client):
@@ -151,6 +154,15 @@ def test_new_run_form_has_intent_textarea_outside_settings(client):
     details_html = html[details:html.index("</details>", details)]
     assert 'name="intent"' in details_html
     assert 'name="intent_text"' not in details_html
+
+
+def test_form_explains_automatic_seeds_before_run_settings(client):
+    html = client.get("/compare").text
+    guidance = html.split('<details class="run-settings">', 1)[0]
+    assert "Running without a seeds file" in guidance
+    assert "OpenAPI examples, defaults, enums and bounds" in guidance
+    assert "skips live replay" in guidance
+    assert "Run settings" in guidance
 
 
 def test_form_requires_intent_text(client):

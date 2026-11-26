@@ -36,6 +36,7 @@ class Request(BaseModel):
     path: str
     params: dict[str, Any] = Field(default_factory=dict)
     body: Any = None
+    seed_sources: dict[str, str] = Field(default_factory=dict)
 
     @property
     def endpoint(self) -> str:
@@ -46,6 +47,11 @@ class HttpResult(BaseModel):
     status: int | None
     body: Any = None
     error: str | None = None
+
+
+class RequestPair(BaseModel):
+    old: Request
+    new: Request
 
 
 class Sample(BaseModel):
@@ -119,6 +125,23 @@ class Telemetry(BaseModel):
     cost_usd: float = 0.0
 
 
+class ContractChange(BaseModel):
+    endpoint: str
+    new_endpoint: str | None = None
+    section: str
+    before: Any = None
+    after: Any = None
+
+
+class EndpointCoverage(BaseModel):
+    endpoint: str
+    seed_sources: list[str] = Field(default_factory=list)
+    contract_compared: bool = False
+    compared: int = 0
+    attempted: int = 0
+    reason: str | None = None
+
+
 class Run(BaseModel):
     id: str
     started_at: datetime
@@ -130,6 +153,17 @@ class Run(BaseModel):
     errors: list[Finding] = Field(default_factory=list)
     score: Score | None = None
     telemetry: Telemetry = Field(default_factory=Telemetry)
+    contract: list[ContractChange] = Field(default_factory=list)
+    coverage: list[EndpointCoverage] = Field(default_factory=list)
+
+    def basic_checks_summary(self) -> str | None:
+        if self.config.get("limited_comparison"):
+            if not self.coverage and "contract_only" not in self.config:
+                return "No API spec: this saved run used sampled responses. This is not a full comparison."
+            compared = sum(row.compared > 0 for row in self.coverage)
+            return (f"No API spec: basic checks only. {compared} of {len(self.coverage)} endpoints compared. "
+                    "This is not a full comparison.")
+        return None
 
 
 class AnswerKey(BaseModel):

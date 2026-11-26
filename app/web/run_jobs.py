@@ -14,11 +14,12 @@ import yaml
 from pydantic import ValidationError
 
 from app.web.configs import DEFAULT_DIR as CONFIGS_DIR, RunInput, config_path, save_config
-from app.web.run_sources import InputError, local_file, resolve_source
+from app.web.run_sources import CAPTURE_PATH, InputError, Source, http_url, local_file, resolve_source
 from nparity import headers, pipeline, store
 from nparity.config import Seeds, load_seeds
 from nparity.evaluator.fake import FakeBackend
-from nparity.models import AnswerKey
+from nparity.models import AnswerKey, Request, RequestPair
+from nparity.request_samples import load_request_pairs
 from nparity.retry import RetryPolicy
 from nparity.review import latest_baseline, scope_of
 from nparity.tls import tls_verify
@@ -113,11 +114,11 @@ class RunJobs:
 
 def compare(job_id: str, inputs: RunInput, directory: Path, progress: Callable[[str], None],
             configs: Path = CONFIGS_DIR) -> str:
-    if inputs.backend == "flash" and not os.environ.get("FIREWORKS_API_KEY"):
+    if inputs.backend == "flash" and not inputs.contract_only and not os.environ.get("FIREWORKS_API_KEY"):
         raise InputError("Set FIREWORKS_API_KEY in the server environment to use Flash.", "backend")
     defaults = pipeline.RunConfig("", "")
     try:
-        seeds_path = local_file(inputs.seeds, {".yaml", ".yml"}) if inputs.seeds else defaults.seeds
+        seeds_path = local_file(inputs.seeds, {".yaml", ".yml"}) if inputs.seeds and not inputs.contract_only else None
     except InputError as exc:
         raise InputError(str(exc), "seeds") from exc
     if inputs.intent_text.strip():
@@ -130,9 +131,15 @@ def compare(job_id: str, inputs: RunInput, directory: Path, progress: Callable[[
             intent_path = local_file(inputs.intent, {".md", ".txt"}) if inputs.intent else None
         except InputError as exc:
             raise InputError(str(exc), "intent") from exc
-    seeds = load_seeds(seeds_path)
-    if not inputs.seeds:
-        seeds.methods = ["GET"]
+    seeds = load_seeds(seeds_path) if seeds_path else Seeds()
+    samples = None
+    if inputs.samples:
+        if inputs.contract_only:
+            raise InputError("Choose either a sample requests file or contract only.", "samples")
+        try:
+            samples = load_request_pairs(local_file(inputs.samples, {".json", ".yaml", ".yml"}))
+        except (OSError, ValueError, yaml.YAMLError) as exc:
+            raise InputError(str(exc), "samples") from exc
 
     try:
         old_h = headers.resolve(inputs.before.headers, "before")
@@ -145,10 +152,12 @@ def compare(job_id: str, inputs: RunInput, directory: Path, progress: Callable[[
     with httpx.Client(timeout=30, verify=tls_verify(), follow_redirects=True,
                       headers={"User-Agent": headers.API_USER_AGENT}) as client:
         progress("Loading before source")
-        before = resolve_source(client, inputs.before, "old", old_h)
+        before = (Source(str(http_url(inputs.before.base_url or inputs.before.source, base=True)))
+                  if samples is not None else resolve_source(client, inputs.before, "old", old_h))
         progress("Loading after source")
-        after = resolve_source(client, inputs.after, "new", new_h)
-        limited = before.spec is None or after.spec is None
+        after = (Source(str(http_url(inputs.after.base_url or inputs.after.source, base=True)))
+                 if samples is not None else resolve_source(client, inputs.after, "new", new_h))
+        limited = before.spec is None or after.spec is None or (before.capture is not None and after.capture is not None)
         score = inputs.score and not limited
         ev = FakeBackend(AnswerKey()) if inputs.backend == "fake" and not score else None
         config = pipeline.RunConfig(
@@ -156,9 +165,12 @@ def compare(job_id: str, inputs: RunInput, directory: Path, progress: Callable[[
             old_headers=inputs.before.headers, new_headers=inputs.after.headers,
             answer_key=defaults.answer_key if score else None,
             backend=inputs.backend, name=f"{inputs.name}-{job_id[:12]}",
+            discover_from=inputs.discover_from, sample_requests=samples, contract_only=inputs.contract_only,
         )
         options = {"specs": (before.spec, after.spec), "request_seeds": seeds, "progress": progress}
-        if before.capture is None and after.capture is None:
+        if samples is not None or inputs.contract_only and limited:
+            run = pipeline.run(config, client, ev, specs=(None, None), progress=progress)
+        elif before.capture is None and after.capture is None:
             if limited:
                 progress("Warning: Without OpenAPI specs for both sides, comparing one GET response per URL.")
                 targets = {"old.response.invalid": (before.base_url, old_h),
@@ -169,10 +181,10 @@ def compare(job_id: str, inputs: RunInput, directory: Path, progress: Callable[[
                     return client.get(url, headers=request_headers)
 
                 config.old, config.new = "http://old.response.invalid", "http://new.response.invalid"
-                response_spec = {"paths": {"/response": {"get": {}}}}
+                request = Request(method="GET", path="/response")
+                config.sample_requests = [RequestPair(old=request, new=request)]
                 with httpx.Client(transport=httpx.MockTransport(serve_endpoint)) as single_response:
-                    run = pipeline.run(config, single_response, ev, specs=(response_spec, response_spec),
-                                       request_seeds=Seeds(), progress=progress)
+                    run = pipeline.run(config, single_response, ev, progress=progress)
                 run.config.update(
                     old=str(httpx.URL(before.base_url).copy_with(query=None)),
                     new=str(httpx.URL(after.base_url).copy_with(query=None)),
@@ -188,9 +200,10 @@ def compare(job_id: str, inputs: RunInput, directory: Path, progress: Callable[[
                 return httpx.Response(status, json=body)
 
             config.retry = RetryPolicy(statuses=frozenset())
-            options["request_seeds"] = Seeds()
+            request = Request(method="GET", path=CAPTURE_PATH)
+            config.sample_requests = [RequestPair(old=request, new=request)]
             with httpx.Client(transport=httpx.MockTransport(serve_capture)) as offline:
-                run = pipeline.run(config, offline, ev, **options)
+                run = pipeline.run(config, offline, ev, progress=progress)
             run.config.update(old=before.label, new=after.label)
         else:
             raise InputError("Choose saved responses for both sides to compare captures. Specs from a manifest can be combined with live API sources.")

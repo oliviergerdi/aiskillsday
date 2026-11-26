@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import yaml
 from pydantic import BaseModel, Field
@@ -13,10 +13,24 @@ def load_yaml(path: str | Path) -> Any:
     return yaml.safe_load(Path(path).read_text(encoding="utf-8"))
 
 
+SeedSource = Literal["manual", "example", "default", "enum", "bounds", "discovered", "sample", "guessed"]
+
+
+class SeedValue(BaseModel):
+    value: Any
+    source: SeedSource
+
+
+class OperationSeeds(BaseModel):
+    params: dict[str, list[SeedValue]] = Field(default_factory=dict)
+    bodies: list[SeedValue] = Field(default_factory=list)
+
+
 class Seeds(BaseModel):
     params: dict[str, list[Any]] = Field(default_factory=dict)
     bodies: dict[str, list[Any]] = Field(default_factory=dict)
     methods: list[str] | None = None     # e.g. [GET] for public servers: never mutate data you don't own
+    operations: dict[str, OperationSeeds] = Field(default_factory=dict)
 
 
 def load_seeds(path: str | Path) -> Seeds:
