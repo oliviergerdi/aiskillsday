@@ -7,6 +7,6 @@ default:
   triage_intended:    # wrong accept = hidden regression, the worst failure
     auto_accept: 0.98
     needs_review: 0.50
-  triage_regression:  # never auto-dismissed; always shown
-    auto_accept: null
+  triage_regression:  # never dismissed. Below auto_accept it becomes unsure ("leans regression"), still shown
+    auto_accept: 0.999
     needs_review: null

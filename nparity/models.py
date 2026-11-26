@@ -60,6 +60,7 @@ class EndpointMap(BaseModel):
     p: float | None = None
     status: MapStatus
     top3: list[tuple[str, float]] = Field(default_factory=list)
+    error: str | None = None          # the LLM call failed; unmapped because of an error, not a decision
 
 
 class FieldMap(BaseModel):
@@ -69,6 +70,7 @@ class FieldMap(BaseModel):
     source: Literal["rule", "llm"]
     p: float | None = None
     status: MapStatus
+    error: str | None = None
 
 
 class Finding(BaseModel):
@@ -80,6 +82,7 @@ class Finding(BaseModel):
     source: FindingSource
     samples: list[Sample] = Field(default_factory=list)
     differing: int = 0
+    differs_in: list[int] = Field(default_factory=list)    # indexes into samples
     type_info: dict[str, str] = Field(default_factory=dict)
     label: Label | None = None
     p: float | None = None

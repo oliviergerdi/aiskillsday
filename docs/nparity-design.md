@@ -144,7 +144,7 @@ Raw diffs are **grouped into findings** by (endpoint pair, JSON path, kind) acro
 
 - One `choice` question per finding: `intended` / `regression` / `unsure`, against `fixtures/intent.md` (free text).
 - State = intent note + finding (kind, path, old and new values from the first 1–3 samples, type info).
-- Labels and thresholds per the evaluator spec: intended auto-accepted at p ≥ 0.98; regression always shown; below threshold → `unsure`.
+- Labels and thresholds: intended auto-accepted at p ≥ 0.98; regression shown as a regression at p ≥ 0.999. **Symmetric bar (decided 10:31):** either label below its bar becomes `unsure` ("leans intended/regression"), which is shown to a human, never dismissed. Set after the first live run: real regressions came back at 1 − p ≈ 1e-6, the ambiguous error-wording change at 0.9895.
 - Reasons: second optional call, only for findings the report shows (regressions and unsure), `max_tokens: 60`.
 - Noise items never reach triage. They're recorded as `noise` with the rule that removed them.
 

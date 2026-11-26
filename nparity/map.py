@@ -104,6 +104,9 @@ def map_endpoints(old: list[Endpoint], new: list[Endpoint], ev: Backend, th: Thr
         )
         state = {"old_endpoint": o.key, "old_fields": list(props(o.response_schema))}
         a = _ask(ev, state, q, tel)
+        if a.meta.get("error"):
+            out.append(EndpointMap(old=o.key, new=None, source="llm", status="unmapped", error=a.meta["error"]))
+            continue
         new_key = None if a.value == NONE else a.value
         status = "unmapped" if new_key is None else status_for(a.p_winner, a.censored, th.mapping)
         out.append(EndpointMap(old=o.key, new=new_key, source="llm", p=a.p_winner, status=status,
@@ -141,6 +144,10 @@ def map_fields(pairs: list[tuple[Endpoint, Endpoint]], ev: Backend, th: Threshol
             state = {"old_endpoint": o.key, "new_endpoint": n.key,
                      "old_fields": list(op), "new_fields": list(np_)}
             a = _ask(ev, state, q, tel)
+            if a.meta.get("error"):
+                out.append(FieldMap(endpoint=o.key, old=name, new=None, source="llm", status="unmapped",
+                                    error=a.meta["error"]))
+                continue
             new_name = None if a.value == NONE else a.value
             out.append(FieldMap(endpoint=o.key, old=name, new=new_name, source="llm", p=a.p_winner,
                                 status=status_for(a.p_winner, a.censored, th.mapping)))

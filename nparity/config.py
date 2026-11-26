@@ -39,3 +39,23 @@ def load_thresholds(path: str | Path = "config/thresholds.yaml", backend_id: str
     if backend_id and backend_id in raw:
         merged.update(raw[backend_id])
     return Thresholds.model_validate(merged)
+
+
+class MaskRule(BaseModel):
+    endpoint: str
+    paths: list[str]
+
+
+class UnorderedRule(BaseModel):
+    endpoint: str
+    path: str
+    key: str | None = None
+
+
+class NoiseRules(BaseModel):
+    mask: list[MaskRule] = Field(default_factory=list)
+    unordered: list[UnorderedRule] = Field(default_factory=list)
+
+
+def load_noise(path: str | Path = "config/noise.yaml") -> NoiseRules:
+    return NoiseRules.model_validate(load_yaml(path) or {})

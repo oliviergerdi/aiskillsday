@@ -54,7 +54,7 @@ def send(client: httpx.Client, base: str, req: Request, policy: RetryPolicy,
 
     def call() -> httpx.Response:
         r = client.request(req.method, url, params=query or None,
-                           json=req.body if req.body is not None else None, timeout=30)
+                           json=req.body if req.body is not None else None)   # timeout lives on the client
         if r.status_code in policy.statuses:
             r.raise_for_status()
         return r

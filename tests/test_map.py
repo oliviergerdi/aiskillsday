@@ -100,4 +100,21 @@ def test_status_for(p, censored, want):
 def test_thresholds_loaded(th):
     assert th.mapping.auto_accept == 0.95
     assert th.triage_intended.auto_accept == 0.98
-    assert th.triage_regression.auto_accept is None
+    assert th.triage_regression.auto_accept == 0.999
+
+
+class Failing:
+    id = "failing"
+    max_options = 30
+
+    def evaluate(self, state, questions, reasons=False):
+        from nparity.evaluator.base import uniform
+        return {q.id: uniform(list(q.criteria), meta={"error": "ConnectError: boom"}) for q in questions}
+
+
+def test_llm_error_is_marked_not_silently_unmapped(specs, th):
+    v1, v2 = specs
+    m = by_old(map_endpoints(v1, v2, Failing(), th))
+    c = m["GET /customers/{id}"]
+    assert (c.new, c.status, c.error) == (None, "unmapped", "ConnectError: boom")
+    assert m["GET /orders"].error is None          # rule decisions never call the LLM

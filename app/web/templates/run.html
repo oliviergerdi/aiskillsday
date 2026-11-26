@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}{{ run.id }} · nParity{% endblock %}
+{% block content %}
+<div class="crumbs"><a href="/">Runs</a> / {{ run.id }}</div>
+<div class="run-head">
+  <div>
+    <h1>{{ run.config.old }} → {{ run.config.new }}</h1>
+    <div class="sub">intent <code>{{ run.config.intent }}</code> · backend <span class="badge b-llm">{{ run.config.backend }}</span>
+      · {{ run.config.requests }} requests across {{ run.config.endpoints }} endpoints</div>
+  </div>
+  <a href="/runs/{{ run.id }}/mapping">Mapping: {{ run.endpoints|length }} endpoints, {{ n_fields }} fields →</a>
+</div>
+
+<div class="counts">
+  <div class="count reg"><div class="n">{{ c.regression }}</div><div class="l">Regressions</div></div>
+  <div class="count uns"><div class="n">{{ c.unsure }}</div><div class="l">Unsure</div></div>
+  <div class="count int"><div class="n">{{ c.intended }}</div><div class="l">Intended</div></div>
+  <div class="count noi"><div class="n">{{ c.noise }}</div><div class="l">Noise removed</div></div>
+  <div class="count err"><div class="n">{{ c.error }}</div><div class="l">Errors</div></div>
+</div>
+
+{% if run.score %}
+<div class="scoreline">
+  <span>Answer key: <b>{{ run.score.correct }}/{{ run.score.total }} correct</b></span>
+  <span><b>{{ run.score.unsure }}</b> flagged unsure</span>
+  <span><b>{{ run.score.false_regressions }}</b> false regressions</span>
+  <span><b>{{ run.endpoints|selectattr("new")|rejectattr("source", "equalto", "rule")|list|length }}</b> endpoint decisions by LLM</span>
+</div>
+{% for d in missed %}<p class="missed">Missed #{{ d.n }}: {{ d.endpoint }} <code>{{ d.path }}</code> expected {{ d.expect }}, got {{ d.got }}</p>{% endfor %}
+{% endif %}
+
+<h2><span class="badge b-reg">Regressions</span> always shown, never auto-dismissed</h2>
+<div class="findings">
+  {% for v in sections.shown %}{% include "_row.html" %}{% else %}<div class="empty">None.</div>{% endfor %}
+</div>
+
+<h2><span class="badge b-uns">Unsure</span> below threshold, needs a human</h2>
+<div class="findings">
+  {% for v in sections.unsure %}{% include "_row.html" %}{% else %}<div class="empty">None.</div>{% endfor %}
+</div>
+
+<h2><span class="badge b-int">Intended</span> matches the intent note</h2>
+<div class="findings">
+  {% for v in sections.accepted %}{% include "_row.html" %}{% else %}<div class="empty">None.</div>{% endfor %}
+</div>
+
+<h2><span class="badge b-noi">Noise removed</span> by normaliser rules, no LLM</h2>
+<div class="findings">
+  {% for n in run.noise %}
+  <div class="f-static"><span></span>
+    <div class="f-ep">{{ n.endpoint }}</div>
+    <div class="f-path"><code>{{ n.path }}</code></div>
+    <div class="f-kind">rule: {{ n.rule }}</div><span></span>
+  </div>
+  {% else %}<div class="empty">None.</div>{% endfor %}
+</div>
+
+{% if run.errors %}
+<h2><span class="badge b-err">Errors</span> requests that failed after retries</h2>
+<div class="findings">
+  {% for e in run.errors %}
+  <div class="f-static"><span></span>
+    <div class="f-ep">{{ e.endpoint }}<small>{{ e.samples[0].old_request.params if e.samples else "" }}</small></div>
+    <div class="f-kind" style="grid-column: span 3">{{ e.reason }}</div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div class="footer-tele">
+  <span>Decisions: <b>{{ run.telemetry.rule_decisions }}</b> by rule, <b>{{ run.telemetry.llm_calls }}</b> by LLM</span>
+  <span>Reasons: <b>{{ run.telemetry.reasons }}</b></span>
+  <span>Retries: <b>{{ run.telemetry.retries }}</b></span>
+  <span>Time: <b>{{ "%.1f"|format(run.telemetry.seconds) }} s</b></span>
+  <span>Tokens: <b>{{ run.telemetry.prompt_tokens }}</b> in (<b>{{ run.telemetry.cached_tokens }}</b> cached) · <b>{{ run.telemetry.completion_tokens }}</b> out</span>
+  <span>Cost: <b>${{ "%.4f"|format(run.telemetry.cost_usd) }}</b></span>
+</div>
+{% endblock %}

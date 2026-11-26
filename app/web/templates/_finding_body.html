@@ -1,0 +1,24 @@
+<div class="meta-grid">
+  <div><span class="k">Label</span><span class="badge {{ v.badge }}">{{ v.f.label or "unlabelled" }}</span>{% if v.f.type_info.get("leans") %} <span class="sub">leans {{ v.f.type_info.leans }}</span>{% endif %}</div>
+  <div><span class="k">p(winner) · threshold</span>{{ v.p_text }} · {{ v.threshold_text }}</div>
+  <div><span class="k">Observed type</span>{{ v.f.type_info.get("observed", "—") }}</div>
+  <div><span class="k">{% if v.f.type_info.get("mapping") %}Mapping{% else %}Declared type{% endif %}</span>{{ v.f.type_info.get("mapping") or v.f.type_info.get("declared", "no change") }}</div>
+</div>
+{% if v.f.type_info.get("mapping") and v.f.type_info.get("declared") %}<p class="sub">Declared type: {{ v.f.type_info.declared }}</p>{% endif %}
+{% if v.distribution %}<p class="sub">Distribution: {{ v.distribution }}</p>{% endif %}
+{% if v.sample_label %}
+<div class="req">{{ v.sample_label }}</div>
+<div class="sbs">
+  <div class="pane"><div class="ph"><span>old</span><span>{{ v.old_head }}</span></div>
+<pre>{% for l in v.old_lines %}<span{% if l.hl %} class="hl-old"{% endif %}>{{ l.text }}</span>{% endfor %}</pre></div>
+  <div class="pane"><div class="ph"><span>new</span><span>{{ v.new_head }}</span></div>
+<pre>{% for l in v.new_lines %}<span{% if l.hl %} class="hl-new"{% endif %}>{{ l.text }}</span>{% endfor %}</pre></div>
+</div>
+{% endif %}
+{% if v.samples %}
+<div class="samples"><b>Samples</b>
+  <ul>{% for req, state in v.samples %}<li><code>{{ req }}</code> · {% if state == "differs" %}<b>differs</b>{% else %}{{ state }}{% endif %}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+{% if v.f.reason %}<div class="reasonbox"><span class="k">Reason</span>{{ v.f.reason }}</div>{% endif %}
+<div class="actions"><button class="btn" disabled>Confirm</button><button class="btn" disabled>Override</button><span class="sub">ledger: stretch</span></div>
