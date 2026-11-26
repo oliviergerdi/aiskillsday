@@ -47,7 +47,14 @@ def local_run_request(request: Request) -> None:
 
 @router.get("/compare", response_class=HTMLResponse)
 def new_run(request: Request):
-    return TEMPLATES.TemplateResponse(request, "new_run.html", {"nav": "new"})
+    fixtures = Path(__file__).parents[2] / "fixtures"
+
+    def intent_text(path: Path) -> str:
+        return path.read_text(encoding="utf-8") if path.is_file() else ""
+
+    presets = {"toy": intent_text(fixtures / "intent.md"),
+               "petstore": intent_text(fixtures / "petstore" / "intent.md")}
+    return TEMPLATES.TemplateResponse(request, "new_run.html", {"nav": "new", "presets": presets})
 
 
 @router.post("/run-jobs", status_code=202, dependencies=[Depends(local_run_request)])
