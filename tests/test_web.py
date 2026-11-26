@@ -33,6 +33,15 @@ def test_run_page(setup):
         assert s in r.text, s
 
 
+def test_run_page_loads_htmx_locally(setup):
+    client, run = setup
+    r = client.get(f"/runs/{run.id}")
+    assert r.status_code == 200
+    assert "/static/htmx.min.js" in r.text
+    assert "unpkg.com" not in r.text
+    assert client.get("/static/htmx.min.js").status_code == 200
+
+
 def test_finding_partial(setup):
     client, run = setup
     total = next(f for f in run.findings if f.path == "$.total")
