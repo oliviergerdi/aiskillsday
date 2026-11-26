@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>nParity Pitch</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@600;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Stardos+Stencil:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a 1280x720 tea-chest "lot" per slide, scaled to fit; stacked reading mode on narrow screens.
+   Palette: strong brew (dark-first) with saffron accent; plywood tea-chest for light. */
+:root {
+  color-scheme: dark;
+  --brew: #1a110b;        /* page ground */
+  --brew-2: #241810;      /* slide surface */
+  --brew-3: #302117;      /* raised */
+  --leaf: #4a3526;        /* rules, borders */
+  --milk: #f2e6d5;        /* text */
+  --milk-dim: #bfae98;    /* secondary text */
+  --saffron: #f0a830;     /* accent */
+  --cardamom: #9cc06c;    /* intended */
+  --chili: #ea5f43;       /* regression */
+  --clove: #b9a3e6;       /* unsure */
+  --dust: #8a7765;        /* noise */
+  --clay: #9c5532;
+  --clay-2: #bf7148;
+  --chai: #c99560;
+  --chip-ink: #1a110b;
+
+  --f-stencil: 'Big Shoulders Stencil Display', 'Big Shoulders Stencil', 'Stardos Stencil', Impact, 'Arial Narrow Bold', sans-serif;
+  --f-body: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --f-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --u: 0.6px;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --brew: #ddc9a6; --brew-2: #efe3cd; --brew-3: #e6d6ba; --leaf: #c2a77c;
+    --milk: #2a1a10; --milk-dim: #6a5240; --saffron: #a9640a; --cardamom: #4c7622;
+    --chili: #b23820; --clove: #6447a6; --dust: #8a7660;
+    --clay: #9c5532; --clay-2: #bf7148; --chai: #b07b45; --chip-ink: #fff8ec;
+  }
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --brew: #ddc9a6; --brew-2: #efe3cd; --brew-3: #e6d6ba; --leaf: #c2a77c;
+  --milk: #2a1a10; --milk-dim: #6a5240; --saffron: #a9640a; --cardamom: #4c7622;
+  --chili: #b23820; --clove: #6447a6; --dust: #8a7660;
+  --clay: #9c5532; --clay-2: #bf7148; --chai: #b07b45; --chip-ink: #fff8ec;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--brew);
+  color: var(--milk);
+  font-family: var(--f-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Deck shell ---------- */
+.deck {
+  display: flex; flex-direction: column; gap: 24px;
+  padding-block: 24px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.slide {
+  position: relative;
+  background: var(--brew-2);
+  border: 1px solid var(--leaf);
+  border-radius: calc(var(--u) * 6);
+  padding: calc(var(--u) * 56) calc(var(--u) * 72);
+  display: flex; flex-direction: column; gap: calc(var(--u) * 28);
+  overflow: hidden;
+  min-width: 0;
+}
+html.is-present body { overflow: hidden; }
+html.is-present .deck {
+  position: fixed; inset: 0 0 48px 0;
+  display: grid; place-items: center;
+  padding: 0;
+}
+html.is-present .slide {
+  grid-area: 1 / 1;
+  width: calc(var(--u) * 1280);
+  height: calc(var(--u) * 720);
+  opacity: 0; visibility: hidden;
+  transform: translateY(calc(var(--u) * 10));
+  transition: opacity .35s ease, transform .35s ease, visibility 0s linear .35s;
+}
+html.is-present .slide.is-active {
+  opacity: 1; visibility: visible; transform: none;
+  transition: opacity .35s ease, transform .35s ease, visibility 0s;
+}
+
+/* Lot stamp in the corner of each slide */
+.lot {
+  position: absolute; top: calc(var(--u) * 26); right: calc(var(--u) * 32);
+  font-family: var(--f-stencil); font-weight: 800;
+  font-size: calc(var(--u) * 20); letter-spacing: .12em;
+  color: var(--milk-dim); opacity: .7;
+}
+
+/* ---------- Type ---------- */
+.eyebrow {
+  font-family: var(--f-mono); font-weight: 600;
+  font-size: calc(var(--u) * 15); letter-spacing: .16em; text-transform: uppercase;
+  color: var(--saffron); margin: 0;
+}
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+h2 {
+  font-family: var(--f-body); font-weight: 600;
+  font-size: calc(var(--u) * 52); line-height: 1.08; letter-spacing: -0.015em;
+  max-width: 22ch;
+}
+h3 { font-size: calc(var(--u) * 26); font-weight: 600; line-height: 1.2; }
+p { margin: 0; }
+.body { font-size: calc(var(--u) * 23); line-height: 1.45; color: var(--milk-dim); max-width: 60ch; }
+.small { font-size: calc(var(--u) * 17); line-height: 1.45; color: var(--milk-dim); }
+.mono { font-family: var(--f-mono); }
+.hl { color: var(--saffron); }
+strong { color: var(--milk); font-weight: 600; }
+.source { font-size: calc(var(--u) * 14); color: var(--dust); font-family: var(--f-mono); letter-spacing: .02em; }
+.push { margin-top: auto; }
+
+/* Placeholder chip: things we still have to measure or decide */
+.todo {
+  display: inline-block;
+  font-family: var(--f-mono); font-size: .78em; font-weight: 600;
+  padding: .08em .45em; border-radius: .3em;
+  border: 1.5px dashed var(--saffron); color: var(--saffron);
+  white-space: nowrap;
+}
+
+/* ---------- Grids ---------- */
+.cols { display: grid; gap: calc(var(--u) * 28); min-width: 0; }
+.cols > * { min-width: 0; }
+html.is-present .c2 { grid-template-columns: 1fr 1fr; }
+html.is-present .c3 { grid-template-columns: repeat(3, 1fr); }
+html.is-present .c4 { grid-template-columns: repeat(4, 1fr); }
+html.is-present .c5 { grid-template-columns: repeat(5, 1fr); }
+html.is-present .c-split { grid-template-columns: 1.55fr 1fr; }
+html.is-present .c-demo { grid-template-columns: 0.85fr 1.25fr; }
+
+.card {
+  background: var(--brew-3);
+  border: 1px solid var(--leaf);
+  border-radius: calc(var(--u) * 6);
+  padding: calc(var(--u) * 24) calc(var(--u) * 26);
+  display: flex; flex-direction: column; gap: calc(var(--u) * 10);
+}
+.card .k {
+  font-family: var(--f-mono); font-size: calc(var(--u) * 14); font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--milk-dim);
+}
+.card .body { font-size: calc(var(--u) * 20); }
+
+/* ---------- Title slide ---------- */
+.s-title { justify-content: center; }
+.title-grid { display: grid; gap: calc(var(--u) * 24); align-items: center; }
+html.is-present .title-grid { grid-template-columns: 1.45fr 1fr; }
+.wordmark {
+  font-family: var(--f-stencil); font-weight: 800;
+  font-size: calc(var(--u) * 210); line-height: .86; letter-spacing: .01em;
+  color: var(--milk);
+}
+.wordmark .n { color: var(--saffron); }
+.question {
+  font-size: calc(var(--u) * 46); font-weight: 600; letter-spacing: -0.01em;
+  line-height: 1.1; margin-top: calc(var(--u) * 18);
+}
+.team {
+  display: flex; flex-wrap: wrap; gap: calc(var(--u) * 10) calc(var(--u) * 26);
+  font-size: calc(var(--u) * 19); color: var(--milk-dim);
+  margin-top: calc(var(--u) * 26);
+}
+.team b { color: var(--milk); font-weight: 600; }
+.cup-wrap { position: relative; display: grid; place-items: center; }
+.cup { width: calc(var(--u) * 360); max-width: 100%; height: auto; }
+.steam path { fill: none; stroke: var(--milk-dim); stroke-width: 5; stroke-linecap: round; opacity: .55; }
+@media (prefers-reduced-motion: no-preference) {
+  .steam path { animation: rise 4.2s ease-in-out infinite; transform-box: fill-box; transform-origin: bottom center; }
+  .steam path:nth-child(2) { animation-delay: 1.3s; }
+  .steam path:nth-child(3) { animation-delay: 2.6s; }
+  @keyframes rise {
+    0% { opacity: .0; transform: translateY(10px) scaleY(.9); }
+    35% { opacity: .6; }
+    100% { opacity: 0; transform: translateY(-22px) scaleY(1.08); }
+  }
+}
+.cup-wrap { gap: calc(var(--u) * 18); }
+.stamp {
+  justify-self: end; margin-right: 6%;
+  transform: rotate(-7deg);
+  border: calc(var(--u) * 3) solid var(--chili);
+  color: var(--chili);
+  padding: calc(var(--u) * 8) calc(var(--u) * 14);
+  font-family: var(--f-stencil); font-weight: 800;
+  font-size: calc(var(--u) * 19); letter-spacing: .1em; line-height: 1.15;
+  text-align: center; opacity: .85;
+}
+
+/* ---------- Big quote ---------- */
+.quote {
+  font-size: calc(var(--u) * 50); line-height: 1.12; font-weight: 600;
+  letter-spacing: -0.015em; max-width: 24ch;
+}
+.quote .hl { font-family: var(--f-stencil); font-weight: 800; font-size: 1.18em; letter-spacing: .01em; }
+
+/* ---------- Numbered steps ---------- */
+.num {
+  font-family: var(--f-stencil); font-weight: 800;
+  font-size: calc(var(--u) * 64); line-height: .9; color: var(--saffron);
+}
+.callout {
+  border-top: 1px solid var(--leaf);
+  padding-top: calc(var(--u) * 22);
+  font-size: calc(var(--u) * 26); line-height: 1.35;
+}
+
+/* ---------- Value prop rows ---------- */
+.vp { display: grid; gap: calc(var(--u) * 18); }
+.vp-row {
+  display: grid; gap: calc(var(--u) * 28);
+  border-top: 1px solid var(--leaf); padding-top: calc(var(--u) * 18);
+}
+html.is-present .vp-row { grid-template-columns: calc(var(--u) * 230) 1fr; }
+.vp-row .lab {
+  font-family: var(--f-stencil); font-weight: 800; font-size: calc(var(--u) * 40);
+  line-height: 1; color: var(--saffron); letter-spacing: .02em;
+}
+.vp-row p { font-size: calc(var(--u) * 25); line-height: 1.42; color: var(--milk); max-width: 58ch; }
+
+/* ---------- Pipeline ---------- */
+.step { gap: calc(var(--u) * 12); }
+.step .verb {
+  font-family: var(--f-stencil); font-weight: 800; font-size: calc(var(--u) * 36);
+  line-height: 1; color: var(--milk);
+}
+.step .what { font-size: calc(var(--u) * 19); line-height: 1.4; color: var(--milk); }
+.step .how { font-size: calc(var(--u) * 15); line-height: 1.4; color: var(--milk-dim); font-family: var(--f-mono); }
+.step .idx { font-family: var(--f-mono); font-size: calc(var(--u) * 14); color: var(--saffron); font-weight: 600; letter-spacing: .1em; }
+.io {
+  display: flex; flex-wrap: wrap; gap: calc(var(--u) * 10) calc(var(--u) * 30);
+  font-size: calc(var(--u) * 20); color: var(--milk-dim);
+}
+
+/* ---------- Demo / tasting ---------- */
+.strip { display: grid; grid-template-columns: repeat(10, 1fr); gap: calc(var(--u) * 6); }
+.cell { aspect-ratio: 1 / 1.35; border-radius: calc(var(--u) * 4); max-width: 100%; }
+.cell.noise { background: transparent; border: calc(var(--u) * 2) dashed var(--dust); }
+.cell.ok { background: var(--cardamom); }
+.cell.bad { background: var(--chili); }
+.cell.huh { background: var(--clove); }
+.legend { display: grid; grid-template-columns: 1fr 1fr; gap: calc(var(--u) * 8) calc(var(--u) * 18); font-size: calc(var(--u) * 17); color: var(--milk-dim); }
+.legend span { display: flex; align-items: center; gap: calc(var(--u) * 10); }
+.legend i { width: calc(var(--u) * 14); height: calc(var(--u) * 14); border-radius: calc(var(--u) * 3); display: inline-block; flex: none; }
+.legend b { color: var(--milk); font-variant-numeric: tabular-nums; }
+.big4 { display: flex; align-items: baseline; gap: calc(var(--u) * 16); }
+.big4 .n4 { font-family: var(--f-stencil); font-weight: 800; font-size: calc(var(--u) * 150); line-height: .85; color: var(--saffron); }
+.big4 .t4 { font-size: calc(var(--u) * 26); line-height: 1.2; font-weight: 600; }
+.lots { display: grid; gap: calc(var(--u) * 12); }
+.lotcard {
+  display: grid; grid-template-columns: 1fr auto; gap: calc(var(--u) * 6) calc(var(--u) * 16);
+  align-items: center;
+  background: var(--brew-3); border: 1px solid var(--leaf);
+  border-left: calc(var(--u) * 6) solid var(--chili);
+  border-radius: calc(var(--u) * 5);
+  padding: calc(var(--u) * 14) calc(var(--u) * 18);
+}
+.lotcard.unsure { border-left-color: var(--clove); }
+.lotcard .path { font-family: var(--f-mono); font-size: calc(var(--u) * 16); color: var(--milk); min-width: 0; overflow-wrap: anywhere; }
+.lotcard .desc { grid-column: 1 / -1; font-size: calc(var(--u) * 17); color: var(--milk-dim); }
+.pill {
+  font-family: var(--f-mono); font-weight: 600; font-size: calc(var(--u) * 13);
+  letter-spacing: .1em; text-transform: uppercase;
+  padding: calc(var(--u) * 5) calc(var(--u) * 10); border-radius: 999px;
+  color: var(--chip-ink); background: var(--chili); white-space: nowrap;
+}
+.pill.unsure { background: var(--clove); }
+.pill.ok { background: var(--cardamom); }
+.found {
+  font-size: calc(var(--u) * 17); color: var(--milk-dim);
+  display: flex; gap: calc(var(--u) * 10); align-items: center; flex-wrap: wrap;
+}
+.found code { font-family: var(--f-mono); color: var(--milk); font-size: .95em; }
+
+/* ---------- Table ---------- */
+.tbl-wrap { overflow-x: auto; min-width: 0; }
+table { border-collapse: collapse; width: 100%; font-size: calc(var(--u) * 17); }
+th, td { text-align: left; padding: calc(var(--u) * 11) calc(var(--u) * 12); border-bottom: 1px solid var(--leaf); vertical-align: top; }
+th { font-family: var(--f-mono); font-size: calc(var(--u) * 13); letter-spacing: .1em; text-transform: uppercase; color: var(--milk-dim); font-weight: 600; }
+td:first-child { color: var(--milk); font-weight: 600; white-space: nowrap; }
+td { color: var(--milk-dim); }
+tr.us td { color: var(--milk); background: color-mix(in srgb, var(--saffron) 14%, transparent); }
+tr.us td:first-child { color: var(--saffron); }
+.y { color: var(--cardamom); font-weight: 600; }
+.n { color: var(--dust); }
+
+/* ---------- Market bars ---------- */
+.bars { display: grid; grid-template-columns: 1fr 1fr; gap: calc(var(--u) * 36); align-items: end; height: calc(var(--u) * 300); }
+.bar { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; gap: calc(var(--u) * 10); }
+.bar .fill { background: var(--saffron); border-radius: calc(var(--u) * 4) calc(var(--u) * 4) 0 0; }
+.bar .fill.proj { background: repeating-linear-gradient(135deg, var(--saffron) 0 calc(var(--u)*10), color-mix(in srgb, var(--saffron) 55%, transparent) calc(var(--u)*10) calc(var(--u)*20)); }
+.bar .val { font-family: var(--f-stencil); font-weight: 800; font-size: calc(var(--u) * 46); line-height: 1; }
+.bar .yr { font-family: var(--f-mono); font-size: calc(var(--u) * 15); color: var(--milk-dim); border-top: 1px solid var(--leaf); padding-top: calc(var(--u) * 8); }
+.stat { font-family: var(--f-stencil); font-weight: 800; font-size: calc(var(--u) * 120); line-height: .9; color: var(--chili); }
+
+/* ---------- Lists ---------- */
+.ticks { list-style: none; margin: 0; padding: 0; display: grid; gap: calc(var(--u) * 12); }
+.ticks li { display: grid; grid-template-columns: calc(var(--u) * 26) 1fr; gap: calc(var(--u) * 10); font-size: calc(var(--u) * 21); line-height: 1.35; }
+.ticks li::before { content: ""; width: calc(var(--u) * 12); height: calc(var(--u) * 12); margin-top: calc(var(--u) * 9); border-radius: 50%; background: var(--saffron); }
+.ticks.out li::before { background: transparent; border: calc(var(--u) * 2) solid var(--dust); }
+.ticks.out li { color: var(--milk-dim); }
+.metric { font-variant-numeric: tabular-nums; }
+
+/* ---------- Nav (presentation mode only) ---------- */
+.nav {
+  display: none;
+  position: fixed; left: 0; right: 0; bottom: 0; height: 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  align-items: center; gap: 12px;
+  font-family: var(--f-mono); font-size: 13px; color: var(--milk-dim);
+}
+html.is-present .nav { display: flex; }
+.nav button {
+  font: inherit; color: var(--milk); background: transparent;
+  border: 1px solid var(--leaf); border-radius: 4px;
+  height: 30px; min-width: 34px; padding: 0 10px; cursor: pointer;
+}
+.nav button:hover { border-color: var(--saffron); color: var(--saffron); }
+.nav button:focus-visible, a:focus-visible { outline: 2px solid var(--saffron); outline-offset: 2px; }
+.progress { flex: 1; height: 3px; background: var(--leaf); border-radius: 2px; overflow: hidden; min-width: 40px; }
+.progress i { display: block; height: 100%; width: 0; background: var(--saffron); transition: width .3s ease; }
+.count { font-variant-numeric: tabular-nums; min-width: 4.5em; text-align: right; }
+.notes { display: none; }
+.notes-panel {
+  position: fixed; left: 50%; bottom: 58px; transform: translateX(-50%);
+  width: min(880px, calc(100% - 32px));
+  background: var(--brew-3); border: 1px solid var(--saffron); border-radius: 6px;
+  padding: 14px 18px; font-size: 15px; line-height: 1.5; color: var(--milk);
+  box-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+.notes-panel .k { font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--saffron); display: block; margin-bottom: 4px; }
+
+/* Reading mode (narrow screens / no script): let headings breathe */
+html:not(.is-present) .slide { padding: 28px 20px; gap: 18px; }
+html:not(.is-present) .lot { top: 12px; right: 14px; }
+html:not(.is-present) .wordmark { font-size: 96px; }
+</style>
+</head>
+<body>
+<main class="deck" id="deck" aria-label="nParity pitch deck">
+
+  <!-- 1 -->
+  <section class="slide s-title" id="s1" aria-label="Title">
+    <span class="lot">LOT 01</span>
+    <div class="title-grid">
+      <div>
+        <p class="eyebrow">Team Chai-GPT · The (AI)mazing Race</p>
+        <h1 class="wordmark"><span class="n">n</span>Parity</h1>
+        <p class="question">Will we break anything?</p>
+        <p class="body" style="margin-top: calc(var(--u) * 14)">nParity tells you which differences between an old and a new API are regressions: before the project, during it and after cutover.</p>
+        <div class="team"><span><b>Gerdi Olivier</b> engine</span><span><b>Stephen Metcalfe</b> captain &amp; demo</span><span><b>Temba Mazingi</b> business case</span></div>
+      </div>
+      <div class="cup-wrap" aria-hidden="true">
+        <svg class="cup" viewBox="0 0 260 300" role="img">
+          <g class="steam">
+            <path d="M100 96 C 86 76, 112 62, 98 38"/>
+            <path d="M132 92 C 118 70, 146 56, 130 28"/>
+            <path d="M164 96 C 150 76, 176 62, 162 40"/>
+          </g>
+          <path d="M40 124 L220 124 L196 268 Q130 284 64 268 Z" fill="var(--clay)"/>
+          <path d="M196 268 Q130 284 64 268 L70 246 Q130 262 190 246 Z" fill="var(--clay-2)" opacity=".35"/>
+          <ellipse cx="130" cy="124" rx="90" ry="16" fill="var(--clay-2)"/>
+          <ellipse cx="130" cy="126" rx="78" ry="11" fill="var(--chai)"/>
+        </svg>
+        <div class="stamp">CHAI-GPT ESTATE<br>DEMO 27·11·2026</div>
+      </div>
+    </div>
+    <aside class="notes">Open with the question every engineer asks throughout an API project. One line on who we are, then straight into the value proposition.</aside>
+  </section>
+
+  <!-- 2 · value proposition -->
+  <section class="slide" id="s2" aria-label="Value proposition">
+    <span class="lot">LOT 02</span>
+    <p class="eyebrow">Value proposition</p>
+    <div class="vp">
+      <div class="vp-row">
+        <span class="lab">What</span>
+        <p>From the first prototype to the day after cutover, nParity tells the backend engineer which differences between the old and new API are regressions, with a probability and a one-line reason for each.</p>
+      </div>
+      <div class="vp-row">
+        <span class="lab">Why</span>
+        <p>Today the check happens once, by hand, near the end, when a regression costs the most to fix. Replay tools show what differs, not whether it was meant.</p>
+      </div>
+      <div class="vp-row">
+        <span class="lab">What changes</span>
+        <p>Regressions surface while the work is in flight. The engineer reviews only regressions and unsure items, and the engineering manager signs off on a short list with confidence attached.</p>
+      </div>
+    </div>
+    <aside class="notes">Land this in the first minute. Every slide after this is evidence for it. Pause after "not whether it was meant".</aside>
+  </section>
+
+  <!-- 2 -->
+  <section class="slide" id="s3" aria-label="The moment">
+    <span class="lot">LOT 03</span>
+    <p class="eyebrow">The moment</p>
+    <p class="quote">Every change on the way to a new API raises the same question: <span class="hl">will we break anything?</span></p>
+    <div class="cols c3 push">
+      <div class="card">
+        <span class="k">Who runs it</span>
+        <h3>Backend engineer</h3>
+        <p class="body">Owns both the old and the new API. Can say in a paragraph what the change was meant to do.</p>
+      </div>
+      <div class="card">
+        <span class="k">Who signs off</span>
+        <h3>Engineering manager</h3>
+        <p class="body">Approves the cutover. Needs a short list with confidence attached, not a raw diff.</p>
+      </div>
+      <div class="card">
+        <span class="k">Not for</span>
+        <h3>Vendor swaps</h3>
+        <p class="body">Moving to a vendor's new API where the flows change. Endpoint comparison stops working there.</p>
+      </div>
+    </div>
+    <aside class="notes">Name the user and the buyer. Say out loud what we are not for: our interview showed that when the flow changes, comparing endpoints breaks down.</aside>
+  </section>
+
+  <!-- 3 · before, during, after -->
+  <section class="slide" id="s4" aria-label="Before, during, after">
+    <span class="lot">LOT 04</span>
+    <p class="eyebrow">When it pays off</p>
+    <h2>Ask it before, during and after the project</h2>
+    <div class="cols c3">
+      <div class="card step">
+        <span class="k">Before</span>
+        <h3>Scope the change</h3>
+        <p class="body">Run the old API against an early prototype. See what will differ before you commit to a plan, and write the intent note from it.</p>
+      </div>
+      <div class="card step">
+        <span class="k">During</span>
+        <h3>Catch drift early</h3>
+        <p class="body">Run it on every pull request. A regression shows up the day it is introduced, while it is cheap to fix.</p>
+      </div>
+      <div class="card step">
+        <span class="k">After</span>
+        <h3>Sign off, then keep checking</h3>
+        <p class="body">Hand the manager a short list at cutover. Keep the run in CI so the next change is checked too.</p>
+      </div>
+    </div>
+    <p class="callout push">Same engine, same report, at every stage of the project.</p>
+    <aside class="notes">This is why the question is "will we", not "did we". The value comes from asking early and often, not once at the end.</aside>
+  </section>
+
+  <!-- 3 -->
+  <section class="slide" id="s5" aria-label="Why it hurts">
+    <span class="lot">LOT 05</span>
+    <p class="eyebrow">Why it hurts today</p>
+    <h2>Three costs, every time you check</h2>
+    <div class="cols c3">
+      <div class="card step">
+        <span class="num">1</span>
+        <h3>Build the comparison</h3>
+        <p class="body">A script or harness written for this migration, then thrown away.</p>
+      </div>
+      <div class="card step">
+        <span class="num">2</span>
+        <h3>Wade through noise</h3>
+        <p class="body">Timestamps, generated IDs, list order and whitespace differ on every call. A renamed field looks like everything changed.</p>
+      </div>
+      <div class="card step">
+        <span class="num">3</span>
+        <h3>Judge intent by hand</h3>
+        <p class="body">Each remaining difference is checked against the change list in someone's head. No tool does this step.</p>
+      </div>
+    </div>
+    <p class="callout push">Engineers spend <span class="todo">X hours</span> per check going through <span class="todo">N differences</span> by hand, and the few regressions hide among noise and intended changes.</p>
+    <aside class="notes">Fill X and N from the stopwatch run on Petstore v2 to v3 before we present. Step 3 is the part nobody automates.</aside>
+  </section>
+
+  <!-- 4 -->
+  <section class="slide" id="s6" aria-label="Evidence">
+    <span class="lot">LOT 06</span>
+    <p class="eyebrow">Evidence</p>
+    <h2>What others found</h2>
+    <div class="cols c2">
+      <div class="card">
+        <span class="k">GitHub · rewriting merges with Scientist</span>
+        <p class="body">Most mismatches were noise: the old code timing out, and commit timestamps. The rollout still took roughly <strong>5 days of part-time work</strong>, with a purpose-built tool.</p>
+      </div>
+      <div class="card">
+        <span class="k">Twitter · Diffy</span>
+        <p class="body">Built because separating real regressions from noise by hand is very hard. One random true/false field alone causes <strong>false alarms on 25% of requests</strong>.</p>
+      </div>
+      <div class="card">
+        <span class="k">Speedscale · sold today</span>
+        <p class="body">Sells side-by-side replay of legacy and migrated services. Its public pages say nothing about renamed endpoints or intended changes.</p>
+      </div>
+      <div class="card">
+        <span class="k">Our interview · 26 Nov</span>
+        <p class="body">“References to the actual documentation would add confidence.” <strong>Trust comes from showing the source</strong> behind each verdict.</p>
+      </div>
+    </div>
+    <p class="small push">Still to add: <span class="todo">2–3 more interviews</span> <span class="todo">timed manual baseline</span></p>
+    <aside class="notes">Public prior art proves the pain is real and that noise dominates. Our own interview shaped scope and trust. Add today's interviews here.</aside>
+  </section>
+
+  <!-- 6 -->
+  <section class="slide" id="s7" aria-label="How it works">
+    <span class="lot">LOT 07</span>
+    <p class="eyebrow">How it works</p>
+    <h2>Steep, strain, match, compare, taste</h2>
+    <div class="cols c5">
+      <div class="card step">
+        <span class="idx">STEP 1</span>
+        <span class="verb">Steep</span>
+        <p class="what">Send the same requests to the old and new API.</p>
+        <p class="how">Built from the old API's OpenAPI spec and seed values.</p>
+      </div>
+      <div class="card step">
+        <span class="idx">STEP 2</span>
+        <span class="verb">Strain</span>
+        <p class="what">Mask timestamps and generated IDs. Sort unordered lists.</p>
+        <p class="how">Fixed rules. No model.</p>
+      </div>
+      <div class="card step">
+        <span class="idx">STEP 3</span>
+        <span class="verb">Match</span>
+        <p class="what">Pair moved endpoints and renamed fields.</p>
+        <p class="how">Rules first. The model only for leftovers.</p>
+      </div>
+      <div class="card step">
+        <span class="idx">STEP 4</span>
+        <span class="verb">Compare</span>
+        <p class="what">Diff values and types for every JSON path.</p>
+        <p class="how">Rounding, counts and pagination: never the model.</p>
+      </div>
+      <div class="card step">
+        <span class="idx">STEP 5</span>
+        <span class="verb">Taste</span>
+        <p class="what">Label each difference intended, regression or unsure.</p>
+        <p class="how">Against your intent note, with a probability.</p>
+      </div>
+    </div>
+    <div class="io push"><span><strong>In:</strong> two base URLs, two OpenAPI specs, one paragraph of intent</span><span><strong>Out:</strong> a short report in the terminal or the browser</span></div>
+    <aside class="notes">Keep this quick. The point: the model only does the two jobs that need judgement, matching leftovers and tasting. Everything else is deterministic.</aside>
+  </section>
+
+  <!-- 7 -->
+  <section class="slide" id="s8" aria-label="Demo">
+    <span class="lot">LOT 08</span>
+    <p class="eyebrow">The tasting · demo</p>
+    <h2>10 differences in. 4 for a human.</h2>
+    <div class="cols c-demo">
+      <div style="display:flex; flex-direction:column; gap: calc(var(--u) * 22)">
+        <div class="strip" role="img" aria-label="10 differences: 2 noise, 4 intended, 3 regressions, 1 unsure">
+          <span class="cell noise"></span><span class="cell noise"></span>
+          <span class="cell ok"></span><span class="cell ok"></span><span class="cell ok"></span><span class="cell ok"></span>
+          <span class="cell bad"></span><span class="cell bad"></span><span class="cell bad"></span>
+          <span class="cell huh"></span>
+        </div>
+        <div class="legend">
+          <span><i style="border: 2px dashed var(--dust)"></i><b>2</b> strained as noise</span>
+          <span><i style="background: var(--cardamom)"></i><b>4</b> intended, accepted</span>
+          <span><i style="background: var(--chili)"></i><b>3</b> regressions</span>
+          <span><i style="background: var(--clove)"></i><b>1</b> unsure</span>
+        </div>
+        <div class="big4"><span class="n4">4</span><span class="t4">items for the engineer to read</span></div>
+      </div>
+      <div class="lots">
+        <div class="lotcard"><span class="path">GET /orders/{id} · $.total</span><span class="pill">Regression</span><span class="desc">10.01 became 10.00. 10.005 can't be stored exactly as a float.</span></div>
+        <div class="lotcard"><span class="path">GET /orders?page=2</span><span class="pill">Regression</span><span class="desc">The last page comes back empty. Off by one.</span></div>
+        <div class="lotcard"><span class="path">GET /customers/{id} · $.currency</span><span class="pill">Regression</span><span class="desc">Missing for one customer type.</span></div>
+        <div class="lotcard unsure"><span class="path">GET /orders/{id} · not found</span><span class="pill unsure">Unsure</span><span class="desc">The error message was reworded. The intent note doesn't say.</span></div>
+        <p class="found"><span class="pill ok">Found</span> without being told: <code>/customers/{id}</code> → <code>/clients/{clientId}</code></p>
+      </div>
+    </div>
+    <p class="source push">Expected result from the answer key on our toy APIs. Live run: Swagger Petstore v2 → v3, two real public APIs.</p>
+    <aside class="notes">Switch to the live demo here. Run the toy APIs first, open one regression, then run Petstore v2 against v3.</aside>
+  </section>
+
+  <!-- 8 -->
+  <section class="slide" id="s9" aria-label="Trust">
+    <span class="lot">LOT 09</span>
+    <p class="eyebrow">Why trust it</p>
+    <h2>Every verdict shows how sure it is</h2>
+    <div class="cols c2">
+      <div class="card"><span class="k">A real probability</span><p class="body">Each label is read from the model's token probabilities, not a confidence score it makes up.</p></div>
+      <div class="card"><span class="k">Higher bars where mistakes cost more</span><p class="body"><span class="mono hl">p ≥ 0.95</span> to accept a mapping. <span class="mono hl">p ≥ 0.98</span> to accept a difference as intended. Regressions are never dismissed automatically.</p></div>
+      <div class="card"><span class="k">Numbers stay deterministic</span><p class="body">Rounding, counts and pagination are caught by the differ. The model never judges them.</p></div>
+      <div class="card"><span class="k">Scored on every run</span><p class="body">Each run is checked against an answer key, and the score is on screen.</p></div>
+    </div>
+    <p class="small push">We tested before we built: 66 model calls for about US$0.006. Yes/no questions rejected correct renames (p = 0.0017), so nParity asks multiple-choice questions.</p>
+    <aside class="notes">Anticipate "why trust the AI?". The thresholds are the answer: the costlier the mistake, the higher the bar.</aside>
+  </section>
+
+  <!-- 9 -->
+  <section class="slide" id="s10" aria-label="Alternatives and why now">
+    <span class="lot">LOT 10</span>
+    <p class="eyebrow">Alternatives · why now</p>
+    <h2 style="max-width: 32ch">Replay tools show what differs. We say whether it was meant.</h2>
+    <div class="cols c-split">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Option</th><th>Replays &amp; compares</th><th>Strains noise</th><th>Matches renames</th><th>Judges intent</th></tr></thead>
+          <tbody>
+            <tr><td>Hand-built harness</td><td>Rebuilt per migration</td><td>If you write the rules</td><td class="n">No</td><td>By hand</td></tr>
+            <tr><td>Twitter Diffy</td><td class="y">Yes</td><td class="y">Yes</td><td class="n">No</td><td class="n">No</td></tr>
+            <tr><td>GitHub Scientist</td><td>Code paths in one app</td><td>Your own rules</td><td class="n">No</td><td class="n">No</td></tr>
+            <tr><td>Speedscale, Keploy</td><td class="y">Yes</td><td>Varies</td><td class="n">Not stated</td><td class="n">Not stated</td></tr>
+            <tr class="us"><td>nParity</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes, with a probability</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <span class="k">Why now</span>
+        <ul class="ticks" style="font-size: inherit">
+          <li style="font-size: calc(var(--u) * 18)">One verdict costs about <strong>US$0.00007</strong> and takes 0.6 s, measured on DeepSeek Flash.</li>
+          <li style="font-size: calc(var(--u) * 18)">AI coding tools make rewrites cheaper, so more teams face a cutover. <span class="todo">to test</span></li>
+          <li style="font-size: calc(var(--u) * 18)">The best-known open-source option, Diffy, now sits in Twitter's archive.</li>
+        </ul>
+      </div>
+    </div>
+    <aside class="notes">"Isn't this Diffy or Scientist?" Answer: they diff. We match, strain and judge against stated intent, with confidence.</aside>
+  </section>
+
+  <!-- 10 -->
+  <section class="slide" id="s11" aria-label="Market">
+    <span class="lot">LOT 11</span>
+    <p class="eyebrow">Market</p>
+    <h2>A slice of every modernisation</h2>
+    <div class="cols c2">
+      <div>
+        <div class="bars" role="img" aria-label="Application modernisation services: US$22.7bn in 2025, projected US$51.5bn in 2031">
+          <div class="bar"><span class="val">$22.7bn</span><span class="fill" style="height: 44.1%"></span><span class="yr">2025</span></div>
+          <div class="bar"><span class="val">$51.5bn</span><span class="fill proj" style="height: 100%"></span><span class="yr">2031 · projected</span></div>
+        </div>
+        <p class="source" style="margin-top: calc(var(--u) * 14)">Application modernisation services, 14.6% a year. MarketsandMarkets.</p>
+      </div>
+      <div style="display:flex; flex-direction:column; gap: calc(var(--u) * 14); justify-content:flex-end">
+        <span class="stat">74%</span>
+        <p class="body">of organisations that started a legacy modernisation failed to complete it.</p>
+        <p class="source">Advanced, 2020.</p>
+        <p class="callout" style="margin-top: calc(var(--u) * 20)">Our wedge: the parity check, run from the first prototype through cutover.</p>
+      </div>
+    </div>
+    <aside class="notes">Don't oversell the big number. Our market is the verification step inside it. Stage 3 will size that slice.</aside>
+  </section>
+
+  <!-- 11 -->
+  <section class="slide" id="s12" aria-label="Business model">
+    <span class="lot">LOT 12</span>
+    <p class="eyebrow">Business model · stage 3</p>
+    <h2>Priced against the cost of one production regression</h2>
+    <div class="cols c2">
+      <div class="card"><span class="k">Who pays</span><p class="body">The engineering manager who signs off cutovers.</p></div>
+      <div class="card"><span class="k">Pricing unit</span><p class="body">Per migration or per repo. <span class="todo">decide</span></p></div>
+      <div class="card"><span class="k">Price</span><p class="body"><span class="todo">to fill</span></p></div>
+      <div class="card"><span class="k">Cost to run</span><p class="body">Cents per run in model fees. Target under US$0.01 on the toy run.</p></div>
+    </div>
+    <p class="callout push">Value anchor: one production regression costs <span class="todo">to fill from interviews</span>. A run costs cents.</p>
+    <aside class="notes">Placeholder slide. Temba fills this in Stage 3.</aside>
+  </section>
+
+  <!-- 12 -->
+  <section class="slide" id="s13" aria-label="Success and scope">
+    <span class="lot">LOT 13</span>
+    <p class="eyebrow">Success · scope</p>
+    <h2>Friday's bar</h2>
+    <div class="cols c3">
+      <div>
+        <h3 style="margin-bottom: calc(var(--u) * 14)">Targets</h3>
+        <ul class="ticks metric">
+          <li>10/10 against the answer key</li>
+          <li>0 regressions dismissed automatically</li>
+          <li>0 false regressions</li>
+          <li>4 or fewer items to read</li>
+          <li>Whole run under 60 s</li>
+          <li>Under US$0.01 in model fees</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="margin-bottom: calc(var(--u) * 14)">In scope</h3>
+        <ul class="ticks">
+          <li>JSON over HTTP</li>
+          <li>OpenAPI specs on both sides</li>
+          <li>Request and response behaviour</li>
+          <li>Before, during and after the project</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="margin-bottom: calc(var(--u) * 14)">Out of scope</h3>
+        <ul class="ticks out">
+          <li>Vendor swaps where the flow changes</li>
+          <li>Database side effects</li>
+          <li>UI</li>
+          <li>Performance</li>
+        </ul>
+      </div>
+    </div>
+    <aside class="notes">Read the targets as promises we test live. Out of scope is a choice, not a gap.</aside>
+  </section>
+
+  <!-- 13 -->
+  <section class="slide s-title" id="s14" aria-label="Close">
+    <span class="lot">LOT 14</span>
+    <div class="title-grid">
+      <div>
+        <p class="eyebrow">nParity</p>
+        <p class="quote" style="margin-top: calc(var(--u) * 12)">Will we break anything? <span class="hl">Know before it ships.</span></p>
+        <p class="body" style="margin-top: calc(var(--u) * 22)">The same engine runs in your CI on every pull request, on whichever model your company has approved.</p>
+        <p class="body" style="margin-top: calc(var(--u) * 16)">Our ask: <span class="todo">to fill</span></p>
+        <div class="team"><span><b>Gerdi Olivier</b></span><span><b>Stephen Metcalfe</b></span><span><b>Temba Mazingi</b></span><span class="mono">Team Chai-GPT</span></div>
+      </div>
+      <div class="cup-wrap" aria-hidden="true">
+        <svg class="cup" viewBox="0 0 260 300" role="img">
+          <g class="steam">
+            <path d="M100 96 C 86 76, 112 62, 98 38"/>
+            <path d="M132 92 C 118 70, 146 56, 130 28"/>
+            <path d="M164 96 C 150 76, 176 62, 162 40"/>
+          </g>
+          <path d="M40 124 L220 124 L196 268 Q130 284 64 268 Z" fill="var(--clay)"/>
+          <path d="M196 268 Q130 284 64 268 L70 246 Q130 262 190 246 Z" fill="var(--clay-2)" opacity=".35"/>
+          <ellipse cx="130" cy="124" rx="90" ry="16" fill="var(--clay-2)"/>
+          <ellipse cx="130" cy="126" rx="78" ry="11" fill="var(--chai)"/>
+        </svg>
+      </div>
+    </div>
+    <aside class="notes">Close on the CI line, then the ask. Questions.</aside>
+  </section>
+</main>
+
+<nav class="nav" aria-label="Slide controls">
+  <button type="button" id="prev" aria-label="Previous slide">←</button>
+  <button type="button" id="next" aria-label="Next slide">→</button>
+  <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+  <span class="count" id="count">1 / 14</span>
+  <button type="button" id="notesBtn" aria-pressed="false" title="Speaker notes (N)">Notes</button>
+  <button type="button" id="fsBtn" title="Full screen (F)">Full screen</button>
+</nav>
+<div class="notes-panel" id="notesPanel" hidden><span class="k">Speaker notes</span><span id="notesText"></span></div>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var total = slides.length;
+  var idx = 0;
+  var notesOn = false;
+  var NAV_H = 48;
+
+  function fit() {
+    var w = window.innerWidth, h = window.innerHeight;
+    var present = w >= 760 && h >= 420;
+    root.classList.toggle('is-present', present);
+    var u = present ? Math.min(w / 1280, (h - NAV_H) / 720) : Math.max(0.5, Math.min(1, (w - 32) / 640));
+    root.style.setProperty('--u', u.toFixed(4) + 'px');
+  }
+
+  function show(i) {
+    idx = Math.max(0, Math.min(total - 1, i));
+    slides.forEach(function (s, k) {
+      var on = k === idx;
+      s.classList.toggle('is-active', on);
+      s.setAttribute('aria-hidden', root.classList.contains('is-present') && !on ? 'true' : 'false');
+    });
+    document.getElementById('count').textContent = (idx + 1) + ' / ' + total;
+    document.getElementById('bar').style.width = ((idx + 1) / total * 100) + '%';
+    var n = slides[idx].querySelector('.notes');
+    document.getElementById('notesText').textContent = n ? n.textContent : '';
+    try { history.replaceState(null, '', '#s' + (idx + 1)); } catch (e) {}
+  }
+
+  function fromHash() {
+    var m = /^#s(\d+)$/.exec(location.hash || '');
+    return m ? parseInt(m[1], 10) - 1 : 0;
+  }
+
+  function toggleNotes() {
+    notesOn = !notesOn;
+    document.getElementById('notesPanel').hidden = !notesOn;
+    document.getElementById('notesBtn').setAttribute('aria-pressed', String(notesOn));
+  }
+
+  function toggleFs() {
+    try {
+      if (document.fullscreenElement) { document.exitFullscreen(); }
+      else if (root.requestFullscreen) { root.requestFullscreen().catch(function () {}); }
+    } catch (e) {}
+  }
+
+  document.getElementById('prev').addEventListener('click', function () { show(idx - 1); });
+  document.getElementById('next').addEventListener('click', function () { show(idx + 1); });
+  document.getElementById('notesBtn').addEventListener('click', toggleNotes);
+  document.getElementById('fsBtn').addEventListener('click', toggleFs);
+
+  document.addEventListener('keydown', function (e) {
+    if (!root.classList.contains('is-present')) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var k = e.key;
+    if (k === 'ArrowRight' || k === 'ArrowDown' || k === 'PageDown' || k === ' ') { e.preventDefault(); show(idx + 1); }
+    else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp') { e.preventDefault(); show(idx - 1); }
+    else if (k === 'Home') { e.preventDefault(); show(0); }
+    else if (k === 'End') { e.preventDefault(); show(total - 1); }
+    else if (k === 'n' || k === 'N') { toggleNotes(); }
+    else if (k === 'f' || k === 'F') { toggleFs(); }
+  });
+
+  window.addEventListener('hashchange', function () { show(fromHash()); });
+  window.addEventListener('resize', function () { fit(); show(idx); });
+
+  fit();
+  show(fromHash());
+})();
+</script>
+</body>
+</html>
