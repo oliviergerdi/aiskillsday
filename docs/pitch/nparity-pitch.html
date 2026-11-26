@@ -502,9 +502,149 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     </div>
     <aside class="notes">Alternatives are compared on four things: replay and compare, noise removal, matching renamed endpoints and fields, and judging intent. Diffy is archived. Speedscale and Keploy do not state that they match renames or judge intent. The cost of about US$0.0001 per verdict is at Fireworks list price. The market is not sized yet (see the appendix).</aside>
   </section>
-  <section class="slide s-compact" id="s6" aria-label="How it works">
+  <section class="slide" id="s6" aria-label="Success and scope">
     <span class="lot">LOT 06</span>
-    <p class="eyebrow">How it works</p>
+    <p class="eyebrow">Success · scope</p>
+    <h2>Demo targets</h2>
+    <div class="cols c3">
+      <div>
+        <h3 class="list-head">Default targets</h3>
+        <ul class="ticks metric">
+          <li><span>10/10 against the answer key</span></li>
+          <li><span>0 regressions dismissed automatically</span></li>
+          <li><span>0 false regressions</span></li>
+          <li><span>4 or fewer items to read</span></li>
+          <li><span>Whole run under 60 s</span></li>
+          <li><span>Under US$0.01 in model fees</span></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="list-head">In scope</h3>
+        <ul class="ticks">
+          <li><span>JSON over HTTP</span></li>
+          <li><span>OpenAPI specs. Docs or samples <span class="todo">in progress</span></span></li>
+          <li><span>Request and response behaviour</span></li>
+          <li><span>Before and during the migration</span></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="list-head">Out of scope</h3>
+        <ul class="ticks out">
+          <li><span>Implementing the migration</span></li>
+          <li><span>Database side effects</span></li>
+          <li><span>Performance</span></li>
+        </ul>
+      </div>
+    </div>
+    <aside class="notes">Targets for the demo prototype. Users can change the targets per run (specified in PRD 0006). The safety rules cannot be changed: no regression is dismissed automatically, static mode never labels a difference 'regression', and every item cites its source. Out of scope: implementing the migration, database side effects, performance.</aside>
+  </section>
+  <section class="slide s-compact" id="s7" aria-label="Demo">
+    <span class="lot">LOT 07</span>
+    <p class="eyebrow">The tasting · demo</p>
+    <h2 class="wide">10 differences in. 4 for a human.</h2>
+    <div class="cols c-gold-r">
+      <div class="tasting">
+        <div class="strip" role="img" aria-label="10 differences: 2 noise, 4 intended, 3 regressions, 1 unsure">
+          <span class="cell noise"></span><span class="cell noise"></span>
+          <span class="cell ok"></span><span class="cell ok"></span><span class="cell ok"></span><span class="cell ok"></span>
+          <span class="cell bad"></span><span class="cell bad"></span><span class="cell bad"></span>
+          <span class="cell huh"></span>
+        </div>
+        <div class="legend">
+          <span><i style="border: 2px dashed var(--dust)"></i><b>2</b>&nbsp;noise</span>
+          <span><i style="background: var(--cardamom)"></i><b>4</b>&nbsp;intended</span>
+          <span><i style="background: var(--chili)"></i><b>3</b>&nbsp;regressions</span>
+          <span><i style="background: var(--clove)"></i><b>1</b>&nbsp;unsure</span>
+        </div>
+        <div class="big4"><span class="n4">4</span><span class="t4">items for the engineer to read</span></div>
+      </div>
+      <div class="lots">
+        <div class="lotcard"><span class="path">GET /orders/{id} · $.total</span><span class="pill">Regression</span><span class="desc">A total of 10.005 now rounds to 10.00, not 10.01. 10.005 can't be stored exactly as a float.</span></div>
+        <div class="lotcard"><span class="path">GET /orders?page=2</span><span class="pill">Regression</span><span class="desc">The last page comes back empty. Off by one.</span></div>
+        <div class="lotcard"><span class="path">GET /customers/{id} · $.currency</span><span class="pill">Regression</span><span class="desc">Missing for one customer type.</span></div>
+        <div class="lotcard unsure"><span class="path">GET /orders/{id} · not found</span><span class="pill unsure">Unsure</span><span class="desc">The error message was reworded. The intent note doesn't say whether that's allowed.</span></div>
+        <p class="found"><span class="pill ok">Found</span> without being told: <code>/customers/{id}</code> → <code>/clients/{clientId}</code></p>
+      </div>
+    </div>
+    <p class="source push">Expected result from the answer key on our toy APIs. Live run: Swagger Petstore v2 → v3, two real public APIs.</p>
+    <aside class="notes">Demo on two API pairs: toy services scored against an answer key (10 differences: noise, intended, regression, unsure), and Swagger Petstore v2 to v3 (saved run: 20 endpoints compared on the contract, 5 also with live calls, 3 findings: 1 unsure, 2 intended, 1 server error from the public v3 server, about 5 seconds). The two public servers run on separate databases, so the intent note says record values differ and nParity treats those as data, not API change. The result on the slide is the expected result from the answer key. Wikipedia and Open Food Facts samples are saved in samples/api-versions/ for offline use.</aside>
+  </section>
+  <section class="slide s-compact" id="s8" aria-label="Value and cost">
+    <span class="lot">LOT 08</span>
+    <p class="eyebrow">Value and cost · stage 3</p>
+    <h2 class="wide">About 95 engineering hours saved per migration, for about US$4 to run</h2>
+    <div class="cols c-gold">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Per migration</th><th>Value</th><th>Basis</th></tr></thead>
+          <tbody>
+            <tr><td>Manual parity passes</td><td>100 h</td><td>5 passes x 20 h (illustrative)</td></tr>
+            <tr><td>With nParity</td><td>5 h</td><td>5 passes x 1 h (assumed)</td></tr>
+            <tr class="us"><td>Labour saved</td><td>95 h · US$3,800</td><td>US$40/h loaded</td></tr>
+            <tr class="us"><td>Cost to run</td><td>US$4.40 · 0.1% of saving</td><td>Model US$3.30, compute and storage US$1.10</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <span class="k">Why it holds</span>
+        <ul class="ticks">
+          <li><span>An internal tool. No price, no sale.</span></li>
+          <li><span>Cautious case (10 h, 3 passes) still saves <strong>US$1,080</strong>.</span></li>
+          <li><span>Model price ten times higher: US$33 a migration.</span></li>
+          <li><span>Not counted: incidents, customer impact, a regression caught early (12 h, US$480).</span></li>
+        </ul>
+      </div>
+    </div>
+    <p class="callout push">The number to firm up is the manual baseline. We have not timed it yet.</p>
+    <aside class="notes">The case is internal: engineer time saved, not revenue. A manual parity pass is about 20 h (illustrative: 200 endpoints x 3 samples x 2 minutes). With nParity about 1 h (assumed). Five passes per migration (assumed) at US$40/h loaded senior cost (assumed): 95 h, US$3,800. Cost to run: model US$3.30 (10 runs of 1,000 findings at list price, tokens measured on 111 Flash calls), compute US$0.10, storage US$1 (assumed). The manual baseline has not been timed. Scenarios and the build payback are in the appendix. Model: docs/costing/business_case.py</aside>
+  </section>
+  <section class="slide s-compact" id="s9" aria-label="Risks">
+    <span class="lot">LOT 09</span>
+    <p class="eyebrow">Risk and sensitivity · stage 3</p>
+    <h2 class="wide">What if we are wrong?</h2>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Risk</th><th>If it happens</th><th>Our answer</th></tr></thead>
+        <tbody>
+          <tr><td>Accuracy too low</td><td>Engineers stop trusting it</td><td>Unsure bucket. No regression is dismissed automatically. Every verdict shows its source.</td></tr>
+          <tr><td>No logprobs on the model route</td><td>No real probability. Vote sampling, about US$11 a migration</td><td>Run the CLI on any logprobs model. Label votes as uncalibrated.</td></tr>
+          <tr><td>Model price ten times higher</td><td>US$33 a migration, under 1% of the saving</td><td>Cache repeat questions, switch engine.</td></tr>
+          <tr><td>Client data reaches a model host</td><td>Compliance refuses it</td><td>Use an approved model. Redaction before model calls is specified, not built.</td></tr>
+          <tr><td>Saving smaller than estimated</td><td>The manual baseline is untimed</td><td>Time one manual pass. At 10 h and 3 passes it still saves about US$1,100.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="callout push">Run cost is under 1% of the saving even if the model costs ten times more. The estimate to check is the manual baseline.</p>
+    <aside class="notes">Five risks: accuracy, no token probabilities on the model route, model price, client data reaching a model host, and a smaller saving than estimated. Costs per migration: vote sampling about US$11 (10 runs of 1,000 findings at US$0.00113 a finding); model price ten times higher US$33. The model route (DeepSeek Flash via Bedrock, served by Fireworks) is stated but not verified for token probabilities or price. Redaction before model calls is specified in PRD 0007 and not built.</aside>
+  </section>
+  <section class="slide s-title" id="s10" aria-label="Close">
+    <span class="lot">LOT 10</span>
+    <div class="title-grid">
+      <div class="title-copy">
+        <p class="eyebrow">nParity</p>
+        <p class="quote">Know what changed. <span class="hl">Know what broke.</span></p>
+        <p class="lead"><strong>Know before you build.</strong> The same engine runs before and during the migration, on whichever model your company has approved.</p>
+        <div class="team"><span><b>Gerdi Olivier</b></span><span><b>Stephen Metcalfe</b></span><span><b>Temba Mazingi</b></span><span class="mono">Team Chai-GPT</span></div>
+      </div>
+      <div class="cup-wrap" aria-hidden="true">
+        <svg class="cup" viewBox="0 0 260 300">
+          <g class="steam">
+            <path d="M100 96 C 86 76, 112 62, 98 38"/>
+            <path d="M132 92 C 118 70, 146 56, 130 28"/>
+            <path d="M164 96 C 150 76, 176 62, 162 40"/>
+          </g>
+          <path d="M40 124 L220 124 L196 268 Q130 284 64 268 Z" fill="var(--clay)"/>
+          <path d="M196 268 Q130 284 64 268 L70 246 Q130 262 190 246 Z" fill="var(--clay-2)" opacity=".35"/>
+          <ellipse cx="130" cy="124" rx="90" ry="16" fill="var(--clay-2)"/>
+          <ellipse cx="130" cy="126" rx="78" ry="11" fill="var(--chai)"/>
+        </svg>
+      </div>
+    </div>
+    <aside class="notes">The same engine runs before and during a migration, on any approved model that returns token probabilities. Authorization-token support for authenticated APIs is not built and is a release requirement.</aside>
+  </section>
+  <section class="slide s-compact" id="s11" aria-label="How it works">
+    <span class="lot">LOT 11</span>
+    <p class="eyebrow">Appendix · How it works</p>
     <h2 class="wide">Steep, strain, match, compare, taste</h2>
     <div class="cols c5">
       <div class="card step">
@@ -541,76 +681,9 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     <div class="io push"><span><strong>In:</strong> two API URLs, two OpenAPI specs and an intent note.</span><span><strong>Out:</strong> a short report in the terminal or the browser</span></div>
     <aside class="notes">Five steps: replay, strain (fixed rules, no model), match (rules first, the model only for leftovers), compare (deterministic differ), taste (the model labels each difference against the intent note). The model does only two jobs: matching leftovers and tasting. Not built: grouping multi-call flows into one step (PRD 0005) and documentation pages as input (PRD 0006). A contract-only mode and sample-request checks are available in the CLI.</aside>
   </section>
-  <section class="slide" id="s7" aria-label="Success and scope">
-    <span class="lot">LOT 07</span>
-    <p class="eyebrow">Success · scope</p>
-    <h2>Demo targets</h2>
-    <div class="cols c3">
-      <div>
-        <h3 class="list-head">Default targets</h3>
-        <ul class="ticks metric">
-          <li><span>10/10 against the answer key</span></li>
-          <li><span>0 regressions dismissed automatically</span></li>
-          <li><span>0 false regressions</span></li>
-          <li><span>4 or fewer items to read</span></li>
-          <li><span>Whole run under 60 s</span></li>
-          <li><span>Under US$0.01 in model fees</span></li>
-        </ul>
-      </div>
-      <div>
-        <h3 class="list-head">In scope</h3>
-        <ul class="ticks">
-          <li><span>JSON over HTTP</span></li>
-          <li><span>OpenAPI specs. Docs or samples <span class="todo">in progress</span></span></li>
-          <li><span>Request and response behaviour</span></li>
-          <li><span>Before and during the migration</span></li>
-        </ul>
-      </div>
-      <div>
-        <h3 class="list-head">Out of scope</h3>
-        <ul class="ticks out">
-          <li><span>Implementing the migration</span></li>
-          <li><span>Database side effects</span></li>
-          <li><span>Performance</span></li>
-        </ul>
-      </div>
-    </div>
-    <aside class="notes">Targets for the demo prototype. Users can change the targets per run (specified in PRD 0006). The safety rules cannot be changed: no regression is dismissed automatically, static mode never labels a difference 'regression', and every item cites its source. Out of scope: implementing the migration, database side effects, performance.</aside>
-  </section>
-  <section class="slide s-compact" id="s8" aria-label="Demo">
-    <span class="lot">LOT 08</span>
-    <p class="eyebrow">The tasting · demo</p>
-    <h2 class="wide">10 differences in. 4 for a human.</h2>
-    <div class="cols c-gold-r">
-      <div class="tasting">
-        <div class="strip" role="img" aria-label="10 differences: 2 noise, 4 intended, 3 regressions, 1 unsure">
-          <span class="cell noise"></span><span class="cell noise"></span>
-          <span class="cell ok"></span><span class="cell ok"></span><span class="cell ok"></span><span class="cell ok"></span>
-          <span class="cell bad"></span><span class="cell bad"></span><span class="cell bad"></span>
-          <span class="cell huh"></span>
-        </div>
-        <div class="legend">
-          <span><i style="border: 2px dashed var(--dust)"></i><b>2</b>&nbsp;noise</span>
-          <span><i style="background: var(--cardamom)"></i><b>4</b>&nbsp;intended</span>
-          <span><i style="background: var(--chili)"></i><b>3</b>&nbsp;regressions</span>
-          <span><i style="background: var(--clove)"></i><b>1</b>&nbsp;unsure</span>
-        </div>
-        <div class="big4"><span class="n4">4</span><span class="t4">items for the engineer to read</span></div>
-      </div>
-      <div class="lots">
-        <div class="lotcard"><span class="path">GET /orders/{id} · $.total</span><span class="pill">Regression</span><span class="desc">A total of 10.005 now rounds to 10.00, not 10.01. 10.005 can't be stored exactly as a float.</span></div>
-        <div class="lotcard"><span class="path">GET /orders?page=2</span><span class="pill">Regression</span><span class="desc">The last page comes back empty. Off by one.</span></div>
-        <div class="lotcard"><span class="path">GET /customers/{id} · $.currency</span><span class="pill">Regression</span><span class="desc">Missing for one customer type.</span></div>
-        <div class="lotcard unsure"><span class="path">GET /orders/{id} · not found</span><span class="pill unsure">Unsure</span><span class="desc">The error message was reworded. The intent note doesn't say whether that's allowed.</span></div>
-        <p class="found"><span class="pill ok">Found</span> without being told: <code>/customers/{id}</code> → <code>/clients/{clientId}</code></p>
-      </div>
-    </div>
-    <p class="source push">Expected result from the answer key on our toy APIs. Live run: Swagger Petstore v2 → v3, two real public APIs.</p>
-    <aside class="notes">Demo on two API pairs: toy services scored against an answer key (10 differences: noise, intended, regression, unsure), and Swagger Petstore v2 to v3 (saved run: 20 endpoints compared on the contract, 5 also with live calls, 3 findings: 1 unsure, 2 intended, 1 server error from the public v3 server, about 5 seconds). The two public servers run on separate databases, so the intent note says record values differ and nParity treats those as data, not API change. The result on the slide is the expected result from the answer key. Wikipedia and Open Food Facts samples are saved in samples/api-versions/ for offline use.</aside>
-  </section>
-  <section class="slide s-compact" id="s9" aria-label="Trust">
-    <span class="lot">LOT 09</span>
-    <p class="eyebrow">Why trust it</p>
+  <section class="slide s-compact" id="s12" aria-label="Trust">
+    <span class="lot">LOT 12</span>
+    <p class="eyebrow">Appendix · Why trust it</p>
     <h2>Every verdict shows how sure it is</h2>
     <div class="cols c2">
       <div class="card"><span class="k">A real probability</span><p class="body">Each verdict is read from the model's token probabilities, not a score the model makes up.</p></div>
@@ -621,9 +694,9 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     <p class="body push">We tested before we built: 66 model calls for about US$0.006. Yes/no questions rejected correct renames (the model gave a correct rename a 0.17% chance), so nParity asks multiple-choice questions.</p>
     <aside class="notes">Each verdict is read from the model's token probabilities (one-token calls, top 5), not a score the model writes. Thresholds: 0.95 to accept a match, 0.98 to accept a difference as intended. A regression is never dismissed automatically. Rounding, counts and pagination are decided by the differ, not the model. A model without token probabilities falls back to vote sampling, which is labelled uncalibrated.</aside>
   </section>
-  <section class="slide s-compact" id="s10" aria-label="AI agents">
-    <span class="lot">LOT 10</span>
-    <p class="eyebrow">Built for people and AI agents</p>
+  <section class="slide s-compact" id="s13" aria-label="AI agents">
+    <span class="lot">LOT 13</span>
+    <p class="eyebrow">Appendix · Built for people and AI agents</p>
     <h2 class="wide">An agent can run it, read it and act on it.</h2>
     <div class="cols c2">
       <div class="card"><span class="k">Machine-readable</span><ul class="ticks"><li><span><code>--format json</code>: one JSON document on stdout, errors on stderr.</span></li><li><span>Fixed exit codes. <code>--fail-on regression</code> exits 5, so an agent knows to stop and look.</span></li></ul></div>
@@ -634,51 +707,9 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     <p class="callout push">A developer tool. The agent does the fixing. nParity says where to look.</p>
     <aside class="notes">Same CLI and engine. The README section 'CLI automation' describes: --format json (one JSON document on stdout, errors on stderr), fixed exit codes, --compact, fetching a single finding, --detach with status polling, --dry-run, and --fail-on (exit code 5, so an agent knows to stop). Status: built and in the repository, not part of the live demo. It is a developer tool, not a CI build step.</aside>
   </section>
-  <section class="slide s-compact" id="s11" aria-label="Value to engineering">
-    <span class="lot">LOT 11</span>
-    <p class="eyebrow">Value to engineering · stage 3</p>
-    <h2>About 95 engineering hours saved per migration</h2>
-    <div class="cols c2">
-      <div class="card"><span class="k">Who benefits</span><p class="body">Engineers proving the new API behaves like the old one. Their manager signs off.</p></div>
-      <div class="card"><span class="k">How we offer it</span><p class="body">An internal tool. Runs on a laptop or internal host with an approved model. No sale.</p></div>
-      <div class="card"><span class="k">Where the saving comes from</span><p class="body">A manual parity pass takes about <strong>20 h</strong>. With nParity, about <strong>1 h</strong>. Five passes a migration saves <strong>95 h</strong>, about <strong>US$3,800</strong> at US$40/h.</p></div>
-      <div class="card"><span class="k">What one regression costs</span><p class="body">Unknown: someone must find it, fix it and redeploy. At 4 to 24 h that is <strong>US$160 to US$960</strong>.</p></div>
-    </div>
-    <p class="callout push">Not counted: incidents and customer impact.</p>
-    <aside class="notes">The case is internal: engineer time saved, not revenue. A manual parity pass is about 20 h (illustrative: 200 endpoints x 3 samples x 2 minutes). With nParity about 1 h (assumed). Five passes per migration (assumed) at US$40/h loaded senior cost (assumed): 95 h, US$3,800. The true cost of a regression is unknown, so it is priced as senior developer time (4, 12 or 24 hours). The manual baseline has not been timed. We considered selling it (Migration Pass, US$149); the numbers did not support an external sale, so the project is framed for internal use. Model: docs/costing/business_case.py</aside>
-  </section>
-  <section class="slide s-compact" id="s12" aria-label="Cost to run per migration">
-    <span class="lot">LOT 12</span>
-    <p class="eyebrow">Cost and unit economics · stage 3</p>
-    <h2 class="wide">About US$4 to run a migration. About US$3,800 saved.</h2>
-    <div class="cols c-gold">
-      <div class="tbl-wrap">
-        <table>
-          <thead><tr><th>Per migration</th><th>Value</th><th>Basis</th></tr></thead>
-          <tbody>
-            <tr><td>Manual parity passes</td><td>100 h</td><td>5 passes x 20 h (illustrative)</td></tr>
-            <tr><td>With nParity</td><td>5 h</td><td>5 passes x 1 h (assumed)</td></tr>
-            <tr class="us"><td>Labour saved</td><td>95 h · US$3,800</td><td>US$40/h loaded</td></tr>
-            <tr><td>Model, compute, storage</td><td>US$3.30 + 1.10</td><td>10 runs of 1,000 findings</td></tr>
-            <tr class="us"><td>Cost to run</td><td>US$4.40 · 0.1% of saving</td><td></td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="card">
-        <span class="k">Fixed and build</span>
-        <ul class="ticks">
-          <li><span><strong>Internal host about US$3 a month idle</strong>, or a laptop for free.</span></li>
-          <li><span><strong>The prototype exists.</strong> Taking PRDs 0005 to 0007 further costs US$19k to US$58k.</span></li>
-          <li><span>Model price ten times higher: US$33 a migration.</span></li>
-        </ul>
-      </div>
-    </div>
-    <p class="callout push">The model is not the cost. The engineer's hour is.</p>
-    <aside class="notes">Tokens are measured on 111 Flash calls. Prices are public list prices, not quotes. Assumptions: 10 runs of 1,000 findings per migration, compute US$0.10, storage US$1 (assumed), about US$3 a month idle serverless hosting if hosted internally (not checked against AWS pages), and a build of US$19k to US$58k (one engineer for 3 months, up to three) for PRDs 0005 to 0007. Run: python3 docs/costing/business_case.py</aside>
-  </section>
-  <section class="slide s-compact" id="s13" aria-label="Business case">
-    <span class="lot">LOT 13</span>
-    <p class="eyebrow">Business case · stage 3</p>
+  <section class="slide s-compact" id="s14" aria-label="Business case">
+    <span class="lot">LOT 14</span>
+    <p class="eyebrow">Appendix · Business case · stage 3</p>
     <h2 class="wide">Even the cautious case repays a build</h2>
     <div class="cols c-gold">
       <div class="tbl-wrap">
@@ -703,52 +734,8 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     <p class="callout push">The number to firm up is the manual baseline. We have not timed it yet.</p>
     <aside class="notes">Saved per migration is (manual hours - 1) x passes x US$40. Migrations to repay the lean build (US$19,200) are rounded up: 18, 6 and 2. The full build (US$57,600) takes 54, 16 and 5. The lean build covers PRDs 0005 to 0007 and is an upper bound for internal use, since the hosted service (PRD 0007) is only needed if the tool is offered outside the company. The base case is also the case on slide 11. Model: docs/costing/business_case.py</aside>
   </section>
-  <section class="slide s-compact" id="s14" aria-label="Risks">
-    <span class="lot">LOT 14</span>
-    <p class="eyebrow">Risk and sensitivity · stage 3</p>
-    <h2 class="wide">What if we are wrong?</h2>
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr><th>Risk</th><th>If it happens</th><th>Our answer</th></tr></thead>
-        <tbody>
-          <tr><td>Accuracy too low</td><td>Engineers stop trusting it</td><td>Unsure bucket. No regression is dismissed automatically. Every verdict shows its source.</td></tr>
-          <tr><td>No logprobs on the model route</td><td>No real probability. Vote sampling, about US$11 a migration</td><td>Run the CLI on any logprobs model. Label votes as uncalibrated.</td></tr>
-          <tr><td>Model price ten times higher</td><td>US$33 a migration, under 1% of the saving</td><td>Cache repeat questions, switch engine.</td></tr>
-          <tr><td>Client data reaches a model host</td><td>Compliance refuses it</td><td>Use an approved model. Redaction before model calls is specified, not built.</td></tr>
-          <tr><td>Saving smaller than estimated</td><td>The manual baseline is untimed</td><td>Time one manual pass. At 10 h and 3 passes it still saves about US$1,100.</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="callout push">Run cost is under 1% of the saving even if the model costs ten times more. The estimate to check is the manual baseline.</p>
-    <aside class="notes">Five risks: accuracy, no token probabilities on the model route, model price, client data reaching a model host, and a smaller saving than estimated. Costs per migration: vote sampling about US$11 (10 runs of 1,000 findings at US$0.00113 a finding); model price ten times higher US$33. The model route (DeepSeek Flash via Bedrock, served by Fireworks) is stated but not verified for token probabilities or price. Redaction before model calls is specified in PRD 0007 and not built.</aside>
-  </section>
-  <section class="slide s-title" id="s15" aria-label="Close">
+  <section class="slide" id="s15" aria-label="Before and during">
     <span class="lot">LOT 15</span>
-    <div class="title-grid">
-      <div class="title-copy">
-        <p class="eyebrow">nParity</p>
-        <p class="quote">Know what changed. <span class="hl">Know what broke.</span></p>
-        <p class="lead"><strong>Know before you build.</strong> The same engine runs before and during the migration, on whichever model your company has approved.</p>
-        <div class="team"><span><b>Gerdi Olivier</b></span><span><b>Stephen Metcalfe</b></span><span><b>Temba Mazingi</b></span><span class="mono">Team Chai-GPT</span></div>
-      </div>
-      <div class="cup-wrap" aria-hidden="true">
-        <svg class="cup" viewBox="0 0 260 300">
-          <g class="steam">
-            <path d="M100 96 C 86 76, 112 62, 98 38"/>
-            <path d="M132 92 C 118 70, 146 56, 130 28"/>
-            <path d="M164 96 C 150 76, 176 62, 162 40"/>
-          </g>
-          <path d="M40 124 L220 124 L196 268 Q130 284 64 268 Z" fill="var(--clay)"/>
-          <path d="M196 268 Q130 284 64 268 L70 246 Q130 262 190 246 Z" fill="var(--clay-2)" opacity=".35"/>
-          <ellipse cx="130" cy="124" rx="90" ry="16" fill="var(--clay-2)"/>
-          <ellipse cx="130" cy="126" rx="78" ry="11" fill="var(--chai)"/>
-        </svg>
-      </div>
-    </div>
-    <aside class="notes">The same engine runs before and during a migration, on any approved model that returns token probabilities. Authorization-token support for authenticated APIs is not built and is a release requirement.</aside>
-  </section>
-  <section class="slide" id="s16" aria-label="Before and during">
-    <span class="lot">LOT 16</span>
     <p class="eyebrow">Appendix · When it pays off</p>
     <h2 class="wide">Run nParity before and during the migration</h2>
     <div class="cols c2">
@@ -766,8 +753,8 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     <p class="callout push">Same engine, same report, from the first prototype to the cutover.</p>
     <aside class="notes">The value comes from asking early and often, not once at the end: 'will we break anything?' is answered before and during a migration, so you know what changed and what broke.</aside>
   </section>
-  <section class="slide s-compact" id="s17" aria-label="Why it hurts">
-    <span class="lot">LOT 17</span>
+  <section class="slide s-compact" id="s16" aria-label="Why it hurts">
+    <span class="lot">LOT 16</span>
     <p class="eyebrow">Appendix · Why it hurts today</p>
     <h2 class="wide">Three costs, every time you check</h2>
     <div class="cols c3">
@@ -790,8 +777,8 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     <p class="callout push">Petstore v2 to v3: <strong>3 findings</strong> to read across 20 endpoints. nParity took about <strong>5 seconds</strong>. By hand we estimate about <strong>2 hours</strong> <span class="todo">not yet timed</span>.</p>
     <aside class="notes">Measured: 3 findings (1 unsure, 2 intended) and 5.0 s, from the saved Petstore run (20 endpoints on the contract, 5 with live calls). An earlier run without the intent note about separate databases reported 39 differences, most of them data. Estimated, not timed: about 2 hours by hand (20 endpoints x 3 samples x 2 minutes per comparison, the model used in the problem definition). A timed manual baseline is still to do. Step 3, judging intent, is the part no tool we found automates.</aside>
   </section>
-  <section class="slide" id="s18" aria-label="Market">
-    <span class="lot">LOT 18</span>
+  <section class="slide" id="s17" aria-label="Market">
+    <span class="lot">LOT 17</span>
     <p class="eyebrow">Appendix · Market</p>
     <h2>A slice of every modernisation</h2>
     <div class="cols c2">
@@ -811,8 +798,8 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     </div>
     <aside class="notes">The large figure is a broad market. nParity's market is the verification step inside it, which has not been sized yet. The business case counts labour saved per migration instead (about US$3,800).</aside>
   </section>
-  <section class="slide s-compact" id="s19" aria-label="Cost to run">
-    <span class="lot">LOT 19</span>
+  <section class="slide s-compact" id="s18" aria-label="Cost to run">
+    <span class="lot">LOT 18</span>
     <p class="eyebrow">Appendix · Cost to run · stage 3</p>
     <h2 class="wide">Model fees are cents. The engine choice is about trust.</h2>
     <div class="cols c-gold">
@@ -839,9 +826,8 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     <p class="callout push">A 1,000-finding run costs about US$0.33 on Flash. Engineer time costs more than the model.</p>
     <aside class="notes">Engine choice affects trust more than cost. Jev and OpenAI Decisions return no reason; Bedrock serverless models do not return token probabilities. Tokens are measured on 111 Flash calls; prices are public list prices, not quotes; the Fireworks -us router price is unverified. Serverless hosting is about US$3 a month idle (assumed). Always-on containers cost US$50 to US$83 a month. Model: docs/costing/nparity-costing.md</aside>
   </section>
-
-  <section class="slide s-compact" id="s20" aria-label="Not built yet">
-    <span class="lot">LOT 20</span>
+  <section class="slide s-compact" id="s19" aria-label="Not built yet">
+    <span class="lot">LOT 19</span>
     <p class="eyebrow">Appendix · Specified, not built</p>
     <h2 class="wide">What we specified and did not get to</h2>
     <div class="tbl-wrap">
