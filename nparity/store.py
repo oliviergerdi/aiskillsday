@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 
 import yaml
 
@@ -16,7 +17,14 @@ def save(run: Run, dir: str | Path = DEFAULT_DIR) -> Path:
     d.mkdir(parents=True, exist_ok=True)
     path = d / f"{run.id}.yaml"
     data = run.model_dump(mode="json")
-    path.write_text(yaml.safe_dump(data, sort_keys=False, allow_unicode=True), encoding="utf-8")
+    tmp = NamedTemporaryFile(mode="w", encoding="utf-8", dir=d, delete=False)
+    pending = Path(tmp.name)
+    try:
+        with tmp:
+            yaml.safe_dump(data, tmp, sort_keys=False, allow_unicode=True)
+        pending.replace(path)
+    finally:
+        pending.unlink(missing_ok=True)
     return path
 
 

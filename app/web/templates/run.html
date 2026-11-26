@@ -5,7 +5,7 @@
 <div class="run-head">
   <div>
     <h1>{{ run.config.old }} → {{ run.config.new }}</h1>
-    <div class="sub">intent <code>{{ run.config.intent }}</code> · backend <span class="badge b-llm">{{ run.config.backend }}</span>
+    <div class="sub">{% if run.config.intent %}intent <code>{{ run.config.intent }}</code> · {% endif %}backend <span class="badge b-llm">{{ run.config.backend }}</span>
       · {{ run.config.requests }} requests across {{ run.config.endpoints }} endpoints</div>
   </div>
   <a href="/runs/{{ run.id }}/mapping">Mapping: {{ run.endpoints|length }} endpoints, {{ n_fields }} fields →</a>

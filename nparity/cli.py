@@ -12,7 +12,7 @@ from nparity import pipeline, store
 from nparity.tls import tls_verify
 from nparity.models import Run
 
-app = typer.Typer(add_completion=False, no_args_is_help=True, help="Did we break anything?")
+app = typer.Typer(add_completion=False, no_args_is_help=True, help="Will we break anything?")
 WEB = os.environ.get("NPARITY_WEB", "http://localhost:8000")
 
 

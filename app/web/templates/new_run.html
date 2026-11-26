@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}New run · nParity{% endblock %}
+{% block content %}
+<div class="run-head">
+  <h1>New comparison</h1>
+  <div class="run-presets" aria-label="Comparison presets">
+    <button type="button" class="run-button" data-preset="toy">Load toy demo</button>
+    <button type="button" class="run-button" data-preset="petstore">Load Petstore</button>
+  </div>
+</div>
+<form id="comparison-form" class="comparison-form">
+  <div class="source-grid">
+    {% for side in ["before", "after"] %}
+    <fieldset class="source-panel" data-side="{{ side }}">
+      <legend>{{ side|capitalize }}</legend>
+      <label for="{{ side }}-kind">Source type</label>
+      <select id="{{ side }}-kind" name="{{ side }}_kind">
+        <option value="api">API base URL</option>
+        <option value="spec">Swagger / OpenAPI</option>
+        <option value="manifest">JSON manifest</option>
+      </select>
+      <label for="{{ side }}-source">Source</label>
+      <input id="{{ side }}-source" name="{{ side }}_source" type="text" required
+             maxlength="4096" spellcheck="false" aria-describedby="{{ side }}-hint">
+      <small class="sub" id="{{ side }}-hint" data-source-hint></small>
+      <div class="run-field" data-base-field hidden>
+        <label for="{{ side }}-base">API base URL override <span class="sub">(optional)</span></label>
+        <input id="{{ side }}-base" name="{{ side }}_base" type="url" maxlength="4096"
+               placeholder="https://example.com/api" spellcheck="false" disabled>
+      </div>
+    </fieldset>
+    {% endfor %}
+  </div>
+  <details class="run-settings">
+    <summary>Run settings</summary>
+    <div class="source-grid">
+      <div class="run-field">
+        <label for="run-name">Name</label>
+        <input id="run-name" name="name" type="text" value="comparison" maxlength="50" pattern="[a-zA-Z0-9_\-]+">
+      </div>
+      <div class="run-field">
+        <label for="run-backend">Evaluator</label>
+        <select id="run-backend" name="backend">
+          <option value="fake">Fake (offline)</option>
+          <option value="flash">Flash (Fireworks)</option>
+        </select>
+      </div>
+      <div class="run-field">
+        <label for="run-seeds">Seeds file <span class="sub">(optional)</span></label>
+        <input id="run-seeds" name="seeds" type="text" maxlength="4096" placeholder="fixtures/petstore/seeds.yaml">
+        <small class="sub">The default seeds cover <code>id</code> and <code>page</code> on GET requests.</small>
+      </div>
+      <div class="run-field">
+        <label for="run-intent">Intent file <span class="sub">(optional)</span></label>
+        <input id="run-intent" name="intent" type="text" maxlength="4096" placeholder="fixtures/petstore/intent.md">
+      </div>
+    </div>
+  </details>
+  <button class="run-button primary" type="submit">Start comparison</button>
+</form>
+<section class="run-output" aria-labelledby="console-title" hidden>
+  <div class="run-head">
+    <h2 id="console-title">Run console</h2>
+    <span id="run-status" class="sub" role="status"></span>
+  </div>
+  <pre id="run-console" role="log" tabindex="0" aria-labelledby="console-title"></pre>
+  <a class="run-button primary" id="run-report" hidden>Open report</a>
+</section>
+<script src="/static/new-run.js" defer></script>
+{% endblock %}

@@ -26,7 +26,7 @@ Unchanged from the handoff: build Thu 26 Nov 09:15–17:00, demo Fri 27 Nov 10:0
 
 ## What nParity is
 
-nParity answers "did we break anything?" when a team rewrites a service. It sends the same requests to the old and new HTTP services, works out which differences matter, and shows how sure it is about each one. The users are backend engineers, and the managers who sign off on a cutover.
+nParity answers "Will we break anything?" when a team rewrites a service. It sends the same requests to the old and new HTTP services, works out which differences matter, and shows how sure it is about each one. The users are backend engineers, and the managers who sign off on a cutover.
 
 Answer to "isn't this Diffy or Scientist?": those tools replay and diff. nParity adds three things: it maps old to new when the shapes differ, it removes noise, and it triages each difference against stated intent, with a confidence a reviewer can act on. The reviewer reads a handful of items, not a wall of diffs.
 
@@ -148,7 +148,7 @@ Claude writes most of the code, with Gerdi driving and reviewing. Owners below a
 
 ## Demo story (5–10 minutes)
 
-1. The problem: a rewrite, hundreds of endpoints, "did we break anything?"
+1. The problem: a rewrite, hundreds of endpoints, "Will we break anything?"
 2. One click: 10 differences found, 2 removed as noise, 3 intended, 3 regressions, 1 unsure, 1 endpoint move discovered.
 3. Open a regression: request, both responses, reason, confidence.
 4. Show the score against the answer key, and the cost footer (cents for the whole run).

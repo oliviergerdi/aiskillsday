@@ -66,6 +66,30 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 
 /* run header */
 .run-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.runs-heading { margin-bottom: 18px; }
+.run-presets { display: flex; gap: 8px; flex-wrap: wrap; }
+.run-button { display: inline-block; padding: 7px 12px; border-radius: 6px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--ink); font: inherit; font-weight: 600; text-decoration: none; cursor: pointer; }
+.run-button.primary { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.run-button:hover { filter: brightness(0.92); }
+.run-button:disabled { opacity: 0.55; cursor: wait; }
+.comparison-form { display: grid; justify-items: start; gap: 16px; margin: 20px 0; }
+.source-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; gap: 16px; }
+.source-panel, .run-settings { min-width: 0; margin: 0; padding: 14px 16px; border: 1px solid var(--line);
+  border-radius: 8px; background: var(--surface); }
+.source-panel legend { padding: 0 6px; font-weight: 700; }
+.source-panel label, .run-field label { display: block; margin: 8px 0 4px; font-weight: 600; }
+.comparison-form input:not([type="checkbox"]), .comparison-form select { width: 100%; min-width: 0;
+  background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; font: inherit; }
+.comparison-form small { display: block; margin-top: 4px; }
+.run-settings { width: 100%; }
+.run-settings summary { cursor: pointer; font-weight: 600; }
+.run-settings .source-grid { margin-top: 8px; }
+.run-output { max-width: 100%; margin-top: 24px; }
+.run-output h2 { margin: 0; }
+#run-console { max-height: 240px; min-height: 100px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere;
+  margin: 8px 0 12px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--code-bg); }
+.run-output [hidden] { display: none; }
 .counts { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
 .count { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; border-top: 3px solid var(--line); }
 .count .n { font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
@@ -133,6 +157,7 @@ details.f > summary:hover { background: var(--code-bg); }
 .arrow { color: var(--muted); padding: 0 4px; }
 
 @media (max-width: 760px) {
+  .source-grid { grid-template-columns: 1fr; }
   .counts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   details.f > summary { grid-template-columns: 14px 1fr; }
   details.f > summary > :nth-child(n+3) { grid-column: 2; }

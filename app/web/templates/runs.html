@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Runs · nParity{% endblock %}
 {% block content %}
-<h1>Runs</h1>
-<p class="sub">Saved runs from <code>runs/*.yaml</code>. Start one from the terminal:
-  <code>poetry run python -m nparity.cli run --old … --new …</code></p>
+<div class="run-head runs-heading">
+  <h1>Runs</h1>
+  <a class="run-button primary" href="/compare">New run</a>
+</div>
 {% if not runs %}
 <div class="findings"><div class="empty">No runs yet.</div></div>
 {% else %}

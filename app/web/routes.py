@@ -1,21 +1,23 @@
-"""Web UI: view saved runs. No auth (prototype), no analysis (front ends only render a Run)."""
+"""Web UI for starting comparisons and viewing saved runs."""
 
 from __future__ import annotations
 
 from collections import defaultdict
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from app.web import views
+from app.web.run_jobs import RunInput, RunJobs
 from nparity import store
 from nparity.config import load_thresholds
 from nparity.models import Run
 
 TEMPLATES = Jinja2Templates(directory=Path(__file__).parent / "templates")
 router = APIRouter()
+jobs = RunJobs()
 
 
 def runs_dir(request: Request) -> Path:
@@ -31,6 +33,35 @@ def load(request: Request, run_id: str) -> Run:
 
 def thresholds(run: Run):
     return load_thresholds(backend_id=run.config.get("backend"))
+
+
+def local_run_request(request: Request) -> None:
+    origin = request.headers.get("origin")
+    expected = f"{request.url.scheme}://{request.url.netloc}"
+    local = request.client and request.client.host in {"127.0.0.1", "::1"}
+    if not local or request.url.hostname not in {"localhost", "127.0.0.1", "::1"} or (origin and origin != expected):
+        raise HTTPException(status_code=403, detail="Open nParity on localhost to start a comparison.")
+
+
+@router.get("/compare", response_class=HTMLResponse)
+def new_run(request: Request):
+    return TEMPLATES.TemplateResponse(request, "new_run.html", {"nav": "new"})
+
+
+@router.post("/run-jobs", status_code=202, dependencies=[Depends(local_run_request)])
+def start_run(request: Request, inputs: RunInput):
+    job_id = jobs.start(inputs, runs_dir(request))
+    if job_id is None:
+        raise HTTPException(status_code=409, detail="A comparison is already running. Try again when it finishes.")
+    return {"job_url": f"/run-jobs/{job_id}"}
+
+
+@router.get("/run-jobs/{job_id}", dependencies=[Depends(local_run_request)])
+def run_status(job_id: str):
+    job = jobs.status(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail="This run console is no longer available.")
+    return job
 
 
 @router.get("/", response_class=HTMLResponse)
