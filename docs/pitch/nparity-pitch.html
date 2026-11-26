@@ -120,6 +120,7 @@ html.is-present .slide.is-active {
   opacity: 1; visibility: visible; transform: none;
   transition: opacity .35s ease, transform .35s ease, visibility 0s;
 }
+html.is-present .slide.s-compact { padding-block: var(--s1); gap: var(--s-1); }
 @media (prefers-reduced-motion: reduce) {
   html.is-present .slide, html.is-present .slide.is-active { transition: none; transform: none; }
 }
@@ -385,7 +386,6 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
 <body>
 <main class="deck" id="deck" aria-label="nParity pitch deck">
 
-  <!-- 1 · title -->
   <section class="slide s-title" id="s1" aria-label="Title">
     <span class="lot">LOT 01</span>
     <div class="title-grid">
@@ -414,7 +414,6 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     <aside class="notes">Open with the question every engineer asks throughout an API migration. One line on who we are, then straight into the value proposition.</aside>
   </section>
 
-  <!-- 2 · value proposition -->
   <section class="slide" id="s2" aria-label="Value proposition">
     <span class="lot">LOT 02</span>
     <p class="eyebrow">Value proposition</p>
@@ -435,7 +434,6 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     <aside class="notes">Land this in the first minute. Every slide after this is evidence for it. Pause after "not whether it was intended".</aside>
   </section>
 
-  <!-- 3 · the moment -->
   <section class="slide" id="s3" aria-label="The moment">
     <span class="lot">LOT 03</span>
     <p class="eyebrow">The moment</p>
@@ -453,68 +451,15 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
       </div>
       <div class="card">
         <span class="k">Not for</span>
-        <h3>Vendor swaps</h3>
-        <p class="body">Moving to a vendor's new API where the flows change. Endpoint comparison stops working there.</p>
+        <h3>Implementation</h3>
+        <p class="body">Writing or running the migration. nParity shows where the differences are and where to focus.</p>
       </div>
     </div>
-    <aside class="notes">Name the user and the buyer. Say out loud what we are not for: our interview showed that when the flow changes, comparing endpoints breaks down.</aside>
+    <aside class="notes">Name the user and the buyer. Say out loud what we are not for: we find and rank the differences, we do not do the migration.</aside>
   </section>
 
-  <!-- 4 · before, during, after -->
-  <section class="slide" id="s4" aria-label="Before, during, after">
+  <section class="slide s-compact" id="s4" aria-label="Evidence">
     <span class="lot">LOT 04</span>
-    <p class="eyebrow">When it pays off</p>
-    <h2 class="wide">Run nParity before, during and after the migration</h2>
-    <div class="cols c3">
-      <div class="card">
-        <span class="k">Before</span>
-        <h3>Scope the change</h3>
-        <p class="body">Run the old API against an early prototype. See what will differ before you commit to a plan. Use the result to write the intent note.</p>
-      </div>
-      <div class="card">
-        <span class="k">During</span>
-        <h3>Catch drift early</h3>
-        <p class="body">Re-run it as the new API takes shape. A regression shows up at the next run, while it is cheap to fix.</p>
-      </div>
-      <div class="card">
-        <span class="k">After</span>
-        <h3>Sign off</h3>
-        <p class="body">Hand the manager a short list at cutover, with a probability on every item.</p>
-      </div>
-    </div>
-    <p class="callout push">Same engine, same report, at every stage of the migration.</p>
-    <aside class="notes">This is why the question is "will we", not "did we". The value comes from asking early and often, not once at the end.</aside>
-  </section>
-
-  <!-- 5 · why it hurts -->
-  <section class="slide" id="s5" aria-label="Why it hurts">
-    <span class="lot">LOT 05</span>
-    <p class="eyebrow">Why it hurts today</p>
-    <h2 class="wide">Three costs, every time you check</h2>
-    <div class="cols c3">
-      <div class="card">
-        <span class="num">1</span>
-        <h3>Build the comparison</h3>
-        <p class="body">A script or harness written for this migration, then thrown away.</p>
-      </div>
-      <div class="card">
-        <span class="num">2</span>
-        <h3>Wade through noise</h3>
-        <p class="body">Timestamps, generated IDs, list order and whitespace differ on every call. A renamed field shows up as one field missing and another added.</p>
-      </div>
-      <div class="card">
-        <span class="num">3</span>
-        <h3>Judge intent by hand</h3>
-        <p class="body">Each remaining difference is checked against the change list in someone's head. None of the tools we found does this step.</p>
-      </div>
-    </div>
-    <p class="callout push">Engineers spend <span class="todo">X hours</span> per check going through <span class="todo">N differences</span> by hand, and the few regressions hide among noise and intended changes.</p>
-    <aside class="notes">Fill X and N from the stopwatch run on Petstore v2 to v3 before we present. Step 3 is the part nobody automates.</aside>
-  </section>
-
-  <!-- 6 · evidence -->
-  <section class="slide" id="s6" aria-label="Evidence">
-    <span class="lot">LOT 06</span>
     <p class="eyebrow">Evidence</p>
     <h2>What others found</h2>
     <div class="cols c2">
@@ -531,19 +476,18 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
         <p class="body">Sells side-by-side replay of legacy and migrated services. Its public pages say nothing about renamed endpoints or intended changes.</p>
       </div>
       <div class="card">
-        <span class="k">Our interview · 26 Nov</span>
-        <p class="body">“References to the actual documentation would add confidence.” <strong>Trust comes from showing the source</strong> behind each verdict.</p>
+        <span class="k">Our interview · 26 Nov · CSOM to Mesh</span>
+        <p class="body">“References to the actual documentation would add confidence.” <strong>Trust comes from showing the source.</strong> Mesh was a new flow, so <strong>endpoints could not be compared</strong>: the team learned by integrating.</p>
       </div>
     </div>
-    <p class="body push">Still to add: <span class="todo">2–3 more interviews</span> <span class="todo">timed manual baseline</span></p>
-    <aside class="notes">Public prior art proves the pain is real and that noise dominates. Our own interview shaped scope and trust. Add today's interviews here.</aside>
+    <p class="body push">Still to add: <span class="todo">2 more interviews</span> <span class="todo">timed manual baseline</span></p>
+    <aside class="notes">Public prior art proves the pain is real and that noise dominates. Our one interview shaped scope and trust, and it was a flow change: same vendor, new process, endpoints that cannot be paired one to one. That is the problem, not a limit. Say what we still lack: only one interview, and no timing. Add the next interviews here.</aside>
   </section>
 
-  <!-- 7 · how it works -->
-  <section class="slide" id="s7" aria-label="How it works">
-    <span class="lot">LOT 07</span>
+  <section class="slide s-compact" id="s5" aria-label="How it works">
+    <span class="lot">LOT 05</span>
     <p class="eyebrow">How it works</p>
-    <h2>Steep, strain, match, compare, taste</h2>
+    <h2 class="wide">Steep, strain, match, compare, taste</h2>
     <div class="cols c5">
       <div class="card step">
         <span class="idx">STEP 1</span>
@@ -560,8 +504,8 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
       <div class="card step">
         <span class="idx">STEP 3</span>
         <span class="verb">Match</span>
-        <p class="what">Pair moved endpoints and renamed fields.</p>
-        <p class="how">Rules first; the model handles only the leftovers.</p>
+        <p class="what">Pair moved endpoints and renamed fields. Group the calls that replace one.</p>
+        <p class="how">Rules first. The model handles the remaining matches. <span class="todo">flows: in progress</span></p>
       </div>
       <div class="card step">
         <span class="idx">STEP 4</span>
@@ -576,13 +520,12 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
         <p class="how">Against your intent note, with a probability.</p>
       </div>
     </div>
-    <div class="io push"><span><strong>In:</strong> two base URLs, two OpenAPI specs and one paragraph of intent</span><span><strong>Out:</strong> a short report in the terminal or the browser</span></div>
-    <aside class="notes">Keep this quick. The point: the model only does the two jobs that need judgement, matching leftovers and tasting. Everything else is deterministic.</aside>
+    <div class="io push"><span><strong>In:</strong> two API URLs, two OpenAPI specs and an intent note. <span class="todo">Docs as input in progress</span></span><span><strong>Out:</strong> a short report in the terminal or the browser</span></div>
+    <aside class="notes">Keep this quick. The point: the model only does the two jobs that need judgement, matching leftovers and tasting. Flow grouping and spec-less input are in progress and not part of the live demo. Everything else is deterministic.</aside>
   </section>
 
-  <!-- 8 · demo -->
-  <section class="slide" id="s8" aria-label="Demo">
-    <span class="lot">LOT 08</span>
+  <section class="slide s-compact" id="s6" aria-label="Demo">
+    <span class="lot">LOT 06</span>
     <p class="eyebrow">The tasting · demo</p>
     <h2 class="wide">10 differences in. 4 for a human.</h2>
     <div class="cols c-gold-r">
@@ -613,9 +556,8 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     <aside class="notes">Switch to the live demo here. Run the toy APIs first, open one regression, then run Petstore v2 against v3.</aside>
   </section>
 
-  <!-- 9 · trust -->
-  <section class="slide" id="s9" aria-label="Trust">
-    <span class="lot">LOT 09</span>
+  <section class="slide s-compact" id="s7" aria-label="Trust">
+    <span class="lot">LOT 07</span>
     <p class="eyebrow">Why trust it</p>
     <h2>Every verdict shows how sure it is</h2>
     <div class="cols c2">
@@ -628,10 +570,179 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     <aside class="notes">Anticipate "why trust the AI?". The thresholds are the answer: the costlier the mistake, the higher the bar.</aside>
   </section>
 
-  <!-- 10 · alternatives and why now -->
-  <section class="slide" id="s10" aria-label="Alternatives and why now">
+  <section class="slide s-compact" id="s8" aria-label="Pricing">
+    <span class="lot">LOT 08</span>
+    <p class="eyebrow">Pricing and revenue · stage 3</p>
+    <h2>Priced at about 4% of the labour it saves</h2>
+    <div class="cols c2">
+      <div class="card"><span class="k">Who pays</span><p class="body">The engineering manager who signs off the cutover, from the team's tooling budget.</p></div>
+      <div class="card"><span class="k">What they buy</span><p class="body">Self-host free (MIT, your own model). Hosted: <strong>Migration Pass, US$149</strong>, 60 days, about 50 runs.</p></div>
+      <div class="card"><span class="k">Why that price</span><p class="body">One migration's parity passes cost about <strong>US$3,800</strong> of senior time. It happens once, so we charge once. Ongoing work: US$99 a month.</p></div>
+      <div class="card"><span class="k">What one regression costs</span><p class="body">Unknown: someone must find it, fix it and redeploy. At 4 to 24 h that is <strong>US$160 to US$960</strong>.</p></div>
+    </div>
+    <p class="callout push">One regression caught early (12 h, US$480) pays for the pass about three times.</p>
+    <aside class="notes">Who pays, how, why that price. Say plainly that the true cost of a regression is unknown, so we price it as senior developer hours. Assumptions: US$40 an hour loaded, 20 h per manual parity pass (illustrative, from the problem definition), 1 h with nParity, 5 passes per migration. Pass price chosen after feedback that US$99 a month is high for a tool used once or twice. Model: docs/costing/business_case.py</aside>
+  </section>
+
+  <section class="slide s-compact" id="s9" aria-label="Unit economics">
+    <span class="lot">LOT 09</span>
+    <p class="eyebrow">Unit economics · stage 3</p>
+    <h2 class="wide">94% gross margin per pass. Support is the real cost.</h2>
+    <div class="cols c-gold">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Per Migration Pass</th><th>US$</th><th>Basis</th></tr></thead>
+          <tbody>
+            <tr class="us"><td>Price</td><td>149.00</td><td>One migration, 60 days</td></tr>
+            <tr><td>Model fees</td><td>3.30</td><td>10 runs of 1,000 findings, list price</td></tr>
+            <tr><td>Infra and payment</td><td>5.57</td><td>Compute, storage, 3% fee</td></tr>
+            <tr class="us"><td>Gross margin</td><td>140.13 · 94%</td><td></td></tr>
+            <tr><td>Support</td><td>40.00</td><td>1 h at US$40/h</td></tr>
+            <tr class="us"><td>Contribution</td><td>100.13 · 67%</td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <span class="k">Fixed and build</span>
+        <ul class="ticks">
+          <li><span><strong>Serverless hosting about US$3 a month idle.</strong> One pass covers 2 years of it.</span></li>
+          <li><span><strong>Build US$19k to US$58k.</strong> One engineer for 3 months, up to three.</span></li>
+          <li><span>Model price ten times higher still leaves 74% margin.</span></li>
+        </ul>
+      </div>
+    </div>
+    <p class="callout push">Model fees are 2% of the price. Watch support time and the build.</p>
+    <aside class="notes">Tokens are measured on 111 Flash calls. Prices are public list prices, not quotes. Support hours, runs per pass, serverless idle cost, payment fee, support hours and build effort are assumptions. Run: python3 docs/costing/business_case.py</aside>
+  </section>
+
+  <section class="slide s-compact" id="s10" aria-label="Business case">
     <span class="lot">LOT 10</span>
-    <p class="eyebrow">Alternatives · why now</p>
+    <p class="eyebrow">Business case · stage 3</p>
+    <h2 class="wide">One pass covers hosting. Paying back the build takes volume.</h2>
+    <div class="cols c-gold">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Case</th><th>Passes a month</th><th>Revenue a month</th><th>Payback, lean build</th><th>Payback, full build</th></tr></thead>
+          <tbody>
+            <tr><td>Pessimistic</td><td>2</td><td>US$298</td><td class="n">Month 101</td><td class="n">Not in 10 years</td></tr>
+            <tr class="us"><td>Base</td><td>4</td><td>US$596</td><td>Month 52</td><td class="n">Not in 10 years</td></tr>
+            <tr><td>Optimistic</td><td>8</td><td>US$1,192</td><td>Month 28</td><td>Month 76</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <span class="k">Assumptions</span>
+        <ul class="ticks">
+          <li><span>Sales start in month 4, after the build. Passes a month are flat, no ramp.</span></li>
+          <li><span>Each pass is one-off. No renewals counted.</span></li>
+          <li><span>Lean build US$19k, full build US$58k.</span></li>
+        </ul>
+      </div>
+    </div>
+    <p class="callout push">The strongest lever is price: at US$299 the base case pays back a lean build in month 23.</p>
+    <aside class="notes">Be honest: at US$149 a pass the hosted tier is a modest business on its own, and the build only pays back with volume. The open core is the funnel. No hockey stick: passes a month are constant. Break-even on run costs is the first pass (US$3 idle hosting a month against US$100 contribution). Model: docs/costing/business_case.py</aside>
+  </section>
+
+  <section class="slide s-compact" id="s11" aria-label="Risks">
+    <span class="lot">LOT 11</span>
+    <p class="eyebrow">Risk and sensitivity · stage 3</p>
+    <h2 class="wide">What if we are wrong?</h2>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Risk</th><th>If it happens</th><th>Our answer</th></tr></thead>
+        <tbody>
+          <tr><td>Accuracy too low</td><td>Engineers stop trusting it</td><td>Unsure bucket. No regression is dismissed automatically. Every verdict shows its source.</td></tr>
+          <tr><td>No logprobs on the model route</td><td>No real probability. Vote sampling, margin 89%</td><td>Run the CLI on any logprobs model. Label votes as uncalibrated.</td></tr>
+          <tr><td>Model price ten times higher</td><td>Margin 74%</td><td>Cache repeat questions, switch engine, raise the price.</td></tr>
+          <tr><td>Customer data leaves AWS</td><td>Banks refuse the hosted tier</td><td>Redaction before any model call. Self-host is free.</td></tr>
+          <tr><td>Demand is one-off</td><td>Each pass is a single sale, payback slips</td><td>Test US$299, keep the build lean, use the CLI as the funnel.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="callout push">Break-even on run costs: the first pass. Break-even on the build: depends on volume, so we measure it in a pilot.</p>
+    <aside class="notes">Four things can sink this: trust, the model route, data governance, and one-off demand. Each has a fallback. Margin figures come from docs/costing/business_case.py (vote sampling: 10 runs of 1,000 findings at US$0.00113).</aside>
+  </section>
+
+  <section class="slide s-title" id="s12" aria-label="Close">
+    <span class="lot">LOT 12</span>
+    <div class="title-grid">
+      <div class="title-copy">
+        <p class="eyebrow">nParity</p>
+        <p class="quote">Will we break anything? <span class="hl">Know before it ships.</span></p>
+        <p class="lead">The same engine runs before, during and after the migration, on whichever model your company has approved.</p>
+        <p class="lead">Our ask: a pilot on one real migration, with two engineers, next quarter.</p>
+        <div class="team"><span><b>Gerdi Olivier</b></span><span><b>Stephen Metcalfe</b></span><span><b>Temba Mazingi</b></span><span class="mono">Team Chai-GPT</span></div>
+      </div>
+      <div class="cup-wrap" aria-hidden="true">
+        <svg class="cup" viewBox="0 0 260 300">
+          <g class="steam">
+            <path d="M100 96 C 86 76, 112 62, 98 38"/>
+            <path d="M132 92 C 118 70, 146 56, 130 28"/>
+            <path d="M164 96 C 150 76, 176 62, 162 40"/>
+          </g>
+          <path d="M40 124 L220 124 L196 268 Q130 284 64 268 Z" fill="var(--clay)"/>
+          <path d="M196 268 Q130 284 64 268 L70 246 Q130 262 190 246 Z" fill="var(--clay-2)" opacity=".35"/>
+          <ellipse cx="130" cy="124" rx="90" ry="16" fill="var(--clay-2)"/>
+          <ellipse cx="130" cy="126" rx="78" ry="11" fill="var(--chai)"/>
+        </svg>
+      </div>
+    </div>
+    <aside class="notes">Close on the model line, then the ask. Questions.</aside>
+  </section>
+
+  <section class="slide" id="s13" aria-label="Before, during, after">
+    <span class="lot">LOT 13</span>
+    <p class="eyebrow">Appendix · When it pays off</p>
+    <h2 class="wide">Run nParity before, during and after the migration</h2>
+    <div class="cols c3">
+      <div class="card">
+        <span class="k">Before</span>
+        <h3>Scope the change</h3>
+        <p class="body">Run the old API against an early prototype. See what will differ before you commit to a plan. Use the result to write the intent note.</p>
+      </div>
+      <div class="card">
+        <span class="k">During</span>
+        <h3>Catch drift early</h3>
+        <p class="body">Re-run it as the new API takes shape. A regression shows up at the next run, while it is cheap to fix.</p>
+      </div>
+      <div class="card">
+        <span class="k">After</span>
+        <h3>Sign off</h3>
+        <p class="body">Hand the manager a short list at cutover, with a probability on every item.</p>
+      </div>
+    </div>
+    <p class="callout push">Same engine, same report, at every stage of the migration.</p>
+    <aside class="notes">This is why the question is "will we", not "did we". The value comes from asking early and often, not once at the end.</aside>
+  </section>
+
+  <section class="slide s-compact" id="s14" aria-label="Why it hurts">
+    <span class="lot">LOT 14</span>
+    <p class="eyebrow">Appendix · Why it hurts today</p>
+    <h2 class="wide">Three costs, every time you check</h2>
+    <div class="cols c3">
+      <div class="card">
+        <span class="num">1</span>
+        <h3>Build the comparison</h3>
+        <p class="body">A script or harness written for this migration, then thrown away.</p>
+      </div>
+      <div class="card">
+        <span class="num">2</span>
+        <h3>Wade through noise</h3>
+        <p class="body">Timestamps, generated IDs, list order and whitespace differ on every call. A renamed field shows up as one field missing and another added.</p>
+      </div>
+      <div class="card">
+        <span class="num">3</span>
+        <h3>Judge intent by hand</h3>
+        <p class="body">Each remaining difference is checked against the change list in someone's head. None of the tools we found does this step.</p>
+      </div>
+    </div>
+    <p class="callout push">Engineers spend <span class="todo">X hours</span> per check going through <span class="todo">N differences</span> by hand, and the few regressions hide among noise and intended changes.</p>
+    <aside class="notes">Fill X and N from the stopwatch run on Petstore v2 to v3 before we present. Step 3 is the part nobody automates.</aside>
+  </section>
+
+  <section class="slide" id="s15" aria-label="Alternatives and why now">
+    <span class="lot">LOT 15</span>
+    <p class="eyebrow">Appendix · Alternatives · why now</p>
     <h2 class="wide">We say whether a difference was intended.</h2>
     <div class="tbl-wrap">
       <table>
@@ -646,17 +757,16 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
       </table>
     </div>
     <div class="cols c3 push">
-      <div class="card"><span class="k">Cheap judgement</span><p class="body">One verdict costs about <strong>US$0.00007</strong> and takes 0.6 s on DeepSeek Flash.</p></div>
+      <div class="card"><span class="k">Cheap judgement</span><p class="body">One verdict took 0.6 s on DeepSeek Flash. Estimated cost: <strong>about US$0.0001</strong>. <span class="todo">verify price</span></p></div>
       <div class="card"><span class="k">More cutovers</span><p class="body">AI coding tools make migrations cheaper, so more teams face a cutover. <span class="todo">to test</span></p></div>
       <div class="card"><span class="k">A gap</span><p class="body">The best-known open-source option, Diffy, now sits in Twitter's archive.</p></div>
     </div>
     <aside class="notes">"Isn't this Diffy or Scientist?" Answer: they diff. We match, strain and judge against stated intent, with a probability on every verdict.</aside>
   </section>
 
-  <!-- 11 · market -->
-  <section class="slide" id="s11" aria-label="Market">
-    <span class="lot">LOT 11</span>
-    <p class="eyebrow">Market</p>
+  <section class="slide" id="s16" aria-label="Market">
+    <span class="lot">LOT 16</span>
+    <p class="eyebrow">Appendix · Market</p>
     <h2>A slice of every modernisation</h2>
     <div class="cols c2">
       <div class="stack">
@@ -676,29 +786,42 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     <aside class="notes">Don't oversell the big number. Our market is the verification step inside it. Stage 3 will size that slice.</aside>
   </section>
 
-  <!-- 12 · business model -->
-  <section class="slide" id="s12" aria-label="Business model">
-    <span class="lot">LOT 12</span>
-    <p class="eyebrow">Business model · stage 3</p>
-    <h2>Priced against the cost of one production regression</h2>
-    <div class="cols c2">
-      <div class="card"><span class="k">Who pays</span><p class="body">The engineering manager who signs off cutovers.</p></div>
-      <div class="card"><span class="k">Pricing unit</span><p class="body">Per migration or per repo. <span class="todo">decide</span></p></div>
-      <div class="card"><span class="k">Price</span><p class="body"><span class="todo">to fill</span></p></div>
-      <div class="card"><span class="k">Cost to run</span><p class="body">Cents per run in model fees. Target under US$0.01 on the toy run.</p></div>
+  <section class="slide s-compact" id="s17" aria-label="Cost to run">
+    <span class="lot">LOT 17</span>
+    <p class="eyebrow">Appendix · Cost to run · stage 3</p>
+    <h2 class="wide">Model fees are cents. The engine choice is about trust.</h2>
+    <div class="cols c-gold">
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Engine</th><th>Per finding</th><th>Real probability</th><th>Reason</th></tr></thead>
+          <tbody>
+            <tr class="us"><td>DeepSeek Flash · Bedrock</td><td>US$0.0003 <span class="todo">verify</span></td><td class="y">Yes</td><td class="y">Yes</td></tr>
+            <tr><td>Other Bedrock, votes</td><td>US$0.001</td><td class="n">No, vote share</td><td class="y">Yes</td></tr>
+            <tr><td>Jev + Flash</td><td>US$0.0001</td><td class="y">Yes</td><td>Via Flash</td></tr>
+            <tr><td>OpenAI Decisions + Flash</td><td>US$0.0001</td><td>Not documented</td><td>Via Flash</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <span class="k">Hosting on AWS</span>
+        <ul class="ticks">
+          <li><span><strong>Serverless: about US$3 a month idle</strong> (assumed). Pay per run.</span></li>
+          <li><span>Always-on containers: US$50 to US$83 a month, so we avoid them. <span class="todo">Cape Town?</span></span></li>
+          <li><span>Hosted tier needs storage and accounts <span class="todo">PRD 0007</span>. The CLI runs anywhere.</span></li>
+        </ul>
+      </div>
     </div>
-    <p class="callout push">Value anchor: one production regression costs <span class="todo">to fill from interviews</span>. A run costs cents.</p>
-    <aside class="notes">Placeholder slide. Temba fills this in Stage 3.</aside>
+    <p class="callout push">A 1,000-finding run costs about US$0.33 on Flash. Support and people cost more than the model.</p>
+    <aside class="notes">Don't say "cheap" and stop. Say what the cheap engines give up: Jev and OpenAI return no reason, Bedrock models return no logprobs. Tokens measured on 111 Flash calls; prices are public list prices, not quotes; the Fireworks -us router price is unverified. Model: docs/costing/nparity-costing.md</aside>
   </section>
 
-  <!-- 13 · success and scope -->
-  <section class="slide" id="s13" aria-label="Success and scope">
-    <span class="lot">LOT 13</span>
-    <p class="eyebrow">Success · scope</p>
+  <section class="slide" id="s18" aria-label="Success and scope">
+    <span class="lot">LOT 18</span>
+    <p class="eyebrow">Appendix · Success · scope</p>
     <h2>Demo targets</h2>
     <div class="cols c3">
       <div>
-        <h3 class="list-head">Targets</h3>
+        <h3 class="list-head">Default targets</h3>
         <ul class="ticks metric">
           <li><span>10/10 against the answer key</span></li>
           <li><span>0 regressions dismissed automatically</span></li>
@@ -712,7 +835,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
         <h3 class="list-head">In scope</h3>
         <ul class="ticks">
           <li><span>JSON over HTTP</span></li>
-          <li><span>OpenAPI specs on both sides</span></li>
+          <li><span>OpenAPI specs. Docs or samples <span class="todo">in progress</span></span></li>
           <li><span>Request and response behaviour</span></li>
           <li><span>Before, during and after the migration</span></li>
         </ul>
@@ -720,42 +843,14 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
       <div>
         <h3 class="list-head">Out of scope</h3>
         <ul class="ticks out">
-          <li><span>Vendor swaps where the flow changes</span></li>
+          <li><span>Implementing the migration</span></li>
           <li><span>Database side effects</span></li>
           <li><span>UI</span></li>
           <li><span>Performance</span></li>
         </ul>
       </div>
     </div>
-    <aside class="notes">Read the targets as promises we test live. Out of scope is a choice, not a gap.</aside>
-  </section>
-
-  <!-- 14 · close -->
-  <section class="slide s-title" id="s14" aria-label="Close">
-    <span class="lot">LOT 14</span>
-    <div class="title-grid">
-      <div class="title-copy">
-        <p class="eyebrow">nParity</p>
-        <p class="quote">Will we break anything? <span class="hl">Know before it ships.</span></p>
-        <p class="lead">The same engine runs before, during and after the migration, on whichever model your company has approved.</p>
-        <p class="lead">Our ask: <span class="todo">to fill</span></p>
-        <div class="team"><span><b>Gerdi Olivier</b></span><span><b>Stephen Metcalfe</b></span><span><b>Temba Mazingi</b></span><span class="mono">Team Chai-GPT</span></div>
-      </div>
-      <div class="cup-wrap" aria-hidden="true">
-        <svg class="cup" viewBox="0 0 260 300">
-          <g class="steam">
-            <path d="M100 96 C 86 76, 112 62, 98 38"/>
-            <path d="M132 92 C 118 70, 146 56, 130 28"/>
-            <path d="M164 96 C 150 76, 176 62, 162 40"/>
-          </g>
-          <path d="M40 124 L220 124 L196 268 Q130 284 64 268 Z" fill="var(--clay)"/>
-          <path d="M196 268 Q130 284 64 268 L70 246 Q130 262 190 246 Z" fill="var(--clay-2)" opacity=".35"/>
-          <ellipse cx="130" cy="124" rx="90" ry="16" fill="var(--clay-2)"/>
-          <ellipse cx="130" cy="126" rx="78" ry="11" fill="var(--chai)"/>
-        </svg>
-      </div>
-    </div>
-    <aside class="notes">Close on the model line, then the ask. Questions.</aside>
+    <aside class="notes">Read the targets as promises we test live. Users can change them per run, but never the safety rules: no regression is dismissed automatically. Out of scope is a choice, not a gap.</aside>
   </section>
 </main>
 
@@ -763,7 +858,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
   <button type="button" id="prev" aria-label="Previous slide">←</button>
   <button type="button" id="next" aria-label="Next slide">→</button>
   <div class="progress" aria-hidden="true"><i id="bar"></i></div>
-  <span class="count" id="count">1 / 14</span>
+  <span class="count" id="count">1 / 18</span>
   <button type="button" id="notesBtn" aria-pressed="false" title="Speaker notes (N)">Notes</button>
   <button type="button" id="fsBtn" title="Full screen (F)">Full screen</button>
 </nav>

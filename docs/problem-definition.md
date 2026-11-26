@@ -32,8 +32,8 @@ Context where it occurs today: our own rewrites and migrations (the V2 greenfiel
 
 ### Narrow scope
 
-- **In:** JSON-over-HTTP services that publish an OpenAPI spec, old vs new, behind two base URLs.
-- **Out:** UI testing, load or performance parity, database or data-migration parity, services without an OpenAPI spec, anything needing real customer data.
+- **In:** JSON-over-HTTP APIs, old vs new, including a provider moving to a new API with a different flow. Described by an OpenAPI spec, documentation or sample responses (a spec gives the best result, PRD 0006). Replay when both sides are reachable.
+- **Out:** UI testing, load or performance parity, database or data-migration parity, executing or implementing the migration, anything needing real customer data.
 
 ## 2. Evidence of real need
 
@@ -125,7 +125,7 @@ Targets 1 to 5 are what the Friday demo shows. Target 6 is the real-need proof a
 | In scope (prototype) | Out of scope |
 |---|---|
 | Replay old vs new from OpenAPI plus seed values | Production traffic capture |
-| Rule-first mapping of endpoints and fields, LLM for leftovers | Auth, deployment, hosting |
+| Rule-first mapping of endpoints and fields, LLM for leftovers | Billing, SSO, on-premise installer (hosted service: PRD 0007) |
 | Noise removal, deterministic diff, type checks | Running real docfox or customer data |
 | Triage against a written intent note, with confidence | Judging numbers or pagination with the LLM (always deterministic) |
 | CLI and read-only web report from the same saved run | Starting runs from the web UI |

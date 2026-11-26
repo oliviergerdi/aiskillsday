@@ -246,6 +246,10 @@ Writes `proto/raw/<EXP>_<n>.json` and `proto/results.json`.
 | uv used the wrong Python | `uv sync --python "$(mise which python)"` (or `asdf where python`) |
 | Wrong Python in a fresh shell | Both mise and asdf are active; disable one |
 
+## Licence
+
+MIT. See `LICENSE`.
+
 ## Notes
 
 - `.tool-versions` (`python 3.14.0`) and `requires-python` (`>=3.14`) stay in sync; bump both together.

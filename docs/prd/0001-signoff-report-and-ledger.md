@@ -25,11 +25,11 @@ The engineering manager approves the cutover and needs one short page, not a raw
 | 2 | `nparity accept RUN_ID FINDING_ID --by NAME --note TEXT` appends to the ledger | Round-trip test |
 | 3 | `--baseline RUN_ID` marks each finding as new, unchanged or resolved against an earlier run | E2E test with two runs |
 | 4 | `--format json\|md` writes the run summary to stdout or `--out` | JSON validates against the `Run` model; Markdown lists regressions, then unsure, with endpoint, path, p, reason |
-| 5 | Web: `/runs/{id}/signoff` page, print-friendly, same data as the Markdown report | Page test; no analysis in the template |
+| 5 | Web: `/runs/{id}/signoff` page, print-friendly, same data as the Markdown report, including each target (PRD 0006 #9) with pass or fail | Page test; no analysis in the template |
 
 ## Out of scope
 
-CI integration, exit-code gating, PR comments, hosted service, user accounts, approval workflow inside the app, Jira or Slack integration.
+CI integration, exit-code gating, PR comments, approval workflow inside the app, Jira or Slack integration. Hosted service and user accounts moved to PRD 0007.
 
 ## Risks
 
