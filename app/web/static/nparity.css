@@ -1,31 +1,30 @@
 /* Lifted from docs/mockups/web-ui.html (approved look). */
 :root {
   color-scheme: light dark;
-  --bg: #fbfbfa; --surface: #ffffff; --ink: #1d2125; --muted: #66707a; --line: #e3e5e8;
-  --code-bg: #f4f5f6;
-  --reg: #c0392b; --reg-bg: #fdecea;
-  --uns: #a86b00; --uns-bg: #fff4df;
-  --int: #1f7a4d; --int-bg: #e6f4ec;
-  --noi: #5f6b76; --noi-bg: #eef0f2;
-  --err: #7d3cc0; --err-bg: #f2eafb;
-  --rule: #2d5fa8; --rule-bg: #e8effa;
-  --hl-old: #fde2df; --hl-new: #fff0c2;
-  --accent: #2d5fa8;
+  --bg: light-dark(#fbfbfa, #15181b);
+  --surface: light-dark(#ffffff, #1d2125);
+  --ink: light-dark(#1d2125, #e7e9eb);
+  --muted: light-dark(#66707a, #9aa3ab);
+  --line: light-dark(#e3e5e8, #30363c);
+  --code-bg: light-dark(#f4f5f6, #24292e);
+  --reg: light-dark(#c0392b, #ff8a7a);
+  --reg-bg: light-dark(#fdecea, #3a1f1c);
+  --uns: light-dark(#a86b00, #f3c069);
+  --uns-bg: light-dark(#fff4df, #3a2e17);
+  --int: light-dark(#1f7a4d, #6fd3a0);
+  --int-bg: light-dark(#e6f4ec, #17332a);
+  --noi: light-dark(#5f6b76, #aab4bd);
+  --noi-bg: light-dark(#eef0f2, #2a3035);
+  --err: light-dark(#7d3cc0, #c9a2f5);
+  --err-bg: light-dark(#f2eafb, #2f2340);
+  --rule: light-dark(#2d5fa8, #8fb4ec);
+  --rule-bg: light-dark(#e8effa, #1e2a3d);
+  --hl-old: light-dark(#fde2df, #4a2622);
+  --hl-new: light-dark(#fff0c2, #4a3d16);
+  --accent: light-dark(#2d5fa8, #8fb4ec);
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #15181b; --surface: #1d2125; --ink: #e7e9eb; --muted: #9aa3ab; --line: #30363c;
-    --code-bg: #24292e;
-    --reg: #ff8a7a; --reg-bg: #3a1f1c;
-    --uns: #f3c069; --uns-bg: #3a2e17;
-    --int: #6fd3a0; --int-bg: #17332a;
-    --noi: #aab4bd; --noi-bg: #2a3035;
-    --err: #c9a2f5; --err-bg: #2f2340;
-    --rule: #8fb4ec; --rule-bg: #1e2a3d;
-    --hl-old: #4a2622; --hl-new: #4a3d16;
-    --accent: #8fb4ec;
-  }
-}
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--ink);
        font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
@@ -43,6 +42,10 @@ td.zero { color: var(--muted); }
 nav.views { display: flex; gap: 4px; }
 nav.views a { text-decoration: none; color: var(--muted); padding: 6px 12px; border-radius: 6px; font-size: 14px; white-space: nowrap; }
 nav.views a.active { background: var(--code-bg); color: var(--ink); font-weight: 600; }
+.theme-toggle { margin-inline-start: auto; padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px;
+  background: var(--surface); color: var(--ink); font: inherit; font-size: 13px; white-space: nowrap; cursor: pointer; }
+.theme-toggle:hover, .theme-toggle[aria-pressed="true"] { background: var(--code-bg); }
+.theme-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 main { padding: 24px 0 64px; }
 
@@ -206,6 +209,10 @@ details.g > details.f { margin-left: 14px; border-left: 1px solid var(--line); }
   .f-body { padding-left: 14px; }
   header.top .wrap { gap: 12px; }
   .brand span { display: none; }
+}
+
+@media (max-width: 480px) {
+  header.top .wrap { flex-wrap: wrap; height: auto; min-height: 56px; padding-block: 8px; gap: 4px 8px; }
 }
 
 /* PRD 0001: rerun menu */

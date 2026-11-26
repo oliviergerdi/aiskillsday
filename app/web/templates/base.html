@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{% block title %}nParity{% endblock %}</title>
 <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+<script src="/static/theme.js"></script>
 <link rel="stylesheet" href="/static/nparity.css">
 <!-- htmx 1.9.12, vendored from the unpkg CDN: htmx.org@1.9.12/dist/htmx.min.js -->
 <script src="/static/htmx.min.js"></script>
@@ -22,6 +23,7 @@
       <a href="/runs/{{ run.id }}/mapping" class="{{ 'active' if nav == 'mapping' }}">Mapping</a>
       {% endif %}
     </nav>
+    <button class="theme-toggle" type="button" aria-pressed="false" hidden>Dark mode</button>
   </div>
 </header>
 <main class="wrap">
