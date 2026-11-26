@@ -721,7 +721,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
         </tbody>
       </table>
     </div>
-    <p class="callout push">Break-even on run costs: the first pass. Break-even on the build: depends on volume, so we measure it in a pilot.</p>
+    <p class="callout push">Break-even on run costs: the first pass. Break-even on the build: depends on volume, which we have not measured yet.</p>
     <aside class="notes">Five risks: accuracy, no token probabilities on the model route, model price, customer data leaving AWS, and one-off demand. Margins: vote sampling 89% (10 runs of 1,000 findings at US$0.00113 a finding); model price ten times higher 74%. The model route (DeepSeek Flash via Bedrock, served by Fireworks) is stated but not verified for token probabilities or price. Redaction before model calls is specified in PRD 0007 and not built.</aside>
   </section>
   <section class="slide s-title" id="s15" aria-label="Close">
@@ -731,7 +731,6 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
         <p class="eyebrow">nParity</p>
         <p class="quote">Know what changed. <span class="hl">Know what broke.</span></p>
         <p class="lead"><strong>Know before you build.</strong> The same engine runs before and during the migration, on whichever model your company has approved.</p>
-        <p class="lead">Our ask: a pilot on one real migration, with two engineers, next quarter.</p>
         <div class="team"><span><b>Gerdi Olivier</b></span><span><b>Stephen Metcalfe</b></span><span><b>Temba Mazingi</b></span><span class="mono">Team Chai-GPT</span></div>
       </div>
       <div class="cup-wrap" aria-hidden="true">
@@ -748,7 +747,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
         </svg>
       </div>
     </div>
-    <aside class="notes">The same engine runs before and during a migration, on any approved model that returns token probabilities. Ask: a pilot on one real migration, with two engineers, next quarter. Authorization-token support for authenticated APIs is not built and is a release requirement.</aside>
+    <aside class="notes">The same engine runs before and during a migration, on any approved model that returns token probabilities. Authorization-token support for authenticated APIs is not built and is a release requirement.</aside>
   </section>
   <section class="slide" id="s16" aria-label="Before and during">
     <span class="lot">LOT 16</span>

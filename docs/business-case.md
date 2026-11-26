@@ -36,7 +36,7 @@ Passes a month are constant (no ramp). Sales start in month 4. Each pass is a on
 
 - Break-even on run costs (idle hosting plus support): the first pass (US$100 contribution against US$3 a month).
 - At US$299 a pass: lean build pays back in month 43 / 23 / 13 (pessimistic / base / optimistic).
-- Read: the hosted tier is a modest business by itself. The open-source core is the funnel and the product is the engine. A pilot tells us the volume.
+- Read: the hosted tier is a modest business by itself. The open-source core is the funnel and the product is the engine. Real usage tells us the volume.
 
 ## 4. Risk and sensitivity
 | Risk | If it happens | Answer |
