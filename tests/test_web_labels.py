@@ -65,7 +65,7 @@ def test_threshold_text_is_percentage(setup):
     th = _th(run)
     f = next(f for f in run.findings if (f.label or "unsure") in ("regression", "intended"))
     text = views.finding_view(run, f, th).threshold_text
-    assert re.search(r"needs \d+(\.\d+)?% to be dismissed$", text), text
+    assert re.search(r"^\d+(\.\d+)?% needed to (confirm as a regression|accept as intended)$", text), text
     assert not re.search(r"\d\.\d{3}", text), text
 
 
@@ -95,3 +95,18 @@ def test_conf_text_percent():
         v = views.finding_view(None, f, th)    # no samples, so run is never read
         assert v.conf_text == want
         assert v.p_text == f"{p:.3f}"
+
+
+def _threshold_text(label):
+    from nparity.models import Finding
+    th = load_thresholds(backend_id=None)
+    f = Finding(id="x", endpoint="GET /a", path="$.a", kind="changed", source="diff", p=0.5, label=label)
+    return views.finding_view(None, f, th).threshold_text
+
+
+def test_threshold_text_regression_bar_wording():
+    assert _threshold_text("regression") == "99.9% needed to confirm as a regression"
+
+
+def test_threshold_text_intended_bar_wording():
+    assert _threshold_text("intended") == "98% needed to accept as intended"

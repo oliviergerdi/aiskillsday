@@ -129,7 +129,9 @@ def finding_view(run: Run, f: Finding, th: Thresholds) -> FindingView:
         p_text=f"{f.p:.3f}" if f.p is not None else "—",
         p_pct=round((f.p or 0) * 100, 1), color=COLOR.get(label, "var(--noi)"),
         thr_pct=round(thr * 100, 1) if thr is not None else None, badge=BADGE.get(label, "b-noi"),
-        threshold_text=(f"{leans or label} needs {_pct(thr)} to be dismissed" if thr is not None else "always shown"),
+        threshold_text=("always shown" if thr is None else
+                        f"{_pct(thr)} needed to confirm as a regression" if bar is th.triage_regression
+                        else f"{_pct(thr)} needed to accept as intended"),
         distribution=dist, conf_text=_pct(f.p) if f.p is not None else "—",
     )
     if s is not None:
