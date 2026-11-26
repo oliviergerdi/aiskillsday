@@ -43,6 +43,9 @@ Answered from how an existing integration calls both APIs (evidence, not enginee
 - `GET /searches`: defined but never called. Nothing is lost.
 - Search profile: CSOM sent it on search creation. Mesh sets a configuration id through the monitor PATCH, chosen from the configurations list.
 
-Still open:
-1. Do the monitor `differences` and `acknowledge` calls map to the `CASE_ALERT_LIST_UPDATED` and `CASE_TRANSITIONED` webhooks, or to nothing? The integration does not call them.
-2. Add a doc URL or quote for each row, and confirm the key.
+Answered by the integration engineer (26 Nov), who answered the question only and has not seen the key:
+- Monitor `differences` has no endpoint counterpart. Monitoring updates arrive as `CASE_ALERT_LIST_UPDATED` webhook events, like CSOM's normal monitoring updates for hits.
+
+Not checked (fine for the hackathon, needed before the key is called verified):
+- Whether `acknowledge` maps to `CASE_TRANSITIONED` and risk decisions, or to nothing.
+- A doc URL or quote for each row. The key has not been reviewed by the engineer, so `confirmed_by` stays null.
