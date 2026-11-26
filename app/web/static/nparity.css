@@ -176,8 +176,13 @@ details.g > details.f { margin-left: 14px; border-left: 1px solid var(--line); }
   .source-grid { grid-template-columns: 1fr; }
   .counts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   details.f > summary { grid-template-columns: 14px 1fr; }
-  details.f > summary > :nth-child(n+3) { grid-column: 2; }
+  details.f > summary > .f-path, details.f > summary > .f-kind, details.f > summary > .pbar { grid-column: 2; }
   .f-reason { grid-column: 2; }
+  .f-static { grid-template-columns: 14px 1fr; gap: 4px 12px; }
+  .f-static > .f-path { grid-column: 2; }
+  /* !important: error rows carry inline style="grid-column: span 3" */
+  .f-static > .f-kind { grid-column: 2 !important; }
+  .f-static > span:last-child { display: none; }
   .sbs, .meta-grid { grid-template-columns: 1fr; }
   .f-body { padding-left: 14px; }
   header.top .wrap { gap: 12px; }
