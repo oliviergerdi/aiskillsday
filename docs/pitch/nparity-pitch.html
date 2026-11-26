@@ -622,8 +622,21 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     <p class="body push">We tested before we built: 66 model calls for about US$0.006. Yes/no questions rejected correct renames (the model gave a correct rename a 0.17% chance), so nParity asks multiple-choice questions.</p>
     <aside class="notes">Anticipate "why trust the AI?". The thresholds are the answer: the costlier the mistake, the higher the bar.</aside>
   </section>
-  <section class="slide s-compact" id="s10" aria-label="Pricing">
+  <section class="slide s-compact" id="s10" aria-label="AI agents">
     <span class="lot">LOT 10</span>
+    <p class="eyebrow">Built for people and AI agents</p>
+    <h2 class="wide">An agent can run it, read it and act on it. <span class="todo">in progress</span></h2>
+    <div class="cols c2">
+      <div class="card"><span class="k">Machine-readable</span><ul class="ticks"><li><span><code>--format json</code>: one JSON document on stdout, errors on stderr.</span></li><li><span>Fixed exit codes, so a script knows what failed.</span></li></ul></div>
+      <div class="card"><span class="k">Small answers</span><ul class="ticks"><li><span><code>--compact</code>: counts, coverage, cost and finding keys.</span></li><li><span>Fetch one finding with its samples, not the whole report.</span></li></ul></div>
+      <div class="card"><span class="k">Long runs</span><ul class="ticks"><li><span><code>--detach</code> returns a run ID at once.</span></li><li><span><code>status</code> polls progress events.</span></li></ul></div>
+      <div class="card"><span class="k">Plan first</span><ul class="ticks"><li><span><code>--dry-run</code> shows the calls, seed sources and skipped endpoints.</span></li><li><span>No replay and no model calls.</span></li></ul></div>
+    </div>
+    <p class="callout push">A developer tool. The agent does the fixing. nParity says where to look.</p>
+    <aside class="notes">Same CLI, same engine. An AI coding agent runs a check during the migration, reads only the regressions and unsure items, then fixes the code. Not a CI gate. The JSON options are being added and are not in the live demo: say "in progress". Source: README "CLI automation" section.</aside>
+  </section>
+  <section class="slide s-compact" id="s11" aria-label="Pricing">
+    <span class="lot">LOT 11</span>
     <p class="eyebrow">Pricing and revenue · stage 3</p>
     <h2>Priced at about 4% of the labour it saves</h2>
     <div class="cols c2">
@@ -635,8 +648,8 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     <p class="callout push">One regression caught early (12 h, US$480) pays for the pass about three times.</p>
     <aside class="notes">Who pays, how, why that price. Say plainly that the true cost of a regression is unknown, so we price it as senior developer hours. Assumptions: US$40 an hour loaded, 20 h per manual parity pass (illustrative, from the problem definition), 1 h with nParity, 5 passes per migration. Pass price chosen after feedback that US$99 a month is high for a tool used once or twice. Model: docs/costing/business_case.py</aside>
   </section>
-  <section class="slide s-compact" id="s11" aria-label="Unit economics">
-    <span class="lot">LOT 11</span>
+  <section class="slide s-compact" id="s12" aria-label="Unit economics">
+    <span class="lot">LOT 12</span>
     <p class="eyebrow">Unit economics · stage 3</p>
     <h2 class="wide">94% gross margin per pass. Support is the real cost.</h2>
     <div class="cols c-gold">
@@ -665,8 +678,8 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     <p class="callout push">Model fees are 2% of the price. Watch support time and the build.</p>
     <aside class="notes">Tokens are measured on 111 Flash calls. Prices are public list prices, not quotes. Support hours, runs per pass, serverless idle cost, payment fee, support hours and build effort are assumptions. Run: python3 docs/costing/business_case.py</aside>
   </section>
-  <section class="slide s-compact" id="s12" aria-label="Business case">
-    <span class="lot">LOT 12</span>
+  <section class="slide s-compact" id="s13" aria-label="Business case">
+    <span class="lot">LOT 13</span>
     <p class="eyebrow">Business case · stage 3</p>
     <h2 class="wide">One pass covers hosting. Paying back the build takes volume.</h2>
     <div class="cols c-gold">
@@ -692,8 +705,8 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     <p class="callout push">The strongest lever is price: at US$299 the base case pays back a lean build in month 23.</p>
     <aside class="notes">Be honest: at US$149 a pass the hosted tier is a modest business on its own, and the build only pays back with volume. The open core is the funnel. No hockey stick: passes a month are constant. Break-even on run costs is the first pass (US$3 idle hosting a month against US$100 contribution). Model: docs/costing/business_case.py</aside>
   </section>
-  <section class="slide s-compact" id="s13" aria-label="Risks">
-    <span class="lot">LOT 13</span>
+  <section class="slide s-compact" id="s14" aria-label="Risks">
+    <span class="lot">LOT 14</span>
     <p class="eyebrow">Risk and sensitivity · stage 3</p>
     <h2 class="wide">What if we are wrong?</h2>
     <div class="tbl-wrap">
@@ -711,8 +724,8 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     <p class="callout push">Break-even on run costs: the first pass. Break-even on the build: depends on volume, so we measure it in a pilot.</p>
     <aside class="notes">Four things can sink this: trust, the model route, data governance, and one-off demand. Each has a fallback. Margin figures come from docs/costing/business_case.py (vote sampling: 10 runs of 1,000 findings at US$0.00113).</aside>
   </section>
-  <section class="slide s-title" id="s14" aria-label="Close">
-    <span class="lot">LOT 14</span>
+  <section class="slide s-title" id="s15" aria-label="Close">
+    <span class="lot">LOT 15</span>
     <div class="title-grid">
       <div class="title-copy">
         <p class="eyebrow">nParity</p>
@@ -737,8 +750,8 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     </div>
     <aside class="notes">Close on the model line, then the ask. Questions.</aside>
   </section>
-  <section class="slide" id="s15" aria-label="Before, during, after">
-    <span class="lot">LOT 15</span>
+  <section class="slide" id="s16" aria-label="Before, during, after">
+    <span class="lot">LOT 16</span>
     <p class="eyebrow">Appendix · When it pays off</p>
     <h2 class="wide">Run nParity before, during and after the migration</h2>
     <div class="cols c3">
@@ -761,8 +774,8 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     <p class="callout push">Same engine, same report, at every stage of the migration.</p>
     <aside class="notes">This is why the question is "will we", not "did we". The value comes from asking early and often, not once at the end.</aside>
   </section>
-  <section class="slide s-compact" id="s16" aria-label="Why it hurts">
-    <span class="lot">LOT 16</span>
+  <section class="slide s-compact" id="s17" aria-label="Why it hurts">
+    <span class="lot">LOT 17</span>
     <p class="eyebrow">Appendix · Why it hurts today</p>
     <h2 class="wide">Three costs, every time you check</h2>
     <div class="cols c3">
@@ -785,8 +798,8 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     <p class="callout push">Petstore v2 to v3: <strong>39 differences</strong> to read. nParity took about <strong>20 seconds</strong>. By hand we estimate about <strong>2 hours</strong> <span class="todo">not yet timed</span>.</p>
     <aside class="notes">39 differences and 20.4 s are measured (run 2026-11-26T105859-petstore: 20 endpoints, 25 regression, 13 unsure, 1 intended). The 2 hours is our estimate, not a stopwatch: 20 endpoints x 3 samples x 2 min per comparison, the same model as the problem definition. Say so. Step 3 is the part nobody automates.</aside>
   </section>
-  <section class="slide" id="s17" aria-label="Market">
-    <span class="lot">LOT 17</span>
+  <section class="slide" id="s18" aria-label="Market">
+    <span class="lot">LOT 18</span>
     <p class="eyebrow">Appendix · Market</p>
     <h2>A slice of every modernisation</h2>
     <div class="cols c2">
@@ -806,8 +819,8 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     </div>
     <aside class="notes">Don't oversell the big number. Our market is the verification step inside it. Stage 3 will size that slice.</aside>
   </section>
-  <section class="slide s-compact" id="s18" aria-label="Cost to run">
-    <span class="lot">LOT 18</span>
+  <section class="slide s-compact" id="s19" aria-label="Cost to run">
+    <span class="lot">LOT 19</span>
     <p class="eyebrow">Appendix · Cost to run · stage 3</p>
     <h2 class="wide">Model fees are cents. The engine choice is about trust.</h2>
     <div class="cols c-gold">
