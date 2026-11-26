@@ -290,6 +290,14 @@ def test_static_and_404(setup):
     assert client.get(f"/runs/{run.id}/findings/f-999").status_code == 404
 
 
+def test_static_files_are_revalidated(setup):
+    client, _ = setup
+    for path in ("/static/nparity.css", "/static/htmx.min.js"):
+        r = client.get(path)
+        assert r.status_code == 200
+        assert r.headers["cache-control"] == "no-cache", path
+
+
 def test_run_name_and_backend_label():
     assert views.run_name("2026-11-26T124642-petstore-4676e543c67a") == "petstore"
     assert views.run_name("demo") == "demo"
