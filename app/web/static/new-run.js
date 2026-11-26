@@ -35,9 +35,19 @@ for (const panel of panels) {
 const rerunSelect = document.querySelector("#rerun-config");
 const rerunBaseline = document.querySelector("#rerun-baseline");
 const rerunSummary = document.querySelector("#rerun-summary");
+const rerunTitle = document.querySelector("#rerun-title");
 const rerunStart = document.querySelector("#rerun-start");
 const rerunEdit = document.querySelector("#rerun-edit");
 let loadedConfig = null;   // the configuration currently shown in the rerun menu
+let hasPreviousRuns = false;
+
+function updateRunLabel() {
+  const baseline = rerunBaseline.value;
+  const compare = baseline === "auto" ? hasPreviousRuns : baseline !== "";
+  const action = compare ? "Rerun" : "Run";
+  rerunTitle.textContent = action + " a configuration";
+  rerunStart.textContent = action;
+}
 
 function option(value, label) {
   const o = document.createElement("option");
@@ -76,14 +86,20 @@ function when(iso) {
 }
 
 async function loadConfig(name) {
+  loadedConfig = null;
+  rerunBaseline.replaceChildren();
+  updateRunLabel();
   const data = await getJSON("/comparisons/" + encodeURIComponent(name), { cache: "no-store" });
+  if (rerunSelect.value !== name) return;
   loadedConfig = data.config;
+  hasPreviousRuns = data.runs.length > 0;
   const c = data.config;
   rerunSummary.textContent = `${c.before.source} → ${c.after.source} · ${c.backend}${c.score ? " · scored" : ""}`;
-  const choices = [option("auto", data.runs.length ? `Latest: ${when(data.runs[0].started_at)} (${data.runs[0].open} open)` : "Latest (no runs yet)")];
+  const choices = [option("auto", hasPreviousRuns ? `Latest: ${when(data.runs[0].started_at)} (${data.runs[0].open} open)` : "Latest (no runs yet)")];
   for (const r of data.runs) choices.push(option(r.id, `${when(r.started_at)} · ${r.open} open · ${r.id}`));
   choices.push(option("", "None"));
   rerunBaseline.replaceChildren(...choices);
+  updateRunLabel();
 }
 
 async function loadConfigs() {
@@ -98,6 +114,7 @@ async function loadConfigs() {
 }
 
 rerunSelect.addEventListener("change", () => loadConfig(rerunSelect.value).catch(showError));
+rerunBaseline.addEventListener("change", updateRunLabel);
 
 rerunEdit.addEventListener("click", () => {
   if (!loadedConfig) return;
