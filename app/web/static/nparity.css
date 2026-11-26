@@ -211,6 +211,8 @@ details.g > details.f { margin-left: 14px; border-left: 1px solid var(--line); }
 /* PRD 0001: rerun menu */
 .rerun { margin-bottom: 28px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
 .rerun h1 { font-size: 18px; margin-bottom: 8px; }
+.rerun select { width: 100%; min-width: 0; padding: 8px 10px; font: inherit; }
+.rerun small { display: block; margin-top: 4px; }
 .rerun .run-presets { margin-top: 12px; }
 label.check { display: flex; gap: 8px; align-items: center; font-weight: 400; }
 

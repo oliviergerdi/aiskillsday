@@ -159,3 +159,27 @@ def test_scroll_step_list_into_view_at_start():
     after = body[body.index("resetConsole();") + len("resetConsole();"):].lstrip()
     assert after.startswith("output.scrollIntoView("), after[:60]
     assert re.match(r'output\.scrollIntoView\(\{\s*block:\s*"start"', after), after[:60]
+
+
+# 6. rerun selects fill their column
+def _rerun_decls(selector):
+    _, rest = _mobile_and_rest()
+    return " ".join(d for sels, d in _rules(rest) if selector in sels)
+
+
+def test_rerun_selects_fill_column():
+    d = _rerun_decls(".rerun select")
+    assert re.search(r"width:\s*100%", d), d
+    assert re.search(r"min-width:\s*0", d), d
+    assert re.search(r"padding:", d) and re.search(r"font:\s*inherit", d), d
+
+
+def test_rerun_description_below_select():
+    assert re.search(r"display:\s*block", _rerun_decls(".rerun small"))
+
+
+def test_rerun_markup_has_select_then_description_in_each_field(setup):
+    client, _ = setup
+    html = client.get("/compare").text
+    for sel_id in ("rerun-config", "rerun-baseline"):
+        assert re.search(rf'<select id="{sel_id}"></select>\s*<small class="sub"', html), sel_id
