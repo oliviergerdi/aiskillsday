@@ -212,3 +212,27 @@ def test_web_flow_report_lists_ordered_steps_and_unmatched_operations(tmp_path):
     assert "No counterpart before" in page and "GET /legacy-screening-statistics" in page
     assert "No counterpart after" in page and "GET /service-metrics" in page
     assert "Ready to cut over" not in page
+
+
+def test_only_one_direct_and_a_method_change_needs_review():
+    class Evaluator:
+        max_options = 8
+
+        def evaluate(self, state, questions):
+            (question,) = questions
+            return {question.id: one_hot("direct", list(question.criteria))}
+
+    old = {"paths": {"/pets": {"post": {"summary": "Add a pet"}}}}
+    new = {"paths": {"/pets": {"post": {"summary": "Add a pet"}, "put": {"summary": "Update a pet"}}}}
+    result = map_flows(old, new, Evaluator(), load_thresholds(), Telemetry(), workers=1)
+    steps = {step.new_op: step for step in result.flows[0].steps}
+    assert steps["POST /pets"].status == "suggested"
+    assert steps["PUT /pets"].status == "unsure" and "HTTP method" in steps["PUT /pets"].warning
+
+
+def test_a_body_that_repeats_a_response_is_not_a_dependency():
+    pet = {"type": "object", "required": ["photoUrls"], "properties": {"photoUrls": {"type": "array"}}}
+    media = {"content": {"application/json": {"schema": pet}}}
+    spec = {"paths": {"/pet": {"post": {"requestBody": {**media, "required": True}, "responses": {"200": media}},
+                               "put": {"requestBody": {**media, "required": True}, "responses": {"200": media}}}}}
+    assert {op.key: op.dependencies for op in operations(spec)} == {"POST /pet": set(), "PUT /pet": set()}

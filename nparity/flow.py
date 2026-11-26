@@ -31,6 +31,16 @@ PAGE_FIELDS = {"cursor", "page", "pagenumber", "pagesize", "limit", "offset", "p
 PATH_PARAMETER = re.compile(r"\{[^}]*\}")
 
 
+def _identifiers(names: set[str]) -> set[str]:
+    """Only ids and tokens hand work from one call to the next. A body that repeats a response is not a dependency."""
+    return {name for name in names if name.endswith("id") or name in {"accesstoken", "token"}}
+
+
+def _method(key: str) -> str | None:
+    head = key.split(" ", 1)[0].lower()
+    return head if head in METHODS else None
+
+
 def _normal(name: str) -> str:
     return re.sub(r"[^a-z0-9]", "", name.lower())
 
@@ -184,7 +194,7 @@ def operations(spec: dict) -> list[Operation]:
             if op.key == other.key:
                 continue
             linked = other.operation_id in op.links or other.reference in op.links
-            shared_ids = op.provides & other.requires if not (op.asynchronous and other.asynchronous) else set()
+            shared_ids = _identifiers(op.provides & other.requires) if not (op.asynchronous and other.asynchronous) else set()
             if linked or shared_ids:
                 other.dependencies.add(op.key)
     return sorted(result, key=lambda op: op.key)
@@ -241,7 +251,10 @@ def map_flows(old_spec: dict, new_spec: dict, ev: Backend, thresholds: Threshold
         old_op, new_op = pair
         q = Choice(id="flow:" + json.dumps([old_op.key, new_op.key]), criteria=ROLES,
                    instructions=f"What role does {new_op.key} serve for a caller replacing {old_op.key} "
-                                f"({old_op.source.quote})? Choose none if it is unrelated to this goal.")
+                                f"({old_op.source.quote})? Choose direct only if this one operation alone does what the old "
+                                f"operation did: the same resource and the same action. Creating, updating and deleting "
+                                f"are different actions, so a sibling operation that does another action is not direct. "
+                                f"Choose none if it is unrelated to this goal.")
         answer = ev.evaluate({"before": old_op.prompt(), "after": new_op.prompt()}, [q])[q.id]
         return answer
 
@@ -266,6 +279,22 @@ def map_flows(old_spec: dict, new_spec: dict, ev: Backend, thresholds: Threshold
             warning = warning or "The source quote could not be verified."
         grouped[old_op.key].append(FlowStep(new_op=new_op.key, role=role, p=answer.p_winner,
                                             status="unsure" if unsure else "suggested", source=source, warning=warning))
+    for old_key, steps in grouped.items():
+        def same_method(step: FlowStep) -> bool:
+            return _method(step.new_op) in (None, _method(old_key))
+
+        directs = [step for step in steps if step.role == "direct" and step.status == "suggested"]
+        best = max((step for step in directs if same_method(step)), key=lambda step: step.p, default=None)
+        for i, step in enumerate(steps):
+            if step not in directs:
+                continue
+            if not same_method(step):
+                warning = "Direct replacement uses a different HTTP method. Review it."
+            elif step is not best:
+                warning = "Another operation is the more likely direct replacement. Review it."
+            else:
+                continue
+            steps[i] = step.model_copy(update={"status": "unsure", "warning": warning})
     dependencies = {op.key: op.dependencies for op in new}
     result = FlowMapping(none_count=none_count)
     placed = set()
