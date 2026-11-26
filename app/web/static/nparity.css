@@ -167,7 +167,8 @@ details.g > details.f { margin-left: 14px; border-left: 1px solid var(--line); }
 .meta-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 8px 0 14px; }
 .meta-grid div { background: var(--code-bg); border-radius: 6px; padding: 8px 10px; font-size: 13px; }
 .meta-grid .k { color: var(--muted); font-size: 12px; display: block; }
-.req { font-size: 13px; margin: 6px 0 10px; }
+.req { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; margin: 6px 0 10px; }
+.req a { margin-inline-start: auto; }
 .req code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; }
 .sbs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .pane { border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
@@ -176,6 +177,23 @@ details.g > details.f { margin-left: 14px; border-left: 1px solid var(--line); }
 .pane pre span { display: block; padding: 0 10px; white-space: pre; }
 .pane pre span.hl-old { background: var(--hl-old); }
 .pane pre span.hl-new { background: var(--hl-new); }
+.pane pre .current-highlight { box-shadow: inset 3px 0 var(--accent); }
+.pane .highlight-note { margin-inline-start: 1em; color: var(--muted); user-select: none; }
+.highlight-nav {
+  position: fixed; inset-inline-end: 12px; top: 50%; transform: translateY(-50%);
+  z-index: 10; display: grid; gap: 4px; padding: 4px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+}
+.highlight-nav[hidden] { display: none; }
+.highlight-nav button {
+  width: 44px; height: 44px; background: var(--code-bg); color: var(--ink);
+  border: 1px solid var(--line); border-radius: 6px; font-size: 20px; cursor: pointer;
+}
+.highlight-nav button:hover:not([aria-disabled="true"]) { border-color: var(--accent); }
+.highlight-nav button[aria-disabled="true"] { color: var(--muted); opacity: .6; cursor: default; }
+@media (max-width: 1250px) {
+  main.wrap:has(> .highlight-nav:not([hidden])) { padding-inline-end: 74px; }
+}
 .samples { margin-top: 12px; font-size: 13px; }
 .samples ul { margin: 4px 0 0; padding-left: 18px; }
 .samples li { margin: 2px 0; }
@@ -230,7 +248,7 @@ details.g > details.f { margin-left: 14px; border-left: 1px solid var(--line); }
 label.check { display: flex; gap: 8px; align-items: center; font-weight: 400; }
 
 /* PRD 0001: decisions */
-.decision { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); }
+.decision { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); scroll-margin-top: 16px; }
 .decision-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .decision-form { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 .decision-form input { padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); }

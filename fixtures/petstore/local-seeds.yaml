@@ -1,0 +1,5 @@
+methods: [GET]
+params:
+  petId: [2, 10]
+  status: [available, sold]
+  tags: [[tag1]]

@@ -63,6 +63,16 @@ def test_finding_partial(setup):
     assert "fullName" in r2 and 'class="hl-new"' in r2       # highlights `name` on the new side
 
 
+def test_finding_links_to_its_review_controls_before_response_bodies(setup):
+    client, run = setup
+    for finding in run.findings[:2]:
+        response = client.get(f"/runs/{run.id}/findings/{finding.id}")
+        assert response.status_code == 200
+        target = f"{finding.id}-review"
+        assert response.text.index(f'href="#{target}"') < response.text.index("<pre>")
+        assert f'class="decision" id="{target}"' in response.text
+
+
 def test_mapping_page(setup):
     client, run = setup
     r = client.get(f"/runs/{run.id}/mapping")
@@ -143,6 +153,41 @@ def test_finding_highlights_only_the_reported_path(path, before, after, old_line
 
     assert [line.text.strip().rstrip(",") for line in view.old_lines if line.hl] == [old_line]
     assert [line.text.strip().rstrip(",") for line in view.new_lines if line.hl] == [new_line]
+
+
+@pytest.mark.parametrize(("path", "kind", "old_line", "new_line", "new_note"), [
+    ("$[*].tags[*]", "type_changed", "{", '"unexpected"', ""),
+    ("$[*].name", "missing_in_new", '"name": "old"', "{", 'Missing field "name"'),
+])
+def test_report_highlights_array_shape_evidence(tmp_path, path, kind, old_line, new_line, new_note):
+    request = Request(method="GET", path="/x")
+    sample = Sample(
+        old_request=request, new_request=request,
+        old=HttpResult(status=200, body=[{"id": 1, "name": "old", "tags": [{"id": 1}]}]),
+        new=HttpResult(status=200, body=[
+            {"id": 2, "name": "new", "tags": [{"id": 2}, "unexpected"]},
+            {"id": 3, "tags": [{"id": 3}]},
+        ]),
+    )
+    finding = Finding(id="f-1", endpoint=request.endpoint, path=path, kind=kind, status="unsure",
+                      source="diff", samples=[sample], differing=1, differs_in=[0])
+    run = Run(id="array-shape", started_at=datetime.now(timezone.utc), findings=[finding],
+              config={"independent_data": True})
+    store.save(run, tmp_path)
+    previous = app.state.runs_dir, app.state.ledger_path
+    app.state.runs_dir, app.state.ledger_path = tmp_path, tmp_path / "accepted.yaml"
+    try:
+        response = TestClient(app).get(f"/runs/{run.id}/findings/{finding.id}")
+    finally:
+        app.state.runs_dir, app.state.ledger_path = previous
+    assert response.status_code == 200
+    for side, line, note in (("old", old_line, "Before example"), ("new", new_line, new_note)):
+        highlighted = re.findall(rf'<span[^>]*class="hl-{side}"[^>]*>(.*?)</span>', response.text)
+        assert len(highlighted) == 1
+        assert html.unescape(highlighted[0]).strip().startswith(line)
+        assert note in html.unescape(highlighted[0])
+        assert f'href="#f-1-{side}-highlight"' in response.text
+        assert f'id="f-1-{side}-highlight"' in response.text
 
 
 def _table(page):

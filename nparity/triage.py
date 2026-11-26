@@ -26,6 +26,12 @@ INSTRUCTIONS = ("Compare the difference with the intent note. "
                 "A shared record ID does not establish that two databases contain the same record. "
                 "When the intent allows different records, treat changes in list membership and record values as data differences. "
                 "Which label fits this difference best?")
+INDEPENDENT_INSTRUCTIONS = (
+    "The services use separate datasets. Judge the observed status or response shape change against the intent note. "
+    "Choose intended only if the note explicitly describes this specific change. "
+    "Permission for record values or membership to differ does not cover status or shape changes. "
+    "Choose unsure if the evidence could reflect which records were sampled."
+)
 MAX_EXAMPLES = 3
 INDEPENDENT_DATA = re.compile(
     r"\b(?:separate|different|independent)\s+(?:test\s+)?(?:databases|datasets|data sets|data stores)\b"
@@ -102,9 +108,7 @@ def _example(f: Finding, s: Sample) -> str:
     return f"- {call}: old {old} → new {new}"
 
 
-def state_for(f: Finding, intent: str) -> str:
-    idx = f.differs_in or list(range(len(f.samples)))
-    examples = [_example(f, f.samples[i]) for i in idx[:MAX_EXAMPLES] if i < len(f.samples)]
+def state_for(f: Finding, intent: str, *, independent_data: bool = False) -> str:
     lines = [
         "Intent note (the changes the rewrite was meant to make):",
         '"""', intent.strip(), '"""', "",
@@ -115,11 +119,18 @@ def state_for(f: Finding, intent: str) -> str:
     ]
     if f.source == "diff":
         lines.append(f"Seen in: {f.differing} of {len(f.samples)} sampled requests")
-    if examples:
-        lines += ["Examples:", *examples]
-    for k in ("observed", "declared"):
-        if k in f.type_info:
-            lines.append(f"{k.capitalize()} type: {f.type_info[k]}")
+    if independent_data:
+        if evidence := f.type_info.get("transitions"):
+            lines.append(f"Observed before → after: {evidence}")
+    else:
+        idx = f.differs_in or list(range(len(f.samples)))
+        examples = [_example(f, f.samples[i]) for i in idx[:MAX_EXAMPLES] if i < len(f.samples)]
+        if examples:
+            lines += ["Examples:", *examples]
+        if "observed" in f.type_info:
+            lines.append(f"Observed type: {f.type_info['observed']}")
+    if "declared" in f.type_info:
+        lines.append(f"Declared type: {f.type_info['declared']}")
     return "\n".join(lines)
 
 
@@ -144,10 +155,12 @@ def apply(f: Finding, a: Answer, th: Thresholds) -> None:
 
 
 def triage(findings: list[Finding], intent: str, ev: Backend, th: Thresholds,
-           tel: Telemetry | None = None, workers: int = 8) -> list[Finding]:
+           tel: Telemetry | None = None, workers: int = 8, *, independent_data: bool = False) -> list[Finding]:
+    instructions = INDEPENDENT_INSTRUCTIONS if independent_data else INSTRUCTIONS
+
     def one(f: Finding) -> tuple[Finding, Answer, Answer | None]:
-        q = Choice(id=question_id(f), instructions=INSTRUCTIONS, criteria=CRITERIA)
-        st = state_for(f, intent)
+        q = Choice(id=question_id(f), instructions=instructions, criteria=CRITERIA)
+        st = state_for(f, intent, independent_data=independent_data)
         a = ev.evaluate(st, [q])[q.id]
         apply(f, a, th)
         r = None

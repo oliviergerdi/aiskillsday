@@ -1,0 +1,18 @@
+before:
+  kind: spec
+  base_url: http://127.0.0.1:18081/api
+  source: http://127.0.0.1:18081/api/swagger.json
+  headers: []
+after:
+  kind: spec
+  base_url: http://127.0.0.1:18082/api/v3
+  source: http://127.0.0.1:18082/api/v3/openapi.json
+  headers: []
+seeds: fixtures/petstore/local-seeds.yaml
+samples: ''
+discover_from: []
+contract_only: false
+intent: fixtures/petstore/intent.md
+backend: flash
+name: petstore-local
+score: false

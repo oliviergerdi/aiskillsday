@@ -61,6 +61,10 @@
 {% if empty %}
 <div class="findings"><div class="empty">Nothing to review</div></div>
 {% else %}
+<nav class="highlight-nav" aria-label="Highlight navigation" hidden>
+  <button type="button" data-highlight-step="-1" aria-label="Skip to previous highlight" title="Skip to previous highlight"><span aria-hidden="true">↑</span></button>
+  <button type="button" data-highlight-step="1" aria-label="Skip to next highlight" title="Skip to next highlight"><span aria-hidden="true">↓</span></button>
+</nav>
 <p class="conf-legend">Bar = confidence in the label. Line = confidence needed to accept without review.</p>
 {% macro grouped(gs, first_open=False) %}
 <div class="findings">

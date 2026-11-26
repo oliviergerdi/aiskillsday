@@ -57,6 +57,50 @@ document.addEventListener("submit", (event) => {
   send(form.closest(".decision"), "POST", { decision: form.dataset.decision, by, note: form.elements.note.value.trim() });
 });
 
+const highlightNav = document.querySelector(".highlight-nav");
+if (highlightNav) {
+  const [previous, next] = highlightNav.querySelectorAll("button");
+  let highlights = [];
+  let current = null;
+
+  function selectHighlight(line) {
+    current?.classList.remove("current-highlight");
+    current = line;
+    current?.classList.add("current-highlight");
+    previous.setAttribute("aria-disabled", current !== null && current === highlights[0]);
+    next.setAttribute("aria-disabled", current !== null && current === highlights.at(-1));
+  }
+
+  function refreshHighlights() {
+    const visible = [...document.querySelectorAll(".f-body .hl-old, .f-body .hl-new")]
+      .filter(line => !line.closest("details:not([open])"));
+    highlightNav.hidden = visible.length === 0;
+    highlights = visible.map(line => ({ line, top: line.getBoundingClientRect().top }))
+      .sort((a, b) => a.top - b.top)
+      .map(({ line }) => line);
+    selectHighlight(highlights.includes(current) ? current : null);
+  }
+
+  highlightNav.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-highlight-step]");
+    if (!button || button.getAttribute("aria-disabled") === "true") return;
+    const step = Number(button.dataset.highlightStep);
+    const index = current ? highlights.indexOf(current) + step : (step > 0 ? 0 : highlights.length - 1);
+    const line = highlights[index];
+    if (!line) return;
+    selectHighlight(line);
+    line.scrollIntoView({ block: "center", inline: "nearest" });
+  });
+
+  document.addEventListener("focusin", (event) => {
+    if (highlights.includes(event.target)) selectHighlight(event.target);
+  });
+  document.addEventListener("toggle", refreshHighlights, true);
+  document.addEventListener("htmx:afterSwap", refreshHighlights);
+  window.addEventListener("resize", refreshHighlights);
+  refreshHighlights();
+}
+
 try {
   const y = sessionStorage.getItem("nparity.scroll");
   if (y !== null) { sessionStorage.removeItem("nparity.scroll"); window.scrollTo(0, Number(y)); }

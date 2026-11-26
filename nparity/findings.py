@@ -39,6 +39,7 @@ def build_findings(emap: list[EndpointMap], fmap: list[FieldMap], samples: list[
         per_endpoint[s.old_request.endpoint].append(s)
 
     groups: dict[tuple[str, str, str], Finding] = {}
+    transitions: dict[tuple[str, str, str], set[str]] = defaultdict(set)
     noise: dict[tuple[str, str, str], Noise] = {}
     errors: list[Finding] = []
     replayed_endpoints: set[str] = set()
@@ -78,6 +79,10 @@ def build_findings(emap: list[EndpointMap], fmap: list[FieldMap], samples: list[
                 if f is None:
                     f = groups[key] = Finding(id="", endpoint=endpoint, new_endpoint=new_endpoint, path=d.path,
                                               kind=d.kind, source="diff", samples=shown)
+                if independent_data and d.kind == "type_changed":
+                    transitions[key].add(f"{' | '.join(d.old)} → {' | '.join(d.new)}")
+                elif independent_data and d.kind == "status_changed":
+                    transitions[key].add(f"{d.old} → {d.new}")
                 f.differing += 1
                 if i < MAX_SAMPLES:
                     f.differs_in.append(i)
@@ -89,6 +94,8 @@ def build_findings(emap: list[EndpointMap], fmap: list[FieldMap], samples: list[
                 a, b = obs[generic(path)]
                 f.type_info["observed"] = f"{_fmt(a)} → {_fmt(b)}"
 
+    for key, evidence in transitions.items():
+        groups[key].type_info["transitions"] = "; ".join(sorted(evidence))
     findings = list(groups.values())
 
     # declared types of mapped fields: attach to an existing finding on the same path, else their own finding

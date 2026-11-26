@@ -4,6 +4,9 @@ from pathlib import Path
 import httpx
 
 from nparity import contract, pipeline
+from nparity.evaluator.base import one_hot
+from nparity.evaluator.fake import FakeBackend
+from nparity.models import AnswerKey
 from nparity.openapi import endpoints
 from nparity.review import Ledger, scope_of, verdict
 from nparity.triage import intent_declares_independent_data
@@ -79,3 +82,31 @@ def test_independent_data_ignores_records_but_retains_response_shape_changes(tmp
     assert scope_of(run) != scope_of(run.model_copy(update={"config": {"old": cfg.old, "new": cfg.new}}))
     clean = run.model_copy(update={"findings": []})
     assert verdict(clean, Ledger(path=tmp_path / "ledger.yaml"))[0] != "Ready to cut over"
+
+
+def test_independent_data_triages_expected_array_item_type_change(tmp_path):
+    class IntentEvaluator(FakeBackend):
+        def evaluate(self, state, questions, reasons=False):
+            if questions[0].id.startswith("triage:"):
+                question = questions[0]
+                intended = ("Where: response field `$[*].code`" in state
+                            and "string → integer" in state and "$[*].code changes from string to integer" in state
+                            and "(absent)" not in state)
+                return {question.id: one_hot("intended" if intended else "unsure", list(question.criteria))}
+            return super().evaluate(state, questions, reasons=reasons)
+
+    intent = tmp_path / "intent.md"
+    intent.write_text("The services use separate databases. On GET /items, $[*].code changes from string to integer.")
+    spec = {"paths": {"/items": {"get": {}}}}
+    responses = {"before": [{"code": "1", "name": "old"}], "after": [{"code": 2}]}
+
+    def get(request):
+        return httpx.Response(200, json=responses[request.url.host])
+
+    cfg = pipeline.RunConfig("http://before", "http://after", intent=intent, answer_key=None)
+    with httpx.Client(transport=httpx.MockTransport(get)) as client:
+        run = pipeline.run(cfg, client, IntentEvaluator(AnswerKey()), specs=(spec, spec))
+    assert [(f.path, f.label, f.status) for f in run.findings] == [
+        ("$[*].code", "intended", "accepted"),
+        ("$[*].name", "unsure", "unsure"),
+    ]

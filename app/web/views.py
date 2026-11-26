@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from nparity.config import Thresholds
+from nparity.diff import observed_type
 from nparity.findings import renames_for
 from nparity.jsonpath import MISSING, child, locate, value_at
 from nparity.lists import keys_text, membership
@@ -30,6 +31,7 @@ BADGE = {"regression": "b-reg", "unsure": "b-uns", "intended": "b-int"}
 class Line:
     text: str
     hl: bool = False
+    note: str = ""
 
 
 @dataclass
@@ -108,37 +110,71 @@ def _sample_paths(run: Run, f: Finding) -> tuple[str | None, str | None]:
     )
 
 
-def _json_line_count(value: Any) -> int:
-    if isinstance(value, dict) and value:
-        return 2 + sum(_json_line_count(item) for item in value.values())
-    if isinstance(value, list) and value:
-        return 2 + sum(_json_line_count(item) for item in value)
-    return 1
+Position = tuple[str | int, ...]
 
 
-def _lines(body: Any, path: str | None) -> list[Line]:
+def _array_matches(body: Any, path: str) -> dict[Position, Any]:
+    head, wildcard, tail = path.partition("[*]")
+    target = locate(body, head)
+    if target is None:
+        return {}
+    value, keys = target
+    if not wildcard:
+        return {tuple(keys): value}
+    if not isinstance(value, list):
+        return {}
+    return {(*keys, index, *suffix): item for index, element in enumerate(value)
+            for suffix, item in _array_matches(element, tail).items()}
+
+
+def _array_highlights(f: Finding, s: Sample) -> tuple[dict[Position, str], dict[Position, str]]:
+    before = _array_matches(s.old.body, f.path)
+    first_before = next(iter(before), None)
+    before_example = {first_before: "Before example"} if first_before is not None else {}
+    if f.kind == "missing_in_new":
+        parent, _, name = f.path.rpartition(".")
+        missing = {position: f"Missing field {json.dumps(name, ensure_ascii=False)}"
+                   for position, record in _array_matches(s.new.body, parent).items()
+                   if isinstance(record, dict) and name not in record}
+        return before_example, missing
+    after = _array_matches(s.new.body, f.path)
+    if f.kind == "added_in_new":
+        return {}, dict.fromkeys(after, "")
+    if f.kind == "type_changed":
+        old_types = {observed_type(value) for value in before.values()}
+        new_types = {observed_type(value) for value in after.values()}
+        old_changes = {position: "" for position, value in before.items() if observed_type(value) not in new_types}
+        new_changes = {position: "" for position, value in after.items() if observed_type(value) not in old_types}
+        return old_changes or before_example, new_changes
+    return {}, {}
+
+
+def _lines(body: Any, path: str | None, *, highlights: dict[Position, str] | None = None) -> list[Line]:
     if body is None:
         return [Line("(no body)")]
     if isinstance(body, str):
         return [Line(line) for line in body.splitlines()]
 
-    line_index = None
-    target = locate(body, path) if path is not None else None
-    if target is not None:
-        _, positions = target
-        line_index = 0
-        current = body
-        for key in positions:
-            siblings = current if isinstance(current, dict) else range(len(current))
-            line_index += 1  # Move past this container's opening line.
-            for sibling in siblings:
-                if sibling == key:
-                    break
-                line_index += _json_line_count(current[sibling])
-            current = current[key]
-
+    if highlights is None:
+        target = locate(body, path) if path is not None else None
+        highlights = {tuple(target[1]): ""} if target is not None else {}
     text = json.dumps(body, indent=2, ensure_ascii=False)
-    return [Line(line, index == line_index) for index, line in enumerate(text.split("\n"))]
+    lines = [Line(line) for line in text.split("\n")]
+
+    def mark(value: Any, position: Position, index: int) -> int:
+        if position in highlights:
+            lines[index].hl = True
+            lines[index].note = highlights[position]
+        if isinstance(value, (list, dict)) and value:
+            items = value.items() if isinstance(value, dict) else enumerate(value)
+            index += 1
+            for key, child_value in items:
+                index = mark(child_value, (*position, key), index)
+        return index + 1
+
+    if highlights:
+        mark(body, (), 0)
+    return lines
 
 
 def _kind_text(f: Finding, s: Sample | None) -> str:
@@ -189,7 +225,9 @@ def finding_view(run: Run, f: Finding, th: Thresholds) -> FindingView:
                           f"{request_line(s, 'old')} → {request_line(s, 'new')}")
         v.old_head = str(s.old.status) if s.old.status is not None else (s.old.error or "error")
         v.new_head = str(s.new.status) if s.new.status is not None else (s.new.error or "error")
-        v.old_lines, v.new_lines = _lines(s.old.body, old_path), _lines(s.new.body, new_path)
+        old_highlights, new_highlights = (_array_highlights(f, s) if "[*]" in f.path else (None, None))
+        v.old_lines = _lines(s.old.body, old_path, highlights=old_highlights)
+        v.new_lines = _lines(s.new.body, new_path, highlights=new_highlights)
     for i, smp in enumerate(f.samples):
         if f.source == "diff":
             state = "differs" if i in f.differs_in else "same"

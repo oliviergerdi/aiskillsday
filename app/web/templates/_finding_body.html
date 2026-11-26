@@ -6,13 +6,22 @@
 </div>
 {% if v.f.type_info.get("mapping") and v.f.type_info.get("declared") %}<p class="sub">Type in the spec: {{ v.f.type_info.declared }}</p>{% endif %}
 {% if v.distribution %}<p class="sub">Model's split between labels: {{ v.distribution }}</p>{% endif %}
+{% if v.sample_label or v.state %}
+<div class="req">
+  {% if v.sample_label %}<span>{{ v.sample_label }}</span>{% endif %}
+  {% if v.state %}<a class="noprint" href="#{{ v.f.id }}-review">Jump to review ↓</a>{% endif %}
+</div>
+{% endif %}
 {% if v.sample_label %}
-<div class="req">{{ v.sample_label }}</div>
+{% macro response_pane(side, status, lines) %}
+{% set first = lines|selectattr("hl")|first %}
+{% set highlight_id = v.f.id ~ "-" ~ side ~ "-highlight" %}
+  <div class="pane"><div class="ph"><span>{{ side }}</span>{% if first %}<a href="#{{ highlight_id }}">Jump to highlight</a>{% endif %}<span>{{ status }}</span></div>
+<pre>{% for l in lines %}<span{% if l.hl %} class="hl-{{ side }}"{% if l is sameas first %} id="{{ highlight_id }}" tabindex="-1"{% endif %}{% endif %}>{{ l.text }}{% if l.note %}<small class="highlight-note">{{ l.note }}</small>{% endif %}</span>{% endfor %}</pre></div>
+{% endmacro %}
 <div class="sbs">
-  <div class="pane"><div class="ph"><span>old</span><span>{{ v.old_head }}</span></div>
-<pre>{% for l in v.old_lines %}<span{% if l.hl %} class="hl-old"{% endif %}>{{ l.text }}</span>{% endfor %}</pre></div>
-  <div class="pane"><div class="ph"><span>new</span><span>{{ v.new_head }}</span></div>
-<pre>{% for l in v.new_lines %}<span{% if l.hl %} class="hl-new"{% endif %}>{{ l.text }}</span>{% endfor %}</pre></div>
+  {{ response_pane("old", v.old_head, v.old_lines) }}
+  {{ response_pane("new", v.new_head, v.new_lines) }}
 </div>
 {% endif %}
 {% if v.samples %}

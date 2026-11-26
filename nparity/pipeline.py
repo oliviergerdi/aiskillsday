@@ -222,14 +222,8 @@ def run(
     if not cfg.contract_only:
         findings, noise, errors = build_findings([] if basic else emap, fmap, samples, load_noise(cfg.noise), v1, v2,
                                                   shape_only=basic, include_declared=False, independent_data=independent_data)
-        if independent_data:
-            progress(f"Triaging {len(findings)} findings for human review. The intent describes separate datasets.")
-            for finding in findings:
-                finding.label = finding.status = "unsure"
-                finding.reason = "The recorded status or shape differs. Check the same records before judging regression risk."
-        else:
-            progress(f"Triaging {len(findings)} findings")
-            triage(findings, intent, ev, th, tel, workers=cfg.workers)
+        progress(f"Triaging {len(findings)} findings")
+        triage(findings, intent, ev, th, tel, workers=cfg.workers, independent_data=independent_data)
     matched = {m.new for m in emap if m.new is not None and m.status == "accepted"}
 
     result = Run(

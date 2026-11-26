@@ -9,7 +9,7 @@ after:
   base_url: https://petstore3.swagger.io/api/v3
   headers: []
 seeds: fixtures/petstore/seeds.yaml
-intent: ''
+intent: fixtures/petstore/intent.md
 backend: flash
 name: petstore
 score: false

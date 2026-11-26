@@ -36,12 +36,16 @@ def json_class(v: Any) -> str:
     return "object"
 
 
+def observed_type(value: Any) -> str:
+    return "integer" if type(value) is int else json_class(value)
+
+
 def _shape(value: Any) -> Any:
     if isinstance(value, dict):
         return tuple((name, _shape(item)) for name, item in sorted(value.items()))
     if isinstance(value, list):
         return frozenset(_shape(item) for item in value)
-    return "integer" if type(value) is int else json_class(value)
+    return observed_type(value)
 
 
 def _dynamic_map(schema: dict) -> bool:
@@ -51,7 +55,7 @@ def _dynamic_map(schema: dict) -> bool:
 
 
 def _observed_types(values: list) -> set[str]:
-    return {"integer" if type(value) is int else json_class(value) for value in values}
+    return {observed_type(value) for value in values}
 
 
 def _walk_independent(before: list, after: list, path: str, out: list[Diff], schemas: tuple[dict, dict]) -> None:
