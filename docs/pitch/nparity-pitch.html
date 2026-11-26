@@ -596,6 +596,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
       </div>
     </div>
     <p class="callout push">The number to firm up is the manual baseline. We have not timed it yet.</p>
+    <p class="source push">Model price: US$0.45 in, US$1.80 out per million tokens, list price for deepseek-v4p1-flash-1017-us on Fireworks (getmaxim.ai Bifrost cost calculator, third party, not billed). Tokens measured on 111 calls. US$40/h and 1 h a pass are our assumptions.</p>
     <aside class="notes">The case is internal: engineer time saved, not revenue. A manual parity pass is about 20 h (illustrative: 200 endpoints x 3 samples x 2 minutes). With nParity about 1 h (assumed). Five passes per migration (assumed) at US$40/h loaded senior cost (assumed): 95 h, US$3,800. Cost to run: model US$3.30 (10 runs of 1,000 findings at list price, tokens measured on 111 Flash calls), compute US$0.10, storage US$1 (assumed). The manual baseline has not been timed. Scenarios and the build payback are in the appendix. Model: docs/costing/business_case.py</aside>
   </section>
   <section class="slide s-compact" id="s9" aria-label="Risks">
@@ -823,7 +824,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
         </ul>
       </div>
     </div>
-    <p class="callout push">A 1,000-finding run costs about US$0.33 on Flash. Engineer time costs more than the model.</p>
+    <p class="source push">A 1,000-finding run costs about US$0.33 on Flash. Sources: Fireworks list prices via getmaxim.ai Bifrost calculator; Jev (flaviocopes.com/jev-pricing); OpenAI Decisions (fourweekmba.com, unconfirmed); AWS pricing pages. Third-party list prices, not quotes.</p>
     <aside class="notes">Engine choice affects trust more than cost. Jev and OpenAI Decisions return no reason; Bedrock serverless models do not return token probabilities. Tokens are measured on 111 Flash calls; prices are public list prices, not quotes; the Fireworks -us router price is unverified. Serverless hosting is about US$3 a month idle (assumed). Always-on containers cost US$50 to US$83 a month. Model: docs/costing/nparity-costing.md</aside>
   </section>
   <section class="slide s-compact" id="s19" aria-label="Not built yet">

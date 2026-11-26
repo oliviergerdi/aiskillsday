@@ -52,7 +52,7 @@ Not priced: Africa (Cape Town) region (not on AWS pages we could read), data tra
 
 ## 5. Sources
 
-- Fireworks list prices: getmaxim.ai Bifrost cost calculator pages for `deepseek-v4p1-flash` and `deepseek-v4p1-flash-1017`.
+- Fireworks list prices: getmaxim.ai Bifrost cost calculator pages for `deepseek-v4p1-flash` and `deepseek-v4p1-flash-1017`. The exact router we use, `deepseek-v4p1-flash-1017-us`, is also listed there (checked 26 Nov 2026): US$0.45 in, US$1.80 out per million tokens, no cached-input price. Third-party calculator, not Fireworks' own page, and not billed.
 - Jev: flaviocopes.com/jev-pricing (updated 9 Oct 2026), docs.aimlapi.com Jev page.
 - OpenAI Decisions API: fourweekmba.com (GA 22 Oct 2026, $0.10 / $0.01 cached, no output fee). A second source (thenewstack.io) says limited preview, price undisclosed. **Confirm on OpenAI's own pricing page.**
 - Bedrock logprobs: AWS ML blog, Custom Model Import.
