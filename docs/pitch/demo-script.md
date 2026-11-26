@@ -16,7 +16,7 @@ Judges score nine things (see the scoring sheet). Slide that carries each: probl
 | 2:20 | 8 | Stephen + Gerdi | **Live demo** (2:00) |
 | 4:20 | 9 | Gerdi | Why the thresholds differ (0:15) |
 | 4:35 | 10 | Gerdi | One sentence (0:10) |
-| 4:45 | 11 | Temba | Why a hosted tier exists (0:25) |
+| 4:45 | 11 | Temba | Engineer savings, not a sale (0:25) |
 | 5:10 | 12 | Temba | The one number to remember (0:15) |
 | 5:25 | 13 | Temba | The honest read (0:20) |
 | 5:45 | 14 | Temba | Two risks, named (0:15) |
@@ -51,11 +51,11 @@ Judges score nine things (see the scoring sheet). Slide that carries each: probl
 
 **Slide 10 (Gerdi).** "It is a developer tool, and an AI agent can drive it too. Built, not in the demo."
 
-**Slide 11 (Temba).** Why hosted exists: "Self-host is free for anyone who can run a model with token probabilities. The hosted pass is for teams who cannot, or would rather not. We charge once because a migration happens once."
+**Slide 11 (Temba).** "This is an internal case. We are not selling it. The saving is engineer time: about 95 hours a migration on our assumptions."
 
-**Slide 12 (Temba).** "Model fees are 2% of the price. Support is the real cost."
+**Slide 12 (Temba).** "Running it costs about four dollars a migration. The engineer's hour is the cost that matters."
 
-**Slide 13 (Temba).** "The honest read: the hosted tier is modest on its own. The free core builds the audience, and the pass pays for itself."
+**Slide 13 (Temba).** "Even the cautious case repays a build. The number to firm up is the manual baseline, which we have not timed."
 
 **Slide 14 (Temba).** Name two risks only: accuracy (the unsure bucket), and the model route not returning probabilities (run the CLI on a model that does).
 
@@ -71,14 +71,14 @@ Judges score nine things (see the scoring sheet). Slide that carries each: probl
 - **Why trust the AI?** Slide 9. Probabilities, thresholds, no regression auto-dismissed.
 - **Who has committed or paid?** No one yet. We have one interview and a working prototype. Say so.
 - **What stops a copy?** See slide 5: judging intent with a probability, plus the calibration.
-- **Why pay when the CLI is free?** The hosted tier is for people who cannot or will not run a model themselves.
+- **Will you sell it?** No. It is framed as an internal tool, because the numbers do not support an external sale. The value is engineer time (slides 11 to 13).
 - **How big is the market?** Not sized yet. Slide 18 is a placeholder with the wrong slice.
 - **How do you know the two hours?** An estimate (20 endpoints x 3 samples x 2 min), not yet timed. Slide 17.
 - **What if there is no OpenAPI spec?** Optional by design. Without one we do basic checks only, and the report says so (PRD 0006, PRD 0008).
 - **Authenticated APIs?** Not built for the demo, public APIs only. A token option is a release requirement.
 - **POST or DELETE endpoints?** The spec gives contract differences for every method with no calls. Behaviour is replayed for GET by default, other methods opt-in (PRD 0008).
 - **Can an AI agent use it?** Yes, a developer CLI with YAML run output. The agent options (`--format json`, `--compact`, `--detach`, `--dry-run`, `--fail-on`) are built; not in the demo. It is not meant for CI builds.
-- **Data leaving the company?** Hosted tier redacts before any model call (specified, not built). Self-host keeps everything local.
+- **Data leaving the company?** Redaction before any model call is specified, not built. Run it on an approved model or locally and nothing leaves.
 - **CSOM to Mesh?** Our worked example. The key is our draft from vendor docs, how our integration calls each API, and one engineer's answer. It has not been reviewed.
 
 ## Checks before you go on

@@ -1,6 +1,19 @@
 # nParity: business case (stage 3, 26 Nov 2026)
 
-**BLUF.** Open core. Self-hosting is free (MIT) with your own model. Hosted pricing is a **Migration Pass at US$149**: 60 days, about 50 runs, one migration. That is about 4% of the senior-developer time one migration's parity passes cost. Gross margin is 94% and contribution 67% after support. Serverless hosting costs about US$3 a month idle, so the first pass covers run costs. Paying back the build needs volume: at 4 passes a month a lean build (US$19k) pays back in month 52 and a full build (US$58k) not within 10 years. At US$299 a pass the base case pays back a lean build in month 23. We moved from US$99 a month because a migration happens once or twice, so a subscription is the wrong shape. All figures USD. Reproduce with `python3 docs/costing/business_case.py`. Everything marked ASSUMED is a guess to challenge.
+**BLUF.** Frame nParity as an internal tool and make the case on engineer time. One migration's parity passes cost about 100 senior hours by hand (5 passes x 20 h, illustrative) and about 5 h with nParity (ASSUMED): **95 h, about US$3,800** at US$40/h loaded. Running it costs about **US$4.40** a migration (model US$3.30, compute and storage US$1.10), 0.1% of the saving. Repaying a lean build (US$19k) takes 18 / 6 / 2 migrations (cautious / base / optimistic). The number to firm up is the manual baseline, which is untimed. The external sale below (Migration Pass, US$149) does not hold up: payback needs volume we cannot show, so it is kept only as a reference. All figures USD. Reproduce with `python3 docs/costing/business_case.py`. Everything marked ASSUMED is a guess to challenge.
+
+## Internal case (current framing)
+| Case | Manual pass | Passes | Saved per migration | Migrations to repay lean build |
+|---|---|---|---|---|
+| Cautious | 10 h | 3 | US$1,080 | 18 |
+| Base | 20 h | 5 | US$3,800 | 6 |
+| Optimistic | 40 h | 8 | US$12,480 | 2 |
+
+- Saved = (manual hours - 1 h) x passes x US$40. Labour only: incidents, customer impact and a regression caught early (4 / 12 / 24 h, US$160 / 480 / 960) are not counted.
+- The prototype and CLI work without the build. The lean build (PRDs 0005 to 0007) is an upper bound for internal use; PRD 0007 (hosted service) is needed only if the tool is offered outside the company.
+- Risks: model price 10x = US$33 a migration; vote sampling about US$11; client data reaching a model host (use an approved model, redaction specified not built); manual baseline untimed.
+
+# Reference: external sale (not recommended)
 
 ## 1. Pricing and revenue model
 - **Who pays:** the engineering manager who signs off the cutover, from the team's tooling budget. The engineer is the user.

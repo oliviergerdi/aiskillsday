@@ -634,75 +634,74 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     <p class="callout push">A developer tool. The agent does the fixing. nParity says where to look.</p>
     <aside class="notes">Same CLI and engine. The README section 'CLI automation' describes: --format json (one JSON document on stdout, errors on stderr), fixed exit codes, --compact, fetching a single finding, --detach with status polling, --dry-run, and --fail-on (exit code 5, so an agent knows to stop). Status: built and in the repository, not part of the live demo. It is a developer tool, not a CI build step.</aside>
   </section>
-  <section class="slide s-compact" id="s11" aria-label="Pricing">
+  <section class="slide s-compact" id="s11" aria-label="Value to engineering">
     <span class="lot">LOT 11</span>
-    <p class="eyebrow">Pricing and revenue · stage 3</p>
-    <h2>Priced at about 4% of the labour it saves</h2>
+    <p class="eyebrow">Value to engineering · stage 3</p>
+    <h2>About 95 engineering hours saved per migration</h2>
     <div class="cols c2">
-      <div class="card"><span class="k">Who pays</span><p class="body">The engineering manager who signs off the cutover, from the team's tooling budget.</p></div>
-      <div class="card"><span class="k">What they buy</span><p class="body">Self-host free (MIT, your own model). Hosted: <strong>Migration Pass, US$149</strong>, 60 days, about 50 runs.</p></div>
-      <div class="card"><span class="k">Why that price</span><p class="body">One migration's parity passes cost about <strong>US$3,800</strong> of senior time. It happens once, so we charge once. Ongoing work: US$99 a month.</p></div>
+      <div class="card"><span class="k">Who benefits</span><p class="body">Engineers proving the new API behaves like the old one. Their manager signs off.</p></div>
+      <div class="card"><span class="k">How we offer it</span><p class="body">An internal tool. Runs on a laptop or internal host with an approved model. No sale.</p></div>
+      <div class="card"><span class="k">Where the saving comes from</span><p class="body">A manual parity pass takes about <strong>20 h</strong>. With nParity, about <strong>1 h</strong>. Five passes a migration saves <strong>95 h</strong>, about <strong>US$3,800</strong> at US$40/h.</p></div>
       <div class="card"><span class="k">What one regression costs</span><p class="body">Unknown: someone must find it, fix it and redeploy. At 4 to 24 h that is <strong>US$160 to US$960</strong>.</p></div>
     </div>
-    <p class="callout push">One regression caught early (12 h, US$480) pays for the pass about three times.</p>
-    <aside class="notes">Who pays: the engineering manager, from the team's tooling budget. Offer: open core. Self-host is free (MIT, your own model). Hosted: Migration Pass at US$149 for 60 days and about 50 runs, plus an optional US$99 a month team plan (not in the base numbers). The true cost of a regression is unknown, so it is priced as senior developer time (4, 12 or 24 hours at US$40/h). Assumptions: US$40 an hour loaded, 20 h per manual parity pass (illustrative), 1 h with nParity, 5 passes per migration. Model: docs/costing/business_case.py</aside>
+    <p class="callout push">Not counted: incidents and customer impact.</p>
+    <aside class="notes">The case is internal: engineer time saved, not revenue. A manual parity pass is about 20 h (illustrative: 200 endpoints x 3 samples x 2 minutes). With nParity about 1 h (assumed). Five passes per migration (assumed) at US$40/h loaded senior cost (assumed): 95 h, US$3,800. The true cost of a regression is unknown, so it is priced as senior developer time (4, 12 or 24 hours). The manual baseline has not been timed. We considered selling it (Migration Pass, US$149); the numbers did not support an external sale, so the project is framed for internal use. Model: docs/costing/business_case.py</aside>
   </section>
-  <section class="slide s-compact" id="s12" aria-label="Unit economics">
+  <section class="slide s-compact" id="s12" aria-label="Cost to run per migration">
     <span class="lot">LOT 12</span>
-    <p class="eyebrow">Unit economics · stage 3</p>
-    <h2 class="wide">94% gross margin per pass. Support is the real cost.</h2>
+    <p class="eyebrow">Cost and unit economics · stage 3</p>
+    <h2 class="wide">About US$4 to run a migration. About US$3,800 saved.</h2>
     <div class="cols c-gold">
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>Per Migration Pass</th><th>US$</th><th>Basis</th></tr></thead>
+          <thead><tr><th>Per migration</th><th>Value</th><th>Basis</th></tr></thead>
           <tbody>
-            <tr class="us"><td>Price</td><td>149.00</td><td>One migration, 60 days</td></tr>
-            <tr><td>Model fees</td><td>3.30</td><td>10 runs of 1,000 findings, list price</td></tr>
-            <tr><td>Infra and payment</td><td>5.57</td><td>Compute, storage, 3% fee</td></tr>
-            <tr class="us"><td>Gross margin</td><td>140.13 · 94%</td><td></td></tr>
-            <tr><td>Support</td><td>40.00</td><td>1 h at US$40/h</td></tr>
-            <tr class="us"><td>Contribution</td><td>100.13 · 67%</td><td></td></tr>
+            <tr><td>Manual parity passes</td><td>100 h</td><td>5 passes x 20 h (illustrative)</td></tr>
+            <tr><td>With nParity</td><td>5 h</td><td>5 passes x 1 h (assumed)</td></tr>
+            <tr class="us"><td>Labour saved</td><td>95 h · US$3,800</td><td>US$40/h loaded</td></tr>
+            <tr><td>Model, compute, storage</td><td>US$3.30 + 1.10</td><td>10 runs of 1,000 findings</td></tr>
+            <tr class="us"><td>Cost to run</td><td>US$4.40 · 0.1% of saving</td><td></td></tr>
           </tbody>
         </table>
       </div>
       <div class="card">
         <span class="k">Fixed and build</span>
         <ul class="ticks">
-          <li><span><strong>Serverless hosting about US$3 a month idle.</strong> One pass covers 2 years of it.</span></li>
-          <li><span><strong>Build US$19k to US$58k.</strong> One engineer for 3 months, up to three.</span></li>
-          <li><span>Model price ten times higher still leaves 74% margin.</span></li>
+          <li><span><strong>Internal host about US$3 a month idle</strong>, or a laptop for free.</span></li>
+          <li><span><strong>The prototype exists.</strong> Taking PRDs 0005 to 0007 further costs US$19k to US$58k.</span></li>
+          <li><span>Model price ten times higher: US$33 a migration.</span></li>
         </ul>
       </div>
     </div>
-    <p class="callout push">Model fees are 2% of the price. Watch support time and the build.</p>
-    <aside class="notes">Tokens are measured on 111 Flash calls. Prices are public list prices, not quotes. Assumptions: 10 runs of 1,000 findings per pass, 1 hour of support at US$40/h, a 3% payment fee, about US$3 a month idle serverless hosting (not checked against AWS pages), and a build of US$19k to US$58k. Run: python3 docs/costing/business_case.py</aside>
+    <p class="callout push">The model is not the cost. The engineer's hour is.</p>
+    <aside class="notes">Tokens are measured on 111 Flash calls. Prices are public list prices, not quotes. Assumptions: 10 runs of 1,000 findings per migration, compute US$0.10, storage US$1 (assumed), about US$3 a month idle serverless hosting if hosted internally (not checked against AWS pages), and a build of US$19k to US$58k (one engineer for 3 months, up to three) for PRDs 0005 to 0007. Run: python3 docs/costing/business_case.py</aside>
   </section>
   <section class="slide s-compact" id="s13" aria-label="Business case">
     <span class="lot">LOT 13</span>
     <p class="eyebrow">Business case · stage 3</p>
-    <h2 class="wide">One pass covers hosting. Paying back the build takes volume.</h2>
+    <h2 class="wide">Even the cautious case repays a build</h2>
     <div class="cols c-gold">
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>Case</th><th>Passes a month</th><th>Revenue a month</th><th>Payback, lean build</th><th>Payback, full build</th></tr></thead>
+          <thead><tr><th>Case</th><th>Manual pass</th><th>Passes</th><th>Saved per migration</th><th>Migrations to repay lean build</th></tr></thead>
           <tbody>
-            <tr><td>Pessimistic</td><td>2</td><td>US$298</td><td class="n">Month 101</td><td class="n">Not in 10 years</td></tr>
-            <tr class="us"><td>Base</td><td>4</td><td>US$596</td><td>Month 52</td><td class="n">Not in 10 years</td></tr>
-            <tr><td>Optimistic</td><td>8</td><td>US$1,192</td><td>Month 28</td><td>Month 76</td></tr>
+            <tr><td>Cautious</td><td>10 h</td><td>3</td><td>US$1,080</td><td class="n">18</td></tr>
+            <tr class="us"><td>Base</td><td>20 h</td><td>5</td><td>US$3,800</td><td>6</td></tr>
+            <tr><td>Optimistic</td><td>40 h</td><td>8</td><td>US$12,480</td><td>2</td></tr>
           </tbody>
         </table>
       </div>
       <div class="card">
         <span class="k">Assumptions</span>
         <ul class="ticks">
-          <li><span>Sales start in month 4, after the build. Passes a month are flat, no ramp.</span></li>
-          <li><span>Each pass is one-off. No renewals counted.</span></li>
-          <li><span>Lean build US$19k, full build US$58k.</span></li>
+          <li><span>1 h a pass with nParity. US$40/h loaded.</span></li>
+          <li><span>Lean build US$19k. The prototype and CLI already work without it.</span></li>
+          <li><span>Counts labour only, no incidents.</span></li>
         </ul>
       </div>
     </div>
-    <p class="callout push">The strongest lever is price: at US$299 the base case pays back a lean build in month 23.</p>
-    <aside class="notes">At US$149 a pass the hosted tier is a modest business on its own, and the build pays back only with volume. The open core is the funnel. Passes a month are held flat (no ramp), sales start in month 4, and each pass is one-off with no renewals counted. Break-even on run costs is the first pass (US$3 idle hosting a month against US$100 contribution). At US$299 a pass the base case pays back a lean build in month 23. Model: docs/costing/business_case.py</aside>
+    <p class="callout push">The number to firm up is the manual baseline. We have not timed it yet.</p>
+    <aside class="notes">Saved per migration is (manual hours - 1) x passes x US$40. Migrations to repay the lean build (US$19,200) are rounded up: 18, 6 and 2. The full build (US$57,600) takes 54, 16 and 5. The lean build covers PRDs 0005 to 0007 and is an upper bound for internal use, since the hosted service (PRD 0007) is only needed if the tool is offered outside the company. The base case is also the case on slide 11. Model: docs/costing/business_case.py</aside>
   </section>
   <section class="slide s-compact" id="s14" aria-label="Risks">
     <span class="lot">LOT 14</span>
@@ -713,15 +712,15 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
         <thead><tr><th>Risk</th><th>If it happens</th><th>Our answer</th></tr></thead>
         <tbody>
           <tr><td>Accuracy too low</td><td>Engineers stop trusting it</td><td>Unsure bucket. No regression is dismissed automatically. Every verdict shows its source.</td></tr>
-          <tr><td>No logprobs on the model route</td><td>No real probability. Vote sampling, margin 89%</td><td>Run the CLI on any logprobs model. Label votes as uncalibrated.</td></tr>
-          <tr><td>Model price ten times higher</td><td>Margin 74%</td><td>Cache repeat questions, switch engine, raise the price.</td></tr>
-          <tr><td>Customer data leaves AWS</td><td>Banks refuse the hosted tier</td><td>Redaction before any model call. Self-host is free.</td></tr>
-          <tr><td>Demand is one-off</td><td>Each pass is a single sale, payback slips</td><td>Test US$299, keep the build lean, use the CLI as the funnel.</td></tr>
+          <tr><td>No logprobs on the model route</td><td>No real probability. Vote sampling, about US$11 a migration</td><td>Run the CLI on any logprobs model. Label votes as uncalibrated.</td></tr>
+          <tr><td>Model price ten times higher</td><td>US$33 a migration, under 1% of the saving</td><td>Cache repeat questions, switch engine.</td></tr>
+          <tr><td>Client data reaches a model host</td><td>Compliance refuses it</td><td>Use an approved model. Redaction before model calls is specified, not built.</td></tr>
+          <tr><td>Saving smaller than estimated</td><td>The manual baseline is untimed</td><td>Time one manual pass. At 10 h and 3 passes it still saves about US$1,100.</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="callout push">Break-even on run costs: the first pass. Break-even on the build: depends on volume, which we have not measured yet.</p>
-    <aside class="notes">Five risks: accuracy, no token probabilities on the model route, model price, customer data leaving AWS, and one-off demand. Margins: vote sampling 89% (10 runs of 1,000 findings at US$0.00113 a finding); model price ten times higher 74%. The model route (DeepSeek Flash via Bedrock, served by Fireworks) is stated but not verified for token probabilities or price. Redaction before model calls is specified in PRD 0007 and not built.</aside>
+    <p class="callout push">Run cost is under 1% of the saving even if the model costs ten times more. The estimate to check is the manual baseline.</p>
+    <aside class="notes">Five risks: accuracy, no token probabilities on the model route, model price, client data reaching a model host, and a smaller saving than estimated. Costs per migration: vote sampling about US$11 (10 runs of 1,000 findings at US$0.00113 a finding); model price ten times higher US$33. The model route (DeepSeek Flash via Bedrock, served by Fireworks) is stated but not verified for token probabilities or price. Redaction before model calls is specified in PRD 0007 and not built.</aside>
   </section>
   <section class="slide s-title" id="s15" aria-label="Close">
     <span class="lot">LOT 15</span>
@@ -832,12 +831,12 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
         <span class="k">Hosting on AWS</span>
         <ul class="ticks">
           <li><span><strong>Serverless: about US$3 a month idle</strong> (assumed). Pay per run.</span></li>
-          <li><span>Always-on containers: US$50 to US$83 a month, so we avoid them. <span class="todo">Cape Town?</span></span></li>
-          <li><span>Hosted tier needs storage and accounts <span class="todo">PRD 0007</span>. The CLI runs anywhere.</span></li>
+          <li><span>Always-on containers: US$50 to US$83 a month, so we avoid them.</span></li>
+          <li><span>Internal use needs no accounts or storage. The CLI runs on a laptop or an internal host.</span></li>
         </ul>
       </div>
     </div>
-    <p class="callout push">A 1,000-finding run costs about US$0.33 on Flash. Support and people cost more than the model.</p>
+    <p class="callout push">A 1,000-finding run costs about US$0.33 on Flash. Engineer time costs more than the model.</p>
     <aside class="notes">Engine choice affects trust more than cost. Jev and OpenAI Decisions return no reason; Bedrock serverless models do not return token probabilities. Tokens are measured on 111 Flash calls; prices are public list prices, not quotes; the Fireworks -us router price is unverified. Serverless hosting is about US$3 a month idle (assumed). Always-on containers cost US$50 to US$83 a month. Model: docs/costing/nparity-costing.md</aside>
   </section>
 
@@ -853,7 +852,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
           <tr><td>PRD 0004 · Before stage</td><td>Run without an intent note and draft the note from the differences found.</td></tr>
           <tr><td>PRD 0005 · Flow mapping</td><td>Group the new calls that replace one old call, as in a move from one vendor API to its successor.</td></tr>
           <tr><td>PRD 0006 · Spec optional</td><td>Documentation pages as input, and a per-run targets file.</td></tr>
-          <tr><td>PRD 0007 · Hosted service</td><td>Accounts, storage, queue, redaction before model calls and metering for the Migration Pass.</td></tr>
+          <tr><td>PRD 0007 · Hosted service</td><td>Accounts, storage, queue, redaction before model calls and metering. Needed only if the tool is offered outside the company.</td></tr>
           <tr><td>Release requirement</td><td>Authorization tokens for authenticated API calls.</td></tr>
         </tbody>
       </table>
