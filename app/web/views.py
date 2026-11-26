@@ -168,7 +168,7 @@ def verdict(c: dict[str, int]) -> tuple[str, str]:
 
 def run_name(run_id: str) -> str:
     """'2026-11-26T124642-petstore-4676e543c67a' -> 'petstore'; other ids are shown as-is."""
-    m = re.fullmatch(r"\d{4}-\d\d-\d\dT\d{6}-(.+)-[0-9a-f]{12}", run_id)
+    m = re.fullmatch(r"\d{4}-\d\d-\d\dT\d{6}-(.+?)(?:-[0-9a-f]{12})?", run_id)
     return m.group(1) if m else run_id
 
 

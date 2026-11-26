@@ -241,7 +241,7 @@ function showError(error) {
 
 async function startJob(body) {
   resetConsole();
-  output.scrollIntoView({ block: "nearest" });
+  output.scrollIntoView({ block: "start" });
   statusText.textContent = "Starting";
   setRunning(true);
   try {
