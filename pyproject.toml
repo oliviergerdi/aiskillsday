@@ -5,25 +5,25 @@ description = "nParity logprobs experiments"
 authors = [
     {name = "Gerdi Olivier",email = "gerdi.olivier@ncino.com"}
 ]
-requires-python = "^3.14"
+requires-python = ">=3.14"
 dependencies = [
-    "openai (==3.59.0)",
+    "openai (==3.55.1)",
     "fastapi (>=0.165.0,<0.166.0)",
     "uvicorn (>=0.54.0,<0.55.0)",
     "typer (>=0.29.2,<0.30.0)",
     "httpx (>=0.28.1,<0.29.0)",
-    "pydantic (>=2.14.4,<3.0.0)",
+    "pydantic (>=2.14.3,<3.0.0)",
     "jinja2 (>=3.1.6,<4.0.0)",
-    "pyyaml (>=6.0.4,<7.0.0)"
+    "pyyaml (>=6.0.3,<7.0.0)"
 ]
 
 
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
-
 [tool.poetry]
 package-mode = false
+
+[tool.uv]
+package = false
+exclude-newer = "7 days"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

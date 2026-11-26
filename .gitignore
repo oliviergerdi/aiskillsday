@@ -3,7 +3,7 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 
-# Environments (poetry keeps its venv in the cache; this is for the opt-in local kind)
+# Environments
 .venv/
 venv/
 
