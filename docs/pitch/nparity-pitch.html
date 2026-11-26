@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
 /* Layout: a 1280x720 tea-chest "lot" per slide, scaled to fit; stacked reading mode on narrow screens.
+   Type, spacing and column splits all step by the golden ratio, phi = 1.618.
    Palette: strong brew (dark-first) with saffron accent; plywood tea-chest for light. */
 :root {
   color-scheme: dark;
@@ -35,7 +36,29 @@
   --f-body: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --f-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
-  --u: 0.6px;
+  /* One stage unit. 1280 units = slide width. Set by script. */
+  --u: 0.75px;
+
+  /* Golden type scale: base 20 units, each step x1.618 */
+  --t-1: calc(var(--u) * 12.36);   /* labels, eyebrows, sources */
+  --t0:  calc(var(--u) * 20);      /* body */
+  --t1:  calc(var(--u) * 32.36);   /* lead, card titles, callouts */
+  --t2:  calc(var(--u) * 52.36);   /* slide headlines */
+  --t3:  calc(var(--u) * 84.72);   /* display numbers */
+  --t4:  calc(var(--u) * 137.08);  /* hero numbers */
+  --t5:  calc(var(--u) * 221.8);   /* wordmark */
+
+  /* Golden spacing scale: base 24 units */
+  --s-2: calc(var(--u) * 9.17);
+  --s-1: calc(var(--u) * 14.83);
+  --s0:  calc(var(--u) * 24);
+  --s1:  calc(var(--u) * 38.83);
+  --s2:  calc(var(--u) * 62.83);
+
+  /* Line heights: body on phi, tighter as type grows */
+  --lh-body: 1.618;
+  --lh-lead: 1.3;
+  --lh-head: 1.15;
 }
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
@@ -74,8 +97,8 @@ body {
   background: var(--brew-2);
   border: 1px solid var(--leaf);
   border-radius: calc(var(--u) * 6);
-  padding: calc(var(--u) * 56) calc(var(--u) * 72);
-  display: flex; flex-direction: column; gap: calc(var(--u) * 28);
+  padding: var(--s2);
+  display: flex; flex-direction: column; gap: var(--s0);
   overflow: hidden;
   min-width: 0;
 }
@@ -90,211 +113,210 @@ html.is-present .slide {
   width: calc(var(--u) * 1280);
   height: calc(var(--u) * 720);
   opacity: 0; visibility: hidden;
-  transform: translateY(calc(var(--u) * 10));
+  transform: translateY(var(--s-2));
   transition: opacity .35s ease, transform .35s ease, visibility 0s linear .35s;
 }
 html.is-present .slide.is-active {
   opacity: 1; visibility: visible; transform: none;
   transition: opacity .35s ease, transform .35s ease, visibility 0s;
 }
+@media (prefers-reduced-motion: reduce) {
+  html.is-present .slide, html.is-present .slide.is-active { transition: none; transform: none; }
+}
 
 /* Lot stamp in the corner of each slide */
 .lot {
-  position: absolute; top: calc(var(--u) * 26); right: calc(var(--u) * 32);
+  position: absolute; top: var(--s0); right: var(--s1);
   font-family: var(--f-stencil); font-weight: 800;
-  font-size: calc(var(--u) * 20); letter-spacing: .12em;
+  font-size: var(--t0); line-height: 1.2; letter-spacing: .12em;
   color: var(--milk-dim); opacity: .7;
 }
 
 /* ---------- Type ---------- */
+p { margin: 0; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
 .eyebrow {
   font-family: var(--f-mono); font-weight: 600;
-  font-size: calc(var(--u) * 15); letter-spacing: .16em; text-transform: uppercase;
-  color: var(--saffron); margin: 0;
+  font-size: var(--t-1); line-height: var(--lh-lead); letter-spacing: .16em; text-transform: uppercase;
+  color: var(--saffron);
 }
-h1, h2, h3 { margin: 0; text-wrap: balance; }
 h2 {
   font-family: var(--f-body); font-weight: 600;
-  font-size: calc(var(--u) * 52); line-height: 1.08; letter-spacing: -0.015em;
+  font-size: var(--t2); line-height: var(--lh-head); letter-spacing: -0.015em;
   max-width: 22ch;
 }
-h3 { font-size: calc(var(--u) * 26); font-weight: 600; line-height: 1.2; }
-p { margin: 0; }
-.body { font-size: calc(var(--u) * 23); line-height: 1.45; color: var(--milk-dim); max-width: 60ch; }
-.small { font-size: calc(var(--u) * 17); line-height: 1.45; color: var(--milk-dim); }
+h2.wide { max-width: none; }
+h3 { font-size: var(--t1); font-weight: 600; line-height: var(--lh-lead); }
+.body { font-size: var(--t0); line-height: var(--lh-body); color: var(--milk-dim); max-width: 60ch; }
+.lead { font-size: var(--t1); line-height: var(--lh-lead); color: var(--milk-dim); max-width: 34ch; }
 .mono { font-family: var(--f-mono); }
 .hl { color: var(--saffron); }
 strong { color: var(--milk); font-weight: 600; }
-.source { font-size: calc(var(--u) * 14); color: var(--dust); font-family: var(--f-mono); letter-spacing: .02em; }
+.source { font-size: var(--t-1); line-height: var(--lh-body); color: var(--dust); font-family: var(--f-mono); letter-spacing: .02em; }
 .push { margin-top: auto; }
 
 /* Placeholder chip: things we still have to measure or decide */
 .todo {
   display: inline-block;
-  font-family: var(--f-mono); font-size: .78em; font-weight: 600;
-  padding: .08em .45em; border-radius: .3em;
+  font-family: var(--f-mono); font-size: .8em; font-weight: 600; line-height: 1.3;
+  padding: 0 .45em; border-radius: .3em;
   border: 1.5px dashed var(--saffron); color: var(--saffron);
-  white-space: nowrap;
+  white-space: nowrap; vertical-align: .05em;
 }
 
 /* ---------- Grids ---------- */
-.cols { display: grid; gap: calc(var(--u) * 28); min-width: 0; }
+.cols { display: grid; gap: var(--s0); min-width: 0; }
 .cols > * { min-width: 0; }
 html.is-present .c2 { grid-template-columns: 1fr 1fr; }
 html.is-present .c3 { grid-template-columns: repeat(3, 1fr); }
-html.is-present .c4 { grid-template-columns: repeat(4, 1fr); }
 html.is-present .c5 { grid-template-columns: repeat(5, 1fr); }
-html.is-present .c-split { grid-template-columns: 1.55fr 1fr; }
-html.is-present .c-demo { grid-template-columns: 0.85fr 1.25fr; }
+html.is-present .c-gold { grid-template-columns: 1.618fr 1fr; }     /* golden split */
+html.is-present .c-gold-r { grid-template-columns: 1fr 1.618fr; }   /* golden split, mirrored */
 
 .card {
   background: var(--brew-3);
   border: 1px solid var(--leaf);
   border-radius: calc(var(--u) * 6);
-  padding: calc(var(--u) * 24) calc(var(--u) * 26);
-  display: flex; flex-direction: column; gap: calc(var(--u) * 10);
+  padding: var(--s0);
+  display: flex; flex-direction: column; gap: var(--s-2);
 }
 .card .k {
-  font-family: var(--f-mono); font-size: calc(var(--u) * 14); font-weight: 600;
+  font-family: var(--f-mono); font-size: var(--t-1); line-height: var(--lh-lead); font-weight: 600;
   letter-spacing: .12em; text-transform: uppercase; color: var(--milk-dim);
 }
-.card .body { font-size: calc(var(--u) * 20); }
 
 /* ---------- Title slide ---------- */
 .s-title { justify-content: center; }
-.title-grid { display: grid; gap: calc(var(--u) * 24); align-items: center; }
-html.is-present .title-grid { grid-template-columns: 1.45fr 1fr; }
+.title-grid { display: grid; gap: var(--s0); align-items: center; }
+html.is-present .title-grid { grid-template-columns: 1.618fr 1fr; }
+.title-copy { display: flex; flex-direction: column; gap: var(--s-1); }
 .wordmark {
   font-family: var(--f-stencil); font-weight: 800;
-  font-size: calc(var(--u) * 210); line-height: .86; letter-spacing: .01em;
+  font-size: var(--t5); line-height: 1.05; letter-spacing: .01em;
   color: var(--milk);
 }
 .wordmark .n { color: var(--saffron); }
-.question {
-  font-size: calc(var(--u) * 46); font-weight: 600; letter-spacing: -0.01em;
-  line-height: 1.1; margin-top: calc(var(--u) * 18);
-}
+.question { font-size: var(--t2); font-weight: 600; letter-spacing: -0.01em; line-height: var(--lh-head); }
 .team {
-  display: flex; flex-wrap: wrap; gap: calc(var(--u) * 10) calc(var(--u) * 26);
-  font-size: calc(var(--u) * 19); color: var(--milk-dim);
-  margin-top: calc(var(--u) * 26);
+  display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s0);
+  font-size: var(--t0); line-height: var(--lh-lead); color: var(--milk-dim);
+  margin-top: var(--s-1);
 }
 .team b { color: var(--milk); font-weight: 600; }
-.cup-wrap { position: relative; display: grid; place-items: center; }
-.cup { width: calc(var(--u) * 360); max-width: 100%; height: auto; }
+.cup-wrap { display: grid; place-items: center; gap: var(--s-1); }
+.cup { width: calc(var(--u) * 340); max-width: 100%; height: auto; }
 .steam path { fill: none; stroke: var(--milk-dim); stroke-width: 5; stroke-linecap: round; opacity: .55; }
 @media (prefers-reduced-motion: no-preference) {
   .steam path { animation: rise 4.2s ease-in-out infinite; transform-box: fill-box; transform-origin: bottom center; }
   .steam path:nth-child(2) { animation-delay: 1.3s; }
   .steam path:nth-child(3) { animation-delay: 2.6s; }
   @keyframes rise {
-    0% { opacity: .0; transform: translateY(10px) scaleY(.9); }
+    0% { opacity: 0; transform: translateY(10px) scaleY(.9); }
     35% { opacity: .6; }
     100% { opacity: 0; transform: translateY(-22px) scaleY(1.08); }
   }
 }
-.cup-wrap { gap: calc(var(--u) * 18); }
 .stamp {
   justify-self: end; margin-right: 6%;
   transform: rotate(-7deg);
   border: calc(var(--u) * 3) solid var(--chili);
   color: var(--chili);
-  padding: calc(var(--u) * 8) calc(var(--u) * 14);
+  padding: var(--s-2) var(--s-1);
   font-family: var(--f-stencil); font-weight: 800;
-  font-size: calc(var(--u) * 19); letter-spacing: .1em; line-height: 1.15;
+  font-size: var(--t0); letter-spacing: .1em; line-height: 1.2;
   text-align: center; opacity: .85;
 }
 
 /* ---------- Big quote ---------- */
 .quote {
-  font-size: calc(var(--u) * 50); line-height: 1.12; font-weight: 600;
+  font-size: var(--t2); line-height: 1.25; font-weight: 600;
   letter-spacing: -0.015em; max-width: 24ch;
 }
-.quote .hl { font-family: var(--f-stencil); font-weight: 800; font-size: 1.18em; letter-spacing: .01em; }
 
 /* ---------- Numbered steps ---------- */
 .num {
   font-family: var(--f-stencil); font-weight: 800;
-  font-size: calc(var(--u) * 64); line-height: .9; color: var(--saffron);
+  font-size: var(--t2); line-height: 1.1; color: var(--saffron);
 }
 .callout {
   border-top: 1px solid var(--leaf);
-  padding-top: calc(var(--u) * 22);
-  font-size: calc(var(--u) * 26); line-height: 1.35;
+  padding-top: var(--s0);
+  font-size: var(--t1); line-height: var(--lh-lead);
 }
 
 /* ---------- Value prop rows ---------- */
-.vp { display: grid; gap: calc(var(--u) * 18); }
+.vp { display: grid; gap: var(--s-1); }
 .vp-row {
-  display: grid; gap: calc(var(--u) * 28);
-  border-top: 1px solid var(--leaf); padding-top: calc(var(--u) * 18);
+  display: grid; gap: var(--s-1) var(--s1);
+  border-top: 1px solid var(--leaf); padding-top: var(--s-1);
 }
-html.is-present .vp-row { grid-template-columns: calc(var(--u) * 230) 1fr; }
+html.is-present .vp-row { grid-template-columns: calc(var(--u) * 190) 1fr; }
 .vp-row .lab {
-  font-family: var(--f-stencil); font-weight: 800; font-size: calc(var(--u) * 40);
-  line-height: 1; color: var(--saffron); letter-spacing: .02em;
+  font-family: var(--f-stencil); font-weight: 800; font-size: var(--t2);
+  line-height: 1.05; color: var(--saffron); letter-spacing: .02em;
 }
-.vp-row p { font-size: calc(var(--u) * 25); line-height: 1.42; color: var(--milk); max-width: 58ch; }
+.vp-row p { font-size: var(--t1); line-height: var(--lh-lead); color: var(--milk); max-width: 52ch; }
 
 /* ---------- Pipeline ---------- */
-.step { gap: calc(var(--u) * 12); }
 .step .verb {
-  font-family: var(--f-stencil); font-weight: 800; font-size: calc(var(--u) * 36);
-  line-height: 1; color: var(--milk);
+  font-family: var(--f-stencil); font-weight: 800; font-size: var(--t1);
+  line-height: 1.15; color: var(--milk);
 }
-.step .what { font-size: calc(var(--u) * 19); line-height: 1.4; color: var(--milk); }
-.step .how { font-size: calc(var(--u) * 15); line-height: 1.4; color: var(--milk-dim); font-family: var(--f-mono); }
-.step .idx { font-family: var(--f-mono); font-size: calc(var(--u) * 14); color: var(--saffron); font-weight: 600; letter-spacing: .1em; }
+.step .what { font-size: var(--t0); line-height: var(--lh-body); color: var(--milk); }
+.step .how { font-size: var(--t-1); line-height: var(--lh-body); color: var(--milk-dim); font-family: var(--f-mono); }
+.step .idx { font-family: var(--f-mono); font-size: var(--t-1); line-height: var(--lh-lead); color: var(--saffron); font-weight: 600; letter-spacing: .1em; }
 .io {
-  display: flex; flex-wrap: wrap; gap: calc(var(--u) * 10) calc(var(--u) * 30);
-  font-size: calc(var(--u) * 20); color: var(--milk-dim);
+  display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s1);
+  font-size: var(--t0); line-height: var(--lh-body); color: var(--milk-dim);
 }
 
 /* ---------- Demo / tasting ---------- */
+.tasting { display: flex; flex-direction: column; gap: var(--s0); }
 .strip { display: grid; grid-template-columns: repeat(10, 1fr); gap: calc(var(--u) * 6); }
-.cell { aspect-ratio: 1 / 1.35; border-radius: calc(var(--u) * 4); max-width: 100%; }
+.cell { aspect-ratio: 1 / 1.618; border-radius: calc(var(--u) * 4); max-width: 100%; }
 .cell.noise { background: transparent; border: calc(var(--u) * 2) dashed var(--dust); }
 .cell.ok { background: var(--cardamom); }
 .cell.bad { background: var(--chili); }
 .cell.huh { background: var(--clove); }
-.legend { display: grid; grid-template-columns: 1fr 1fr; gap: calc(var(--u) * 8) calc(var(--u) * 18); font-size: calc(var(--u) * 17); color: var(--milk-dim); }
-.legend span { display: flex; align-items: center; gap: calc(var(--u) * 10); }
-.legend i { width: calc(var(--u) * 14); height: calc(var(--u) * 14); border-radius: calc(var(--u) * 3); display: inline-block; flex: none; }
+.legend { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-2) var(--s-1); font-size: var(--t0); line-height: var(--lh-lead); color: var(--milk-dim); }
+.legend span { display: flex; align-items: center; gap: var(--s-2); }
+.legend i { width: var(--s-1); height: var(--s-1); border-radius: calc(var(--u) * 3); display: inline-block; flex: none; }
 .legend b { color: var(--milk); font-variant-numeric: tabular-nums; }
-.big4 { display: flex; align-items: baseline; gap: calc(var(--u) * 16); }
-.big4 .n4 { font-family: var(--f-stencil); font-weight: 800; font-size: calc(var(--u) * 150); line-height: .85; color: var(--saffron); }
-.big4 .t4 { font-size: calc(var(--u) * 26); line-height: 1.2; font-weight: 600; }
-.lots { display: grid; gap: calc(var(--u) * 12); }
+.big4 { display: flex; align-items: center; gap: var(--s-1); }
+.big4 .n4 { font-family: var(--f-stencil); font-weight: 800; font-size: var(--t4); line-height: 1; color: var(--saffron); }
+.big4 .t4 { font-size: var(--t1); line-height: var(--lh-lead); font-weight: 600; max-width: 9ch; }
+.lots { display: flex; flex-direction: column; gap: var(--s-2); }
 .lotcard {
-  display: grid; grid-template-columns: 1fr auto; gap: calc(var(--u) * 6) calc(var(--u) * 16);
+  display: grid; grid-template-columns: 1fr auto; gap: calc(var(--u) * 4) var(--s-1);
   align-items: center;
   background: var(--brew-3); border: 1px solid var(--leaf);
   border-left: calc(var(--u) * 6) solid var(--chili);
   border-radius: calc(var(--u) * 5);
-  padding: calc(var(--u) * 14) calc(var(--u) * 18);
+  padding: var(--s-2) var(--s-1);
 }
 .lotcard.unsure { border-left-color: var(--clove); }
-.lotcard .path { font-family: var(--f-mono); font-size: calc(var(--u) * 16); color: var(--milk); min-width: 0; overflow-wrap: anywhere; }
-.lotcard .desc { grid-column: 1 / -1; font-size: calc(var(--u) * 17); color: var(--milk-dim); }
+.lotcard .path { font-family: var(--f-mono); font-size: var(--t0); line-height: var(--lh-lead); color: var(--milk); min-width: 0; overflow-wrap: anywhere; }
+.lotcard .desc { grid-column: 1 / -1; font-size: var(--t0); line-height: var(--lh-lead); color: var(--milk-dim); }
 .pill {
-  font-family: var(--f-mono); font-weight: 600; font-size: calc(var(--u) * 13);
+  font-family: var(--f-mono); font-weight: 600; font-size: var(--t-1); line-height: 1.3;
   letter-spacing: .1em; text-transform: uppercase;
-  padding: calc(var(--u) * 5) calc(var(--u) * 10); border-radius: 999px;
+  padding: calc(var(--u) * 4) var(--s-2); border-radius: 999px;
   color: var(--chip-ink); background: var(--chili); white-space: nowrap;
 }
 .pill.unsure { background: var(--clove); }
 .pill.ok { background: var(--cardamom); }
 .found {
-  font-size: calc(var(--u) * 17); color: var(--milk-dim);
-  display: flex; gap: calc(var(--u) * 10); align-items: center; flex-wrap: wrap;
+  font-size: var(--t0); line-height: var(--lh-lead); color: var(--milk-dim);
+  display: flex; gap: var(--s-2); align-items: center; flex-wrap: wrap;
+  margin-top: var(--s-2);
 }
 .found code { font-family: var(--f-mono); color: var(--milk); font-size: .95em; }
 
 /* ---------- Table ---------- */
 .tbl-wrap { overflow-x: auto; min-width: 0; }
-table { border-collapse: collapse; width: 100%; font-size: calc(var(--u) * 17); }
-th, td { text-align: left; padding: calc(var(--u) * 11) calc(var(--u) * 12); border-bottom: 1px solid var(--leaf); vertical-align: top; }
-th { font-family: var(--f-mono); font-size: calc(var(--u) * 13); letter-spacing: .1em; text-transform: uppercase; color: var(--milk-dim); font-weight: 600; }
+table { border-collapse: collapse; width: 100%; font-size: var(--t0); line-height: var(--lh-lead); }
+th, td { text-align: left; padding: var(--s-2) var(--s-1); border-bottom: 1px solid var(--leaf); vertical-align: top; }
+th { font-family: var(--f-mono); font-size: var(--t-1); letter-spacing: .1em; text-transform: uppercase; color: var(--milk-dim); font-weight: 600; }
 td:first-child { color: var(--milk); font-weight: 600; white-space: nowrap; }
 td { color: var(--milk-dim); }
 tr.us td { color: var(--milk); background: color-mix(in srgb, var(--saffron) 14%, transparent); }
@@ -303,21 +325,24 @@ tr.us td:first-child { color: var(--saffron); }
 .n { color: var(--dust); }
 
 /* ---------- Market bars ---------- */
-.bars { display: grid; grid-template-columns: 1fr 1fr; gap: calc(var(--u) * 36); align-items: end; height: calc(var(--u) * 300); }
-.bar { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; gap: calc(var(--u) * 10); }
+.bars { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s1); align-items: end; height: calc(var(--u) * 300); }
+.bar { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; gap: var(--s-2); }
 .bar .fill { background: var(--saffron); border-radius: calc(var(--u) * 4) calc(var(--u) * 4) 0 0; }
 .bar .fill.proj { background: repeating-linear-gradient(135deg, var(--saffron) 0 calc(var(--u)*10), color-mix(in srgb, var(--saffron) 55%, transparent) calc(var(--u)*10) calc(var(--u)*20)); }
-.bar .val { font-family: var(--f-stencil); font-weight: 800; font-size: calc(var(--u) * 46); line-height: 1; }
-.bar .yr { font-family: var(--f-mono); font-size: calc(var(--u) * 15); color: var(--milk-dim); border-top: 1px solid var(--leaf); padding-top: calc(var(--u) * 8); }
-.stat { font-family: var(--f-stencil); font-weight: 800; font-size: calc(var(--u) * 120); line-height: .9; color: var(--chili); }
+.bar .val { font-family: var(--f-stencil); font-weight: 800; font-size: var(--t2); line-height: 1.1; }
+.bar .yr { font-family: var(--f-mono); font-size: var(--t-1); line-height: var(--lh-lead); color: var(--milk-dim); border-top: 1px solid var(--leaf); padding-top: var(--s-2); }
+.stat { font-family: var(--f-stencil); font-weight: 800; font-size: var(--t4); line-height: 1; color: var(--chili); }
+.stack { display: flex; flex-direction: column; gap: var(--s-1); min-width: 0; }
 
 /* ---------- Lists ---------- */
-.ticks { list-style: none; margin: 0; padding: 0; display: grid; gap: calc(var(--u) * 12); }
-.ticks li { display: grid; grid-template-columns: calc(var(--u) * 26) 1fr; gap: calc(var(--u) * 10); font-size: calc(var(--u) * 21); line-height: 1.35; }
-.ticks li::before { content: ""; width: calc(var(--u) * 12); height: calc(var(--u) * 12); margin-top: calc(var(--u) * 9); border-radius: 50%; background: var(--saffron); }
+.ticks { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-2); }
+.ticks li { display: flex; gap: var(--s-1); align-items: baseline; font-size: var(--t0); line-height: var(--lh-lead); }
+.ticks li::before { content: ""; flex: none; width: calc(var(--u) * 12); height: calc(var(--u) * 12); border-radius: 50%; background: var(--saffron); transform: translateY(calc(var(--u) * -1)); }
+.ticks li > span { min-width: 0; }
 .ticks.out li::before { background: transparent; border: calc(var(--u) * 2) solid var(--dust); }
 .ticks.out li { color: var(--milk-dim); }
 .metric { font-variant-numeric: tabular-nums; }
+.list-head { margin-bottom: var(--s-1); }
 
 /* ---------- Nav (presentation mode only) ---------- */
 .nav {
@@ -344,33 +369,35 @@ html.is-present .nav { display: flex; }
   position: fixed; left: 50%; bottom: 58px; transform: translateX(-50%);
   width: min(880px, calc(100% - 32px));
   background: var(--brew-3); border: 1px solid var(--saffron); border-radius: 6px;
-  padding: 14px 18px; font-size: 15px; line-height: 1.5; color: var(--milk);
+  padding: 14px 18px; font-size: 15px; line-height: 1.618; color: var(--milk);
   box-shadow: 0 10px 30px rgba(0,0,0,.35);
 }
 .notes-panel .k { font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--saffron); display: block; margin-bottom: 4px; }
 
-/* Reading mode (narrow screens / no script): let headings breathe */
+/* Reading mode (narrow screens / no script) */
 html:not(.is-present) .slide { padding: 28px 20px; gap: 18px; }
-html:not(.is-present) .lot { top: 12px; right: 14px; }
-html:not(.is-present) .wordmark { font-size: 96px; }
+html:not(.is-present) .lot { position: static; align-self: flex-end; margin-bottom: -8px; }
+html:not(.is-present) .wordmark { font-size: var(--t3); }
+html:not(.is-present) .stat, html:not(.is-present) .big4 .n4 { font-size: var(--t3); }
+html:not(.is-present) .bar .val { font-size: var(--t1); }
 </style>
 </head>
 <body>
 <main class="deck" id="deck" aria-label="nParity pitch deck">
 
-  <!-- 1 -->
+  <!-- 1 · title -->
   <section class="slide s-title" id="s1" aria-label="Title">
     <span class="lot">LOT 01</span>
     <div class="title-grid">
-      <div>
+      <div class="title-copy">
         <p class="eyebrow">Team Chai-GPT · The (AI)mazing Race</p>
         <h1 class="wordmark"><span class="n">n</span>Parity</h1>
         <p class="question">Will we break anything?</p>
-        <p class="body" style="margin-top: calc(var(--u) * 14)">nParity tells you which differences between an old and a new API are regressions: before the project, during it and after cutover.</p>
+        <p class="lead">It shows which differences between your old and new API are regressions, before, during and after the migration.</p>
         <div class="team"><span><b>Gerdi Olivier</b> engine</span><span><b>Stephen Metcalfe</b> captain &amp; demo</span><span><b>Temba Mazingi</b> business case</span></div>
       </div>
       <div class="cup-wrap" aria-hidden="true">
-        <svg class="cup" viewBox="0 0 260 300" role="img">
+        <svg class="cup" viewBox="0 0 260 300">
           <g class="steam">
             <path d="M100 96 C 86 76, 112 62, 98 38"/>
             <path d="M132 92 C 118 70, 146 56, 130 28"/>
@@ -384,7 +411,7 @@ html:not(.is-present) .wordmark { font-size: 96px; }
         <div class="stamp">CHAI-GPT ESTATE<br>DEMO 27·11·2026</div>
       </div>
     </div>
-    <aside class="notes">Open with the question every engineer asks throughout an API project. One line on who we are, then straight into the value proposition.</aside>
+    <aside class="notes">Open with the question every engineer asks throughout an API migration. One line on who we are, then straight into the value proposition.</aside>
   </section>
 
   <!-- 2 · value proposition -->
@@ -394,21 +421,21 @@ html:not(.is-present) .wordmark { font-size: 96px; }
     <div class="vp">
       <div class="vp-row">
         <span class="lab">What</span>
-        <p>From the first prototype to the day after cutover, nParity tells the backend engineer which differences between the old and new API are regressions, with a probability and a one-line reason for each.</p>
+        <p>From the first prototype to sign-off, nParity tells the backend engineer which differences between the old and new API are regressions, with a probability and a one-line reason for each.</p>
       </div>
       <div class="vp-row">
         <span class="lab">Why</span>
-        <p>Today the check happens once, by hand, near the end, when a regression costs the most to fix. Replay tools show what differs, not whether it was meant.</p>
+        <p>Today the check happens once, by hand, near the end, when a regression costs the most to fix. Replay tools show what differs, not whether it was intended.</p>
       </div>
       <div class="vp-row">
         <span class="lab">What changes</span>
-        <p>Regressions surface while the work is in flight. The engineer reviews only regressions and unsure items, and the engineering manager signs off on a short list with confidence attached.</p>
+        <p>Regressions surface while the work is in flight. The engineer reviews only regressions and unsure items, and the engineering manager signs off on a short list with a probability on each item.</p>
       </div>
     </div>
-    <aside class="notes">Land this in the first minute. Every slide after this is evidence for it. Pause after "not whether it was meant".</aside>
+    <aside class="notes">Land this in the first minute. Every slide after this is evidence for it. Pause after "not whether it was intended".</aside>
   </section>
 
-  <!-- 2 -->
+  <!-- 3 · the moment -->
   <section class="slide" id="s3" aria-label="The moment">
     <span class="lot">LOT 03</span>
     <p class="eyebrow">The moment</p>
@@ -417,12 +444,12 @@ html:not(.is-present) .wordmark { font-size: 96px; }
       <div class="card">
         <span class="k">Who runs it</span>
         <h3>Backend engineer</h3>
-        <p class="body">Owns both the old and the new API. Can say in a paragraph what the change was meant to do.</p>
+        <p class="body">Owns both the old and the new API. Can say in a paragraph what the change is intended to do.</p>
       </div>
       <div class="card">
         <span class="k">Who signs off</span>
         <h3>Engineering manager</h3>
-        <p class="body">Approves the cutover. Needs a short list with confidence attached, not a raw diff.</p>
+        <p class="body">Approves the cutover. Needs a short list with a probability on each item, not a raw diff.</p>
       </div>
       <div class="card">
         <span class="k">Not for</span>
@@ -433,59 +460,59 @@ html:not(.is-present) .wordmark { font-size: 96px; }
     <aside class="notes">Name the user and the buyer. Say out loud what we are not for: our interview showed that when the flow changes, comparing endpoints breaks down.</aside>
   </section>
 
-  <!-- 3 · before, during, after -->
+  <!-- 4 · before, during, after -->
   <section class="slide" id="s4" aria-label="Before, during, after">
     <span class="lot">LOT 04</span>
     <p class="eyebrow">When it pays off</p>
-    <h2>Ask it before, during and after the project</h2>
+    <h2 class="wide">Run nParity before, during and after the migration</h2>
     <div class="cols c3">
-      <div class="card step">
+      <div class="card">
         <span class="k">Before</span>
         <h3>Scope the change</h3>
-        <p class="body">Run the old API against an early prototype. See what will differ before you commit to a plan, and write the intent note from it.</p>
+        <p class="body">Run the old API against an early prototype. See what will differ before you commit to a plan. Use the result to write the intent note.</p>
       </div>
-      <div class="card step">
+      <div class="card">
         <span class="k">During</span>
         <h3>Catch drift early</h3>
-        <p class="body">Re-run it as the new API takes shape. A regression shows up the day it is introduced, while it is cheap to fix.</p>
+        <p class="body">Re-run it as the new API takes shape. A regression shows up at the next run, while it is cheap to fix.</p>
       </div>
-      <div class="card step">
+      <div class="card">
         <span class="k">After</span>
         <h3>Sign off</h3>
-        <p class="body">Hand the manager a short list at cutover, with a confidence on every item.</p>
+        <p class="body">Hand the manager a short list at cutover, with a probability on every item.</p>
       </div>
     </div>
-    <p class="callout push">Same engine, same report, at every stage of the project.</p>
+    <p class="callout push">Same engine, same report, at every stage of the migration.</p>
     <aside class="notes">This is why the question is "will we", not "did we". The value comes from asking early and often, not once at the end.</aside>
   </section>
 
-  <!-- 3 -->
+  <!-- 5 · why it hurts -->
   <section class="slide" id="s5" aria-label="Why it hurts">
     <span class="lot">LOT 05</span>
     <p class="eyebrow">Why it hurts today</p>
-    <h2>Three costs, every time you check</h2>
+    <h2 class="wide">Three costs, every time you check</h2>
     <div class="cols c3">
-      <div class="card step">
+      <div class="card">
         <span class="num">1</span>
         <h3>Build the comparison</h3>
         <p class="body">A script or harness written for this migration, then thrown away.</p>
       </div>
-      <div class="card step">
+      <div class="card">
         <span class="num">2</span>
         <h3>Wade through noise</h3>
-        <p class="body">Timestamps, generated IDs, list order and whitespace differ on every call. A renamed field looks like everything changed.</p>
+        <p class="body">Timestamps, generated IDs, list order and whitespace differ on every call. A renamed field shows up as one field missing and another added.</p>
       </div>
-      <div class="card step">
+      <div class="card">
         <span class="num">3</span>
         <h3>Judge intent by hand</h3>
-        <p class="body">Each remaining difference is checked against the change list in someone's head. No tool does this step.</p>
+        <p class="body">Each remaining difference is checked against the change list in someone's head. None of the tools we found does this step.</p>
       </div>
     </div>
     <p class="callout push">Engineers spend <span class="todo">X hours</span> per check going through <span class="todo">N differences</span> by hand, and the few regressions hide among noise and intended changes.</p>
     <aside class="notes">Fill X and N from the stopwatch run on Petstore v2 to v3 before we present. Step 3 is the part nobody automates.</aside>
   </section>
 
-  <!-- 4 -->
+  <!-- 6 · evidence -->
   <section class="slide" id="s6" aria-label="Evidence">
     <span class="lot">LOT 06</span>
     <p class="eyebrow">Evidence</p>
@@ -493,11 +520,11 @@ html:not(.is-present) .wordmark { font-size: 96px; }
     <div class="cols c2">
       <div class="card">
         <span class="k">GitHub · rewriting merges with Scientist</span>
-        <p class="body">Most mismatches were noise: the old code timing out, and commit timestamps. The rollout still took roughly <strong>5 days of part-time work</strong>, with a purpose-built tool.</p>
+        <p class="body">Most mismatches were noise: the old code timing out, and commit timestamps that differed. The rollout still took roughly <strong>5 days of part-time work</strong>, even with a purpose-built tool.</p>
       </div>
       <div class="card">
         <span class="k">Twitter · Diffy</span>
-        <p class="body">Built because separating real regressions from noise by hand is very hard. One random true/false field alone causes <strong>false alarms on 25% of requests</strong>.</p>
+        <p class="body">Built because separating real regressions from noise by hand is very hard. Without noise filtering, one random true/false field causes <strong>false alarms on 25% of requests</strong>.</p>
       </div>
       <div class="card">
         <span class="k">Speedscale · sold today</span>
@@ -508,11 +535,11 @@ html:not(.is-present) .wordmark { font-size: 96px; }
         <p class="body">“References to the actual documentation would add confidence.” <strong>Trust comes from showing the source</strong> behind each verdict.</p>
       </div>
     </div>
-    <p class="small push">Still to add: <span class="todo">2–3 more interviews</span> <span class="todo">timed manual baseline</span></p>
+    <p class="body push">Still to add: <span class="todo">2–3 more interviews</span> <span class="todo">timed manual baseline</span></p>
     <aside class="notes">Public prior art proves the pain is real and that noise dominates. Our own interview shaped scope and trust. Add today's interviews here.</aside>
   </section>
 
-  <!-- 6 -->
+  <!-- 7 · how it works -->
   <section class="slide" id="s7" aria-label="How it works">
     <span class="lot">LOT 07</span>
     <p class="eyebrow">How it works</p>
@@ -522,7 +549,7 @@ html:not(.is-present) .wordmark { font-size: 96px; }
         <span class="idx">STEP 1</span>
         <span class="verb">Steep</span>
         <p class="what">Send the same requests to the old and new API.</p>
-        <p class="how">Built from the old API's OpenAPI spec and seed values.</p>
+        <p class="how">Requests come from the old API's OpenAPI spec and seed values.</p>
       </div>
       <div class="card step">
         <span class="idx">STEP 2</span>
@@ -534,13 +561,13 @@ html:not(.is-present) .wordmark { font-size: 96px; }
         <span class="idx">STEP 3</span>
         <span class="verb">Match</span>
         <p class="what">Pair moved endpoints and renamed fields.</p>
-        <p class="how">Rules first. The model only for leftovers.</p>
+        <p class="how">Rules first; the model handles only the leftovers.</p>
       </div>
       <div class="card step">
         <span class="idx">STEP 4</span>
         <span class="verb">Compare</span>
         <p class="what">Diff values and types for every JSON path.</p>
-        <p class="how">Rounding, counts and pagination: never the model.</p>
+        <p class="how">The model never judges rounding, counts or pagination.</p>
       </div>
       <div class="card step">
         <span class="idx">STEP 5</span>
@@ -549,17 +576,17 @@ html:not(.is-present) .wordmark { font-size: 96px; }
         <p class="how">Against your intent note, with a probability.</p>
       </div>
     </div>
-    <div class="io push"><span><strong>In:</strong> two base URLs, two OpenAPI specs, one paragraph of intent</span><span><strong>Out:</strong> a short report in the terminal or the browser</span></div>
+    <div class="io push"><span><strong>In:</strong> two base URLs, two OpenAPI specs and one paragraph of intent</span><span><strong>Out:</strong> a short report in the terminal or the browser</span></div>
     <aside class="notes">Keep this quick. The point: the model only does the two jobs that need judgement, matching leftovers and tasting. Everything else is deterministic.</aside>
   </section>
 
-  <!-- 7 -->
+  <!-- 8 · demo -->
   <section class="slide" id="s8" aria-label="Demo">
     <span class="lot">LOT 08</span>
     <p class="eyebrow">The tasting · demo</p>
-    <h2>10 differences in. 4 for a human.</h2>
-    <div class="cols c-demo">
-      <div style="display:flex; flex-direction:column; gap: calc(var(--u) * 22)">
+    <h2 class="wide">10 differences in. 4 for a human.</h2>
+    <div class="cols c-gold-r">
+      <div class="tasting">
         <div class="strip" role="img" aria-label="10 differences: 2 noise, 4 intended, 3 regressions, 1 unsure">
           <span class="cell noise"></span><span class="cell noise"></span>
           <span class="cell ok"></span><span class="cell ok"></span><span class="cell ok"></span><span class="cell ok"></span>
@@ -567,18 +594,18 @@ html:not(.is-present) .wordmark { font-size: 96px; }
           <span class="cell huh"></span>
         </div>
         <div class="legend">
-          <span><i style="border: 2px dashed var(--dust)"></i><b>2</b> strained as noise</span>
-          <span><i style="background: var(--cardamom)"></i><b>4</b> intended, accepted</span>
-          <span><i style="background: var(--chili)"></i><b>3</b> regressions</span>
-          <span><i style="background: var(--clove)"></i><b>1</b> unsure</span>
+          <span><i style="border: 2px dashed var(--dust)"></i><b>2</b>&nbsp;noise</span>
+          <span><i style="background: var(--cardamom)"></i><b>4</b>&nbsp;intended</span>
+          <span><i style="background: var(--chili)"></i><b>3</b>&nbsp;regressions</span>
+          <span><i style="background: var(--clove)"></i><b>1</b>&nbsp;unsure</span>
         </div>
         <div class="big4"><span class="n4">4</span><span class="t4">items for the engineer to read</span></div>
       </div>
       <div class="lots">
-        <div class="lotcard"><span class="path">GET /orders/{id} · $.total</span><span class="pill">Regression</span><span class="desc">10.01 became 10.00. 10.005 can't be stored exactly as a float.</span></div>
+        <div class="lotcard"><span class="path">GET /orders/{id} · $.total</span><span class="pill">Regression</span><span class="desc">A total of 10.005 now rounds to 10.00, not 10.01. 10.005 can't be stored exactly as a float.</span></div>
         <div class="lotcard"><span class="path">GET /orders?page=2</span><span class="pill">Regression</span><span class="desc">The last page comes back empty. Off by one.</span></div>
         <div class="lotcard"><span class="path">GET /customers/{id} · $.currency</span><span class="pill">Regression</span><span class="desc">Missing for one customer type.</span></div>
-        <div class="lotcard unsure"><span class="path">GET /orders/{id} · not found</span><span class="pill unsure">Unsure</span><span class="desc">The error message was reworded. The intent note doesn't say.</span></div>
+        <div class="lotcard unsure"><span class="path">GET /orders/{id} · not found</span><span class="pill unsure">Unsure</span><span class="desc">The error message was reworded. The intent note doesn't say whether that's allowed.</span></div>
         <p class="found"><span class="pill ok">Found</span> without being told: <code>/customers/{id}</code> → <code>/clients/{clientId}</code></p>
       </div>
     </div>
@@ -586,75 +613,70 @@ html:not(.is-present) .wordmark { font-size: 96px; }
     <aside class="notes">Switch to the live demo here. Run the toy APIs first, open one regression, then run Petstore v2 against v3.</aside>
   </section>
 
-  <!-- 8 -->
+  <!-- 9 · trust -->
   <section class="slide" id="s9" aria-label="Trust">
     <span class="lot">LOT 09</span>
     <p class="eyebrow">Why trust it</p>
     <h2>Every verdict shows how sure it is</h2>
     <div class="cols c2">
-      <div class="card"><span class="k">A real probability</span><p class="body">Each label is read from the model's token probabilities, not a confidence score it makes up.</p></div>
-      <div class="card"><span class="k">Higher bars where mistakes cost more</span><p class="body"><span class="mono hl">p ≥ 0.95</span> to accept a mapping. <span class="mono hl">p ≥ 0.98</span> to accept a difference as intended. Regressions are never dismissed automatically.</p></div>
+      <div class="card"><span class="k">A real probability</span><p class="body">Each verdict is read from the model's token probabilities, not a score the model makes up.</p></div>
+      <div class="card"><span class="k">Higher bars where mistakes cost more</span><p class="body"><span class="mono hl">p ≥ 0.95</span> to accept a match. <span class="mono hl">p ≥ 0.98</span> to accept a difference as intended. Regressions are never dismissed automatically.</p></div>
       <div class="card"><span class="k">Numbers stay deterministic</span><p class="body">Rounding, counts and pagination are caught by the differ. The model never judges them.</p></div>
-      <div class="card"><span class="k">Scored on every run</span><p class="body">Each run is checked against an answer key, and the score is on screen.</p></div>
+      <div class="card"><span class="k">Scored on our test APIs</span><p class="body">On our test APIs, every run is scored against an answer key, and the score is on screen.</p></div>
     </div>
-    <p class="small push">We tested before we built: 66 model calls for about US$0.006. Yes/no questions rejected correct renames (p = 0.0017), so nParity asks multiple-choice questions.</p>
+    <p class="body push">We tested before we built: 66 model calls for about US$0.006. Yes/no questions rejected correct renames (the model gave a correct rename a 0.17% chance), so nParity asks multiple-choice questions.</p>
     <aside class="notes">Anticipate "why trust the AI?". The thresholds are the answer: the costlier the mistake, the higher the bar.</aside>
   </section>
 
-  <!-- 9 -->
+  <!-- 10 · alternatives and why now -->
   <section class="slide" id="s10" aria-label="Alternatives and why now">
     <span class="lot">LOT 10</span>
     <p class="eyebrow">Alternatives · why now</p>
-    <h2 style="max-width: 32ch">Replay tools show what differs. We say whether it was meant.</h2>
-    <div class="cols c-split">
-      <div class="tbl-wrap">
-        <table>
-          <thead><tr><th>Option</th><th>Replays &amp; compares</th><th>Strains noise</th><th>Matches renames</th><th>Judges intent</th></tr></thead>
-          <tbody>
-            <tr><td>Hand-built harness</td><td>Rebuilt per migration</td><td>If you write the rules</td><td class="n">No</td><td>By hand</td></tr>
-            <tr><td>Twitter Diffy</td><td class="y">Yes</td><td class="y">Yes</td><td class="n">No</td><td class="n">No</td></tr>
-            <tr><td>GitHub Scientist</td><td>Code paths in one app</td><td>Your own rules</td><td class="n">No</td><td class="n">No</td></tr>
-            <tr><td>Speedscale, Keploy</td><td class="y">Yes</td><td>Varies</td><td class="n">Not stated</td><td class="n">Not stated</td></tr>
-            <tr class="us"><td>nParity</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes, with a probability</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="card">
-        <span class="k">Why now</span>
-        <ul class="ticks" style="font-size: inherit">
-          <li style="font-size: calc(var(--u) * 18)">One verdict costs about <strong>US$0.00007</strong> and takes 0.6 s, measured on DeepSeek Flash.</li>
-          <li style="font-size: calc(var(--u) * 18)">AI coding tools make rewrites cheaper, so more teams face a cutover. <span class="todo">to test</span></li>
-          <li style="font-size: calc(var(--u) * 18)">The best-known open-source option, Diffy, now sits in Twitter's archive.</li>
-        </ul>
-      </div>
+    <h2 class="wide">We say whether a difference was intended.</h2>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Option</th><th>Replays &amp; compares</th><th>Removes noise</th><th>Matches renames</th><th>Judges intent</th></tr></thead>
+        <tbody>
+          <tr><td>Hand-built harness</td><td>Rebuilt per migration</td><td>If you write the rules</td><td class="n">No</td><td>By hand</td></tr>
+          <tr><td>Twitter Diffy</td><td class="y">Yes</td><td class="y">Yes</td><td class="n">No</td><td class="n">No</td></tr>
+          <tr><td>GitHub Scientist</td><td>Code paths in one app</td><td>Your own rules</td><td class="n">No</td><td class="n">No</td></tr>
+          <tr><td>Speedscale, Keploy</td><td class="y">Yes</td><td>Varies</td><td class="n">Not stated</td><td class="n">Not stated</td></tr>
+          <tr class="us"><td>nParity</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes, with a probability</td></tr>
+        </tbody>
+      </table>
     </div>
-    <aside class="notes">"Isn't this Diffy or Scientist?" Answer: they diff. We match, strain and judge against stated intent, with confidence.</aside>
+    <div class="cols c3 push">
+      <div class="card"><span class="k">Cheap judgement</span><p class="body">One verdict costs about <strong>US$0.00007</strong> and takes 0.6 s on DeepSeek Flash.</p></div>
+      <div class="card"><span class="k">More cutovers</span><p class="body">AI coding tools make migrations cheaper, so more teams face a cutover. <span class="todo">to test</span></p></div>
+      <div class="card"><span class="k">A gap</span><p class="body">The best-known open-source option, Diffy, now sits in Twitter's archive.</p></div>
+    </div>
+    <aside class="notes">"Isn't this Diffy or Scientist?" Answer: they diff. We match, strain and judge against stated intent, with a probability on every verdict.</aside>
   </section>
 
-  <!-- 10 -->
+  <!-- 11 · market -->
   <section class="slide" id="s11" aria-label="Market">
     <span class="lot">LOT 11</span>
     <p class="eyebrow">Market</p>
     <h2>A slice of every modernisation</h2>
     <div class="cols c2">
-      <div>
+      <div class="stack">
         <div class="bars" role="img" aria-label="Application modernisation services: US$22.7bn in 2025, projected US$51.5bn in 2031">
           <div class="bar"><span class="val">$22.7bn</span><span class="fill" style="height: 44.1%"></span><span class="yr">2025</span></div>
           <div class="bar"><span class="val">$51.5bn</span><span class="fill proj" style="height: 100%"></span><span class="yr">2031 · projected</span></div>
         </div>
-        <p class="source" style="margin-top: calc(var(--u) * 14)">Application modernisation services, 14.6% a year. MarketsandMarkets.</p>
+        <p class="source">Application modernisation services, growing 14.6% a year. MarketsandMarkets.</p>
       </div>
-      <div style="display:flex; flex-direction:column; gap: calc(var(--u) * 14); justify-content:flex-end">
+      <div class="stack" style="justify-content: flex-end">
         <span class="stat">74%</span>
         <p class="body">of organisations that started a legacy modernisation failed to complete it.</p>
         <p class="source">Advanced, 2020.</p>
-        <p class="callout" style="margin-top: calc(var(--u) * 20)">Our wedge: the parity check, run from the first prototype through cutover.</p>
+        <p class="callout">Our wedge: the parity check, run from the first prototype through cutover.</p>
       </div>
     </div>
     <aside class="notes">Don't oversell the big number. Our market is the verification step inside it. Stage 3 will size that slice.</aside>
   </section>
 
-  <!-- 11 -->
+  <!-- 12 · business model -->
   <section class="slide" id="s12" aria-label="Business model">
     <span class="lot">LOT 12</span>
     <p class="eyebrow">Business model · stage 3</p>
@@ -669,58 +691,58 @@ html:not(.is-present) .wordmark { font-size: 96px; }
     <aside class="notes">Placeholder slide. Temba fills this in Stage 3.</aside>
   </section>
 
-  <!-- 12 -->
+  <!-- 13 · success and scope -->
   <section class="slide" id="s13" aria-label="Success and scope">
     <span class="lot">LOT 13</span>
     <p class="eyebrow">Success · scope</p>
-    <h2>Friday's bar</h2>
+    <h2>Demo targets</h2>
     <div class="cols c3">
       <div>
-        <h3 style="margin-bottom: calc(var(--u) * 14)">Targets</h3>
+        <h3 class="list-head">Targets</h3>
         <ul class="ticks metric">
-          <li>10/10 against the answer key</li>
-          <li>0 regressions dismissed automatically</li>
-          <li>0 false regressions</li>
-          <li>4 or fewer items to read</li>
-          <li>Whole run under 60 s</li>
-          <li>Under US$0.01 in model fees</li>
+          <li><span>10/10 against the answer key</span></li>
+          <li><span>0 regressions dismissed automatically</span></li>
+          <li><span>0 false regressions</span></li>
+          <li><span>4 or fewer items to read</span></li>
+          <li><span>Whole run under 60 s</span></li>
+          <li><span>Under US$0.01 in model fees</span></li>
         </ul>
       </div>
       <div>
-        <h3 style="margin-bottom: calc(var(--u) * 14)">In scope</h3>
+        <h3 class="list-head">In scope</h3>
         <ul class="ticks">
-          <li>JSON over HTTP</li>
-          <li>OpenAPI specs on both sides</li>
-          <li>Request and response behaviour</li>
-          <li>Before, during and after the project</li>
+          <li><span>JSON over HTTP</span></li>
+          <li><span>OpenAPI specs on both sides</span></li>
+          <li><span>Request and response behaviour</span></li>
+          <li><span>Before, during and after the migration</span></li>
         </ul>
       </div>
       <div>
-        <h3 style="margin-bottom: calc(var(--u) * 14)">Out of scope</h3>
+        <h3 class="list-head">Out of scope</h3>
         <ul class="ticks out">
-          <li>Vendor swaps where the flow changes</li>
-          <li>Database side effects</li>
-          <li>UI</li>
-          <li>Performance</li>
+          <li><span>Vendor swaps where the flow changes</span></li>
+          <li><span>Database side effects</span></li>
+          <li><span>UI</span></li>
+          <li><span>Performance</span></li>
         </ul>
       </div>
     </div>
     <aside class="notes">Read the targets as promises we test live. Out of scope is a choice, not a gap.</aside>
   </section>
 
-  <!-- 13 -->
+  <!-- 14 · close -->
   <section class="slide s-title" id="s14" aria-label="Close">
     <span class="lot">LOT 14</span>
     <div class="title-grid">
-      <div>
+      <div class="title-copy">
         <p class="eyebrow">nParity</p>
-        <p class="quote" style="margin-top: calc(var(--u) * 12)">Will we break anything? <span class="hl">Know before it ships.</span></p>
-        <p class="body" style="margin-top: calc(var(--u) * 22)">The same engine, before, during and after the project, on whichever model your company has approved.</p>
-        <p class="body" style="margin-top: calc(var(--u) * 16)">Our ask: <span class="todo">to fill</span></p>
+        <p class="quote">Will we break anything? <span class="hl">Know before it ships.</span></p>
+        <p class="lead">The same engine runs before, during and after the migration, on whichever model your company has approved.</p>
+        <p class="lead">Our ask: <span class="todo">to fill</span></p>
         <div class="team"><span><b>Gerdi Olivier</b></span><span><b>Stephen Metcalfe</b></span><span><b>Temba Mazingi</b></span><span class="mono">Team Chai-GPT</span></div>
       </div>
       <div class="cup-wrap" aria-hidden="true">
-        <svg class="cup" viewBox="0 0 260 300" role="img">
+        <svg class="cup" viewBox="0 0 260 300">
           <g class="steam">
             <path d="M100 96 C 86 76, 112 62, 98 38"/>
             <path d="M132 92 C 118 70, 146 56, 130 28"/>
@@ -760,7 +782,7 @@ html:not(.is-present) .wordmark { font-size: 96px; }
     var w = window.innerWidth, h = window.innerHeight;
     var present = w >= 760 && h >= 420;
     root.classList.toggle('is-present', present);
-    var u = present ? Math.min(w / 1280, (h - NAV_H) / 720) : Math.max(0.5, Math.min(1, (w - 32) / 640));
+    var u = present ? Math.min(w / 1280, (h - NAV_H) / 720) : Math.max(0.75, Math.min(1, (w - 32) / 480));
     root.style.setProperty('--u', u.toFixed(4) + 'px');
   }
 
