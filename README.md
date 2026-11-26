@@ -153,6 +153,26 @@ The two Petstore servers hold different data (v2 is a shared junk sandbox), so e
 
 Useful `run` options: `--old-spec/--new-spec` (URL or file, default `<base>/openapi.json`), `--seeds`, `--intent`, `--answer-key`, `--no-score`, `--backend fake|flash` (or `NPARITY_LLM`), `--name`, `--runs-dir`.
 
+#### CLI automation
+
+Use `--format json` before or after the command name. Successful commands write one JSON document to stdout. Errors and optional progress go to stderr. Text is the default.
+
+- Add `--dry-run` to `run` to see planned calls, seed sources and skipped endpoints. The plan can fetch remote specs. Replay, discovery and model calls are skipped.
+- Add `--compact` to `run` or `show` for counts, coverage, cost and finding keys. On `show`, use `--status regression`, `--endpoint 'GET /orders'`, `--limit` and `--offset` to narrow results. Fetch one finding and its response samples with `finding RUN_ID FINDING_ID_OR_KEY --format json`.
+- Add `--progress jsonl` to stream progress events on stderr. The first event includes the run ID. Use `--detach` to start a background run and return its ID immediately. Poll with `status RUN_ID --after 0 --wait 10 --format json`, passing the last event's `seq` as `--after` on the next call. Use the same `--runs-dir` if you set a custom one.
+- Add `--fail-on regression`, `--fail-on unsure` or `--fail-on error` to gate the saved result. You can repeat the flag. The regression gate uses the run's regression findings.
+
+| Exit code | Meaning |
+|---|---|
+| 0 | Command completed |
+| 2 | Invalid input or missing file |
+| 3 | Retryable upstream failure |
+| 4 | Permanent or unexpected failure |
+| 5 | Run completed and saved, with a requested gate triggered |
+| 130 | Interrupted |
+
+For detached runs, `status` returns the run's outcome in `exit_code` once it finishes. The polling command itself succeeds when it can read the status.
+
 ### Freezing the demo
 
 Flash answers jitter slightly between runs. The cache makes the demo repeatable, free and offline.

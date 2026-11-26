@@ -19,6 +19,7 @@ from nparity import headers, pipeline, store
 from nparity.config import Seeds, load_seeds
 from nparity.evaluator.fake import FakeBackend
 from nparity.models import AnswerKey, Request, RequestPair
+from nparity.pipeline import stage_for
 from nparity.request_samples import load_request_pairs
 from nparity.retry import RetryPolicy
 from nparity.review import latest_baseline, scope_of
@@ -36,21 +37,6 @@ class Job:
     field: str | None = None
     error_message: str | None = None
     stage: str | None = None
-
-
-STAGES = (
-    ("Loading ", "load"),
-    ("Reading API endpoints", "read"),
-    ("Mapping endpoints and fields", "map"),
-    ("Replaying ", "replay"),
-    ("Comparing responses and schemas", "compare"),
-    ("Triaging ", "triage"),
-    ("Saving report with", "save"),
-)
-
-
-def stage_for(line: str) -> str | None:
-    return next((key for prefix, key in STAGES if line.startswith(prefix)), None)
 
 
 class RunJobs:

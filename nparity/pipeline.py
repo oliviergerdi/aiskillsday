@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import time
+from collections import defaultdict
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -20,10 +21,24 @@ from nparity.generate import allowed_methods, generate
 from nparity.map import map_endpoints, map_fields
 from nparity.models import AnswerKey, EndpointMap, RequestPair, Run, Telemetry
 from nparity.openapi import Endpoint, endpoints, load_spec
-from nparity.replay import replay, replay_pairs
+from nparity.replay import replay, replay_pairs, to_new
 from nparity.retry import RetryPolicy
 from nparity.score import score
 from nparity.triage import triage
+
+STAGES = (
+    ("Loading ", "load"),
+    ("Reading API endpoints", "read"),
+    ("Mapping endpoints and fields", "map"),
+    ("Replaying ", "replay"),
+    ("Comparing responses and schemas", "compare"),
+    ("Triaging ", "triage"),
+    ("Saving report", "save"),
+)
+
+
+def stage_for(message: str) -> str | None:
+    return next((stage for prefix, stage in STAGES if message.startswith(prefix)), None)
 
 
 @dataclass
@@ -47,6 +62,7 @@ class RunConfig:
     seed_samples: Path | None = None
     sample_requests: list[RequestPair] | None = None
     contract_only: bool = False
+    run_id: str | None = None
 
 
 def _optional_spec(client, base, location, request_headers):
@@ -76,6 +92,67 @@ def _toy_seeds(cfg: RunConfig, old_spec: dict, new_spec: dict) -> Path | None:
     return None
 
 
+def _specs(cfg, client, old_headers, new_headers):
+    if cfg.sample_requests is not None:
+        return None, None
+    return (
+        _optional_spec(client, cfg.old, cfg.old_spec, old_headers),
+        _optional_spec(client, cfg.new, cfg.new_spec, new_headers),
+    )
+
+
+def _request_seeds(cfg, old_spec, new_spec, endpoints, supplied=None):
+    path = cfg.seeds
+    if supplied is None:
+        path = path or _toy_seeds(cfg, old_spec, new_spec)
+        supplied = load_seeds(path) if path else Seeds()
+    seeds = seed_generation.fill_gaps(supplied, seed_generation.from_spec(endpoints))
+    if cfg.seed_samples is not None:
+        seed_samples.apply(cfg.seed_samples, endpoints, seeds, cfg.old)
+    return path, seeds
+
+
+def plan(cfg: RunConfig, client: httpx.Client) -> dict:
+    """Forecast replay from specs and local seeds without contacting live endpoints or a model."""
+    old_h = headers.resolve(cfg.old_headers, "old")
+    new_h = headers.resolve(cfg.new_headers, "new")
+    old_spec, new_spec = _specs(cfg, client, old_h, new_h)
+    basic = old_spec is None or new_spec is None
+    rows = []
+    if basic:
+        for pair in cfg.sample_requests or []:
+            rows.append({"endpoint": pair.old.endpoint, "new_endpoint": pair.new.endpoint, "requests": 1,
+                         "seed_sources": ["sample"], "reason": None})
+    else:
+        before, after = endpoints(old_spec), endpoints(new_spec)
+        _, seeds = _request_seeds(cfg, old_spec, new_spec, before) if not cfg.contract_only else (None, Seeds())
+        evaluator = FakeBackend.from_file(cfg.answer_key) if cfg.backend == "fake" and cfg.answer_key else FakeBackend(AnswerKey())
+        mapped = map_endpoints(before, after, evaluator, load_thresholds(cfg.thresholds, evaluator.id))
+        requests = defaultdict(list)
+        if not cfg.contract_only:
+            for request in generate(before, seeds):
+                requests[request.endpoint].append(request)
+        allowed = allowed_methods(seeds)
+        for endpoint, mapping in zip(before, mapped):
+            candidates = requests[endpoint.key]
+            count = sum(to_new(request, mapping) is not None for request in candidates)
+            reason = None
+            if cfg.contract_only:
+                reason = "contract only"
+            elif endpoint.method not in allowed:
+                reason = "method not enabled"
+            elif not candidates:
+                reason = "not seeded"
+            elif not count:
+                reason = "mapping unresolved without a model or a compatible endpoint"
+            rows.append({"endpoint": endpoint.key, "new_endpoint": mapping.new, "requests": count,
+                         "seed_sources": sorted({s for req in candidates for s in req.seed_sources.values()}),
+                         "reason": reason})
+    return {"dry_run": True, "limited_comparison": basic, "endpoints": rows,
+            "requests": sum(row["requests"] for row in rows),
+            "discovery": {"allowlist": cfg.discover_from, "executed": False}}
+
+
 def run(
     cfg: RunConfig, client: httpx.Client, ev: Backend | None = None, *,
     specs: tuple[dict, dict] | None = None,
@@ -90,9 +167,7 @@ def run(
     new_h = headers.resolve(cfg.new_headers, "new")
 
     progress("Reading API endpoints")
-    old_spec, new_spec = specs or ((None, None) if cfg.sample_requests is not None else (
-        _optional_spec(client, cfg.old, cfg.old_spec, old_h), _optional_spec(client, cfg.new, cfg.new_spec, new_h),
-    ))
+    old_spec, new_spec = specs or _specs(cfg, client, old_h, new_h)
     basic = old_spec is None or new_spec is None
     if ev is None:
         ev = (FakeBackend(AnswerKey()) if cfg.contract_only or (cfg.backend == "fake" and (basic or cfg.answer_key is None))
@@ -124,13 +199,7 @@ def run(
         reqs = [old for old, _ in explicit]
         samples, retries = replay_pairs(explicit, client, cfg.old, cfg.new, cfg.retry, cfg.workers, old_h, new_h)
     else:
-        if request_seeds is None:
-            seeds_path = seeds_path or _toy_seeds(cfg, old_spec, new_spec)
-            if seeds_path is not None:
-                seeds = load_seeds(seeds_path)
-        seeds = seed_generation.fill_gaps(seeds, seed_generation.from_spec(v1))
-        if cfg.seed_samples is not None:
-            seed_samples.apply(cfg.seed_samples, v1, seeds, cfg.old)
+        seeds_path, seeds = _request_seeds(cfg, old_spec, new_spec, v1, request_seeds)
         if cfg.discover_from and not old_h:
             progress("Discovering seeds from allowlisted GET endpoints")
             safe = [ep for ep in v1 if ep.method == "GET" and ep.key in cfg.discover_from and not ep.has_body]
@@ -157,7 +226,7 @@ def run(
     matched = {m.new for m in emap if m.new is not None and m.status == "accepted"}
 
     result = Run(
-        id=f"{started.astimezone():%Y-%m-%dT%H%M%S}-{cfg.name}",   # local time, readable
+        id=cfg.run_id or f"{started.astimezone():%Y-%m-%dT%H%M%S}-{cfg.name}",
         started_at=started,
         config={"old": cfg.old, "new": cfg.new, "intent": str(cfg.intent) if cfg.intent is not None else None,
                 "seeds": str(seeds_path) if seeds_path else None, "limited_comparison": basic,
