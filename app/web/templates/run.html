@@ -57,7 +57,7 @@
   <details class="g"{% if g.count <= 3 or (first_open and loop.first) %} open{% endif %}>
     <summary><span class="g-ep">{{ g.endpoint }} → {{ g.new_endpoint or "unmapped" }}</span>
       <span class="g-meta">{{ g.count }} finding{{ "s" if g.count != 1 }} · lowest p {{ "%.3f"|format(g.min_p) if g.min_p is not none else "—" }}</span></summary>
-    {% for v in g.items %}{% include "_row.html" %}{% endfor %}
+    {% for v in g.items %}{% set in_group = true %}{% include "_row.html" %}{% endfor %}
   </details>
   {% else %}<div class="empty">None.</div>{% endfor %}
 </div>

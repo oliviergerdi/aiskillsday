@@ -1,5 +1,6 @@
 /* Lifted from docs/mockups/web-ui.html (approved look). */
 :root {
+  color-scheme: light dark;
   --bg: #fbfbfa; --surface: #ffffff; --ink: #1d2125; --muted: #66707a; --line: #e3e5e8;
   --code-bg: #f4f5f6;
   --reg: #c0392b; --reg-bg: #fdecea;
@@ -30,6 +31,7 @@ body { margin: 0; background: var(--bg); color: var(--ink);
        font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
 code, pre, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 13px; }
 a { color: var(--accent); }
+select { background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; }
 .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
 
 header.top { border-bottom: 1px solid var(--line); background: var(--surface); }
@@ -39,7 +41,7 @@ header.top .wrap { display: flex; align-items: center; gap: 24px; height: 56px; 
 td.zero { color: var(--muted); }
 .brand span { color: var(--muted); font-weight: 400; font-size: 14px; margin-left: 6px; }
 nav.views { display: flex; gap: 4px; }
-nav.views a { text-decoration: none; color: var(--muted); padding: 6px 12px; border-radius: 6px; font-size: 14px; }
+nav.views a { text-decoration: none; color: var(--muted); padding: 6px 12px; border-radius: 6px; font-size: 14px; white-space: nowrap; }
 nav.views a.active { background: var(--code-bg); color: var(--ink); font-weight: 600; }
 
 main { padding: 24px 0 64px; }
@@ -185,6 +187,8 @@ details.g > details.f { margin-left: 14px; border-left: 1px solid var(--line); }
 .arrow { color: var(--muted); padding: 0 4px; }
 
 @media (max-width: 760px) {
+  nav.views { gap: 0; }
+  nav.views a { padding: 6px 8px; }
   .source-grid { grid-template-columns: 1fr; }
   .counts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   details.f > summary { grid-template-columns: 14px 1fr; }
