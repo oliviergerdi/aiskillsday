@@ -419,7 +419,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
     <div class="vp">
       <div class="vp-row">
         <span class="lab">What</span>
-        <p>From the first prototype to sign-off, nParity tells the backend engineer which differences between the old and new API are regressions, with a probability and a one-line reason for each.</p>
+        <p>From the first prototype to sign-off, nParity tells the engineer which differences between the old and new API are regressions, with a probability and a reason, and maps each old call to the new calls that replace it.</p>
       </div>
       <div class="vp-row">
         <span class="lab">Why</span>
@@ -524,6 +524,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
           <li><span>JSON over HTTP</span></li>
           <li><span>OpenAPI specs, or recorded samples</span></li>
           <li><span>Request and response behaviour</span></li>
+          <li><span>Flows: one old call to several new</span></li>
           <li><span>Before and during the migration</span></li>
         </ul>
       </div>
@@ -564,10 +565,11 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
         <div class="lotcard"><span class="path">GET /customers/{id} · $.currency</span><span class="pill">Regression</span><span class="desc">Missing for one customer type.</span></div>
         <div class="lotcard unsure"><span class="path">GET /orders/{id} · not found</span><span class="pill unsure">Unsure</span><span class="desc">The error message was reworded. The intent note doesn't say whether that's allowed.</span></div>
         <p class="found"><span class="pill ok">Found</span> without being told: <code>/customers/{id}</code> → <code>/clients/{clientId}</code></p>
+        <p class="found"><span class="pill ok">Mapped</span> <code>POST /screenings</code> → six new calls, in order.</p>
       </div>
     </div>
     <p class="source push">Expected result from the answer key on our toy APIs. Live run: Swagger Petstore v2 → v3, two real public APIs.</p>
-    <aside class="notes">Demo on two API pairs: toy services scored against an answer key (10 differences: noise, intended, regression, unsure), and Swagger Petstore v2 to v3 (saved run: 20 endpoints compared on the contract, 5 also with live calls, 3 findings: 1 unsure, 2 intended, 1 server error from the public v3 server, about 5 seconds). The two public servers run on separate databases, so the intent note says record values differ and nParity treats those as data, not API change. The result on the slide is the expected result from the answer key. Wikipedia and Open Food Facts samples are saved in samples/api-versions/ for offline use.</aside>
+    <aside class="notes">Demo on two API pairs: toy services scored against an answer key (10 differences: noise, intended, regression, unsure), and Swagger Petstore v2 to v3 (saved run: 20 endpoints compared on the contract, 5 also with live calls, 3 findings: 1 unsure, 2 intended, 1 server error from the public v3 server, about 5 seconds). The two public servers run on separate databases, so the intent note says record values differ and nParity treats those as data, not API change. The result on the slide is the expected result from the answer key. Flow mapping is shown on the toy flow pair (one synchronous call that becomes token, configuration, start, completion callback, result and paged read); it suggests flows from the specs with a role, probability and quoted source, and never replays them. Wikipedia and Open Food Facts samples are saved in samples/api-versions/ for offline use.</aside>
   </section>
   <section class="slide s-compact" id="s8" aria-label="Value and cost">
     <span class="lot">LOT 08</span>

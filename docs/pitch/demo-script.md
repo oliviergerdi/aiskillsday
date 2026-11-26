@@ -36,7 +36,8 @@ Judges score nine things (see the scoring sheet). Slide that carries each: probl
 1. (0:45) Run the **toy APIs**. "Ten differences in, four for a human."
 2. (0:40) Open the rounding regression (10.005 now rounds to 10.00). "The differ catches the number. The model judges whether it was intended." Say why a difference needs 0.98 and a match 0.95: the costlier the mistake, the higher the bar.
 3. (0:15) Point at the rename found without being told.
-4. (1:00) Run **Petstore v2 against v3**. "Two real public APIs. About 5 seconds, three findings. By hand we estimate two hours, which we have not timed." Open the unsure finding (`GET /pet/findByStatus`, `tags` changed from object to string) and say it is the unsure bucket doing its job: the intent note does not cover a type change, so it asks a human.
+4. (0:30) Run the **toy flow** (`toy-flow`, fake backend). "One old call, six new ones, in order: token, configuration, start, callback, result, paged read. Each has a role and the spec sentence behind it. It suggests, it never replays."
+5. (0:50) Run **Petstore v2 against v3**. "Two real public APIs. About 5 seconds, three findings. By hand we estimate two hours, which we have not timed." Open the unsure finding (`GET /pet/findByStatus`, `tags` changed from object to string) and say it is the unsure bucket doing its job: the intent note does not cover a type change, so it asks a human.
 
 *Fallback if a live run fails:* say "this is the saved output from this morning", show the toy output already on screen, and move on. Do not debug live. Do not run the Wikipedia pair live unless the User-Agent fix is in.
 
@@ -48,7 +49,7 @@ Judges score nine things (see the scoring sheet). Slide that carries each: probl
 
 ## If you run long (cut in this order)
 1. Slide 9: name one risk (10 s).
-2. Slide 7: skip the Petstore run and say it is in the repo (1:00).
+2. Slide 7: skip the Petstore run and say it is in the repo (0:50).
 3. Slide 5: drop the market line (10 s).
 
 ## Likely questions (appendix slides 11 to 19)
@@ -64,7 +65,7 @@ Judges score nine things (see the scoring sheet). Slide that carries each: probl
 - **POST or DELETE endpoints?** The spec gives contract differences for every method with no calls. Behaviour is replayed for GET by default, other methods opt-in (PRD 0008).
 - **Can an AI agent use it?** Appendix slide 13. Yes, a developer CLI with YAML run output. The agent options (`--format json`, `--compact`, `--detach`, `--dry-run`, `--fail-on`) are built; not in the demo. It is not meant for CI builds.
 - **Data leaving the company?** Redaction before any model call is specified, not built. Run it on an approved model or locally and nothing leaves.
-- **One old call that becomes several new ones?** Flow mapping (PRD 0005) is built: it suggests the new calls, in order, each with a role, a probability and the quoted spec sentence. It works from the specs only and never replays a flow. Shown on the toy flow pair with the fake backend. Real specs need the Flash backend, and scoring needs an engineer-confirmed key.
+- **One old call that becomes several new ones?** Slide 7 shows it on the toy flow. Flow mapping (PRD 0005) is built: it suggests the new calls, in order, each with a role, a probability and the quoted spec sentence. It works from the specs only and never replays a flow. Shown on the toy flow pair with the fake backend. Real specs need the Flash backend, and scoring needs an engineer-confirmed key.
 - **CSOM to Mesh?** Our worked example. The key is our draft from vendor docs, how our integration calls each API, and one engineer's answer. It has not been reviewed.
 
 ## Checks before you go on
