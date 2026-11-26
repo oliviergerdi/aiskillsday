@@ -43,7 +43,7 @@ Judges score nine things (see the scoring sheet). Slide that carries each: probl
 1. (0:35) Run the **toy APIs**. "Ten differences in, four for a human."
 2. (0:30) Open the rounding regression (10.005 now rounds to 10.00). "The differ catches the number. The model judges whether it was intended."
 3. (0:15) Point at the rename found without being told.
-4. (0:40) Run **Petstore v2 against v3**. "Two real public APIs. About 20 seconds. By hand we estimate two hours, which we have not timed."
+4. (0:40) Run **Petstore v2 against v3**. "Two real public APIs. About 5 seconds, three findings. By hand we estimate two hours, which we have not timed."
 
 *Fallback if a live run fails:* say "this is the saved output from this morning", show the toy output already on screen, and move on. Do not debug live. Do not run the Wikipedia pair live unless the User-Agent fix is in.
 

@@ -606,7 +606,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
       </div>
     </div>
     <p class="source push">Expected result from the answer key on our toy APIs. Live run: Swagger Petstore v2 → v3, two real public APIs.</p>
-    <aside class="notes">Demo on two API pairs: toy services scored against an answer key (10 differences: noise, intended, regression, unsure), and Swagger Petstore v2 to v3 (saved run: 20 endpoints, 39 differences, 25 regression, 13 unsure, 1 intended, about 20 seconds). The Petstore public servers hold junk data, so some differences reflect data, not API change. The result on the slide is the expected result from the answer key. Wikipedia and Open Food Facts samples are saved in samples/api-versions/ for offline use.</aside>
+    <aside class="notes">Demo on two API pairs: toy services scored against an answer key (10 differences: noise, intended, regression, unsure), and Swagger Petstore v2 to v3 (saved run: 20 endpoints compared on the contract, 5 also with live calls, 3 findings: 1 unsure, 2 intended, 1 server error from the public v3 server, about 5 seconds). The two public servers run on separate databases, so the intent note says record values differ and nParity treats those as data, not API change. The result on the slide is the expected result from the answer key. Wikipedia and Open Food Facts samples are saved in samples/api-versions/ for offline use.</aside>
   </section>
   <section class="slide s-compact" id="s9" aria-label="Trust">
     <span class="lot">LOT 09</span>
@@ -788,8 +788,8 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
         <p class="body">Each remaining difference is checked against the change list in someone's head. None of the tools we found does this step.</p>
       </div>
     </div>
-    <p class="callout push">Petstore v2 to v3: <strong>39 differences</strong> to read. nParity took about <strong>20 seconds</strong>. By hand we estimate about <strong>2 hours</strong> <span class="todo">not yet timed</span>.</p>
-    <aside class="notes">Measured: 39 differences and 20.4 s, from the saved Petstore run (20 endpoints: 25 regression, 13 unsure, 1 intended). Estimated, not timed: about 2 hours by hand (20 endpoints x 3 samples x 2 minutes per comparison, the model used in the problem definition). A timed manual baseline is still to do. Step 3, judging intent, is the part no tool we found automates.</aside>
+    <p class="callout push">Petstore v2 to v3: <strong>3 findings</strong> to read across 20 endpoints. nParity took about <strong>5 seconds</strong>. By hand we estimate about <strong>2 hours</strong> <span class="todo">not yet timed</span>.</p>
+    <aside class="notes">Measured: 3 findings (1 unsure, 2 intended) and 5.0 s, from the saved Petstore run (20 endpoints on the contract, 5 with live calls). An earlier run without the intent note about separate databases reported 39 differences, most of them data. Estimated, not timed: about 2 hours by hand (20 endpoints x 3 samples x 2 minutes per comparison, the model used in the problem definition). A timed manual baseline is still to do. Step 3, judging intent, is the part no tool we found automates.</aside>
   </section>
   <section class="slide" id="s18" aria-label="Market">
     <span class="lot">LOT 18</span>
