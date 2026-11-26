@@ -122,10 +122,34 @@ function setRunning(running) {
   rerunStart.disabled = running;
 }
 
+const stepItems = Array.from(document.querySelectorAll("#run-steps li"));
+const opening = document.querySelector("#run-opening");
+
+function renderSteps(job) {
+  const current = stepItems.findIndex((li) => li.dataset.step === job.stage);
+  const last = job.lines.at(-1) || "";
+  const failedMessage = last.startsWith("Error: ") ? last.slice(7) : job.error?.message || "";
+  stepItems.forEach((li, index) => {
+    let state = "waiting";
+    if (job.state === "complete" || index < current) state = "done";
+    else if (index === current) state = job.state === "failed" ? "failed" : "running";
+    li.dataset.state = state;
+    li.querySelector(".run-step-marker").textContent = state;
+    const slot = li.querySelector(".run-step-error");
+    slot.textContent = state === "failed" ? failedMessage : "";
+    slot.hidden = state !== "failed";
+  });
+}
+
+let openTimer = null;
+
 function resetConsole() {
+  clearTimeout(openTimer);
   output.hidden = false;
   report.hidden = true;
   report.removeAttribute("href");
+  opening.hidden = true;
+  renderSteps({ state: "running", stage: null, lines: [] });
   consoleOutput.replaceChildren();
 }
 
@@ -175,11 +199,14 @@ function fieldFromLoc(loc) {
 
 async function followJob(url) {
   let seen = 0;
+  let sawRunning = false;
   while (true) {
     const job = await getJSON(url, { cache: "no-store" });
     for (const line of job.lines.slice(seen)) appendLine(line);
     seen = job.lines.length;
+    renderSteps(job);
     if (job.state === "running") {
+      sawRunning = true;
       statusText.textContent = "Running";
       await new Promise((resolve) => setTimeout(resolve, 400));
       continue;
@@ -189,6 +216,10 @@ async function followJob(url) {
     if (job.report_url) {
       report.href = job.report_url;
       report.hidden = false;
+    }
+    if (job.state === "complete" && sawRunning) {
+      opening.hidden = false;
+      openTimer = setTimeout(() => location.replace(job.report_url), 1500);
     }
     return;
   }

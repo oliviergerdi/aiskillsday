@@ -34,6 +34,22 @@ class Job:
     report_url: str | None = None
     field: str | None = None
     error_message: str | None = None
+    stage: str | None = None
+
+
+STAGES = (
+    ("Loading ", "load"),
+    ("Reading API endpoints", "read"),
+    ("Mapping endpoints and fields", "map"),
+    ("Replaying ", "replay"),
+    ("Comparing responses and schemas", "compare"),
+    ("Triaging ", "triage"),
+    ("Saving report with", "save"),
+)
+
+
+def stage_for(line: str) -> str | None:
+    return next((key for prefix, key in STAGES if line.startswith(prefix)), None)
 
 
 class RunJobs:
@@ -57,13 +73,15 @@ class RunJobs:
             job = self.jobs.get(job_id)
             if job is not None:
                 error = {"field": job.field, "message": job.error_message} if job.field else None
-                return {"state": job.state, "lines": list(job.lines), "report_url": job.report_url, "error": error}
+                return {"state": job.state, "lines": list(job.lines), "report_url": job.report_url, "error": error,
+                        "stage": job.stage}
         return None
 
     def run(self, job_id: str, job: Job, inputs: RunInput, directory: Path, configs: Path = CONFIGS_DIR) -> None:
         def progress(message: str) -> None:
             with self.lock:
                 job.lines.append(message)
+                job.stage = stage_for(message) or job.stage
 
         try:
             report_id = compare(job_id, inputs, directory, progress, configs)
