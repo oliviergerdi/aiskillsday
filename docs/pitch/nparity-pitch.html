@@ -411,7 +411,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
         <div class="stamp">CHAI-GPT ESTATE<br>DEMO 27·11·2026</div>
       </div>
     </div>
-    <aside class="notes">Open with the question every engineer asks throughout an API migration. One line on who we are, then straight into the value proposition.</aside>
+    <aside class="notes">nParity compares an old API with its replacement and says which differences are regressions, before, during and after a migration. Built by Team Chai-GPT for The (AI)mazing Race (27 Nov 2026). Open source under the MIT licence: github.com/oliviergerdi/aiskillsday.</aside>
   </section>
   <section class="slide" id="s2" aria-label="Value proposition">
     <span class="lot">LOT 02</span>
@@ -430,7 +430,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
         <p>Regressions surface while the work is in flight. The engineer reviews only regressions and unsure items, and the engineering manager signs off on a short list with a probability on each item.</p>
       </div>
     </div>
-    <aside class="notes">Land this in the first minute. Every slide after this is evidence for it. Pause after "not whether it was intended".</aside>
+    <aside class="notes">Today the check happens once, by hand, near the end of a migration. Replay tools show what differs, not whether the difference was intended. nParity labels each difference intended, regression or unsure, with a probability read from the model's token probabilities and a one-line reason.</aside>
   </section>
   <section class="slide" id="s3" aria-label="The moment">
     <span class="lot">LOT 03</span>
@@ -453,7 +453,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
         <p class="body">Writing or running the migration. nParity shows where the differences are and where to focus.</p>
       </div>
     </div>
-    <aside class="notes">Name the user and the buyer. Say out loud what we are not for: we find and rank the differences, we do not do the migration.</aside>
+    <aside class="notes">Users: the backend engineer who must prove the new API behaves like the old one, and the engineering manager who signs off the cutover. Not in scope: writing or running the migration itself. nParity finds and ranks the differences and shows where to focus.</aside>
   </section>
   <section class="slide s-compact" id="s4" aria-label="Evidence">
     <span class="lot">LOT 04</span>
@@ -478,7 +478,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
       </div>
     </div>
     <p class="body push">Still to add: <span class="todo">2 more interviews</span> <span class="todo">timed manual baseline</span></p>
-    <aside class="notes">Public prior art proves the pain is real and that noise dominates. Our one interview shaped scope and trust, and it was a flow change: same vendor, new process, endpoints that cannot be paired one to one. That is the problem, not a limit. Say what we still lack: only one interview, and no timing. Add the next interviews here.</aside>
+    <aside class="notes">Public prior art (GitHub Scientist, Twitter Diffy, Speedscale) shows that noise dominates manual and replay-based checks. Our own evidence of need is one interview: an engineer who moved an integration from one version of a vendor API to its successor (same vendor, new process, endpoints that cannot be paired one to one). Limits: one interview, and no timed manual baseline yet. Two more interviews are planned.</aside>
   </section>
   <section class="slide" id="s5" aria-label="Alternatives and why now">
     <span class="lot">LOT 05</span>
@@ -501,7 +501,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
       <div class="card"><span class="k">More cutovers</span><p class="body">AI coding tools make migrations cheaper, so more teams face a cutover. <span class="todo">to test</span></p></div>
       <div class="card"><span class="k">A gap</span><p class="body">The best-known open-source option, Diffy, now sits in Twitter's archive.</p></div>
     </div>
-    <aside class="notes">"Isn't this Diffy or Scientist?" Answer: they diff. We match, strain and judge against stated intent, with a probability on every verdict.</aside>
+    <aside class="notes">Alternatives are compared on four things: replay and compare, noise removal, matching renamed endpoints and fields, and judging intent. Diffy is archived. Speedscale and Keploy do not state that they match renames or judge intent. The cost of about US$0.0001 per verdict is an estimate at Fireworks list price and is unverified for our model route. The claim that AI coding tools increase the number of migrations is untested. The market is not sized yet (see the appendix).</aside>
   </section>
   <section class="slide s-compact" id="s6" aria-label="How it works">
     <span class="lot">LOT 06</span>
@@ -540,7 +540,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
       </div>
     </div>
     <div class="io push"><span><strong>In:</strong> two API URLs, two OpenAPI specs and an intent note. <span class="todo">Docs as input in progress</span></span><span><strong>Out:</strong> a short report in the terminal or the browser</span></div>
-    <aside class="notes">Keep this quick. The point: the model only does the two jobs that need judgement, matching leftovers and tasting. Flow grouping and spec-less input are in progress and not part of the live demo. Everything else is deterministic.</aside>
+    <aside class="notes">Five steps: replay, strain (fixed rules, no model), match (rules first, the model only for leftovers), compare (deterministic differ), taste (the model labels each difference against the intent note). The model does only two jobs: matching leftovers and tasting. In progress: grouping multi-call flows (PRD 0005) and documentation pages as input (PRD 0006). Neither is in the live demo. A contract-only mode and sample-request checks are available in the CLI.</aside>
   </section>
   <section class="slide" id="s7" aria-label="Success and scope">
     <span class="lot">LOT 07</span>
@@ -576,7 +576,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
         </ul>
       </div>
     </div>
-    <aside class="notes">Read the targets as promises we test live. Users can change them per run, but never the safety rules: no regression is dismissed automatically. Out of scope is a choice, not a gap.</aside>
+    <aside class="notes">Targets for the demo prototype. Users can change the targets per run (specified in PRD 0006). The safety rules cannot be changed: no regression is dismissed automatically, static mode never labels a difference 'regression', and every item cites its source. Out of scope: implementing the migration, database side effects, performance.</aside>
   </section>
   <section class="slide s-compact" id="s8" aria-label="Demo">
     <span class="lot">LOT 08</span>
@@ -607,7 +607,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
       </div>
     </div>
     <p class="source push">Expected result from the answer key on our toy APIs. Live run: Swagger Petstore v2 → v3, two real public APIs.</p>
-    <aside class="notes">Switch to the live demo here. Run the toy APIs first, open one regression, then run Petstore v2 against v3.</aside>
+    <aside class="notes">Demo on two API pairs: toy services scored against an answer key (10 differences: noise, intended, regression, unsure), and Swagger Petstore v2 to v3 (saved run: 20 endpoints, 39 differences, 25 regression, 13 unsure, 1 intended, about 20 seconds). The Petstore public servers hold junk data, so some differences reflect data, not API change. The result on the slide is the expected result from the answer key. Wikipedia and Open Food Facts samples are saved in samples/api-versions/ for offline use.</aside>
   </section>
   <section class="slide s-compact" id="s9" aria-label="Trust">
     <span class="lot">LOT 09</span>
@@ -620,7 +620,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
       <div class="card"><span class="k">Scored on our test APIs</span><p class="body">On our test APIs, every run is scored against an answer key, and the score is on screen.</p></div>
     </div>
     <p class="body push">We tested before we built: 66 model calls for about US$0.006. Yes/no questions rejected correct renames (the model gave a correct rename a 0.17% chance), so nParity asks multiple-choice questions.</p>
-    <aside class="notes">Anticipate "why trust the AI?". The thresholds are the answer: the costlier the mistake, the higher the bar.</aside>
+    <aside class="notes">Each verdict is read from the model's token probabilities (one-token calls, top 5), not a score the model writes. Thresholds: 0.95 to accept a match, 0.98 to accept a difference as intended. A regression is never dismissed automatically. Rounding, counts and pagination are decided by the differ, not the model. A model without token probabilities falls back to vote sampling, which is labelled uncalibrated.</aside>
   </section>
   <section class="slide s-compact" id="s10" aria-label="AI agents">
     <span class="lot">LOT 10</span>
@@ -633,7 +633,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
       <div class="card"><span class="k">Plan first</span><ul class="ticks"><li><span><code>--dry-run</code> shows the calls, seed sources and skipped endpoints.</span></li><li><span>No replay and no model calls.</span></li></ul></div>
     </div>
     <p class="callout push">A developer tool. The agent does the fixing. nParity says where to look.</p>
-    <aside class="notes">Same CLI, same engine. An AI coding agent runs a check during the migration, reads only the regressions and unsure items, then fixes the code. Not a CI gate. The JSON options are being added and are not in the live demo: say "in progress". Source: README "CLI automation" section.</aside>
+    <aside class="notes">Same CLI and engine. The README section 'CLI automation' describes: --format json (one JSON document on stdout, errors on stderr), fixed exit codes, --compact, fetching a single finding, --detach with status polling, --dry-run, and --fail-on (exit code 5, so an agent knows to stop). Status: in progress and not part of the live demo. It is a developer tool, not a CI build step.</aside>
   </section>
   <section class="slide s-compact" id="s11" aria-label="Pricing">
     <span class="lot">LOT 11</span>
@@ -646,7 +646,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
       <div class="card"><span class="k">What one regression costs</span><p class="body">Unknown: someone must find it, fix it and redeploy. At 4 to 24 h that is <strong>US$160 to US$960</strong>.</p></div>
     </div>
     <p class="callout push">One regression caught early (12 h, US$480) pays for the pass about three times.</p>
-    <aside class="notes">Who pays, how, why that price. Say plainly that the true cost of a regression is unknown, so we price it as senior developer hours. Assumptions: US$40 an hour loaded, 20 h per manual parity pass (illustrative, from the problem definition), 1 h with nParity, 5 passes per migration. Pass price chosen after feedback that US$99 a month is high for a tool used once or twice. Model: docs/costing/business_case.py</aside>
+    <aside class="notes">Who pays: the engineering manager, from the team's tooling budget. Offer: open core. Self-host is free (MIT, your own model). Hosted: Migration Pass at US$149 for 60 days and about 50 runs, plus an optional US$99 a month team plan (not in the base numbers). The true cost of a regression is unknown, so it is priced as senior developer time (4, 12 or 24 hours at US$40/h). Assumptions: US$40 an hour loaded, 20 h per manual parity pass (illustrative), 1 h with nParity, 5 passes per migration. Model: docs/costing/business_case.py</aside>
   </section>
   <section class="slide s-compact" id="s12" aria-label="Unit economics">
     <span class="lot">LOT 12</span>
@@ -676,7 +676,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
       </div>
     </div>
     <p class="callout push">Model fees are 2% of the price. Watch support time and the build.</p>
-    <aside class="notes">Tokens are measured on 111 Flash calls. Prices are public list prices, not quotes. Support hours, runs per pass, serverless idle cost, payment fee, support hours and build effort are assumptions. Run: python3 docs/costing/business_case.py</aside>
+    <aside class="notes">Tokens are measured on 111 Flash calls. Prices are public list prices, not quotes. Assumptions: 10 runs of 1,000 findings per pass, 1 hour of support at US$40/h, a 3% payment fee, about US$3 a month idle serverless hosting (not checked against AWS pages), and a build of US$19k to US$58k. Run: python3 docs/costing/business_case.py</aside>
   </section>
   <section class="slide s-compact" id="s13" aria-label="Business case">
     <span class="lot">LOT 13</span>
@@ -703,7 +703,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
       </div>
     </div>
     <p class="callout push">The strongest lever is price: at US$299 the base case pays back a lean build in month 23.</p>
-    <aside class="notes">Be honest: at US$149 a pass the hosted tier is a modest business on its own, and the build only pays back with volume. The open core is the funnel. No hockey stick: passes a month are constant. Break-even on run costs is the first pass (US$3 idle hosting a month against US$100 contribution). Model: docs/costing/business_case.py</aside>
+    <aside class="notes">At US$149 a pass the hosted tier is a modest business on its own, and the build pays back only with volume. The open core is the funnel. Passes a month are held flat (no ramp), sales start in month 4, and each pass is one-off with no renewals counted. Break-even on run costs is the first pass (US$3 idle hosting a month against US$100 contribution). At US$299 a pass the base case pays back a lean build in month 23. Model: docs/costing/business_case.py</aside>
   </section>
   <section class="slide s-compact" id="s14" aria-label="Risks">
     <span class="lot">LOT 14</span>
@@ -722,7 +722,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
       </table>
     </div>
     <p class="callout push">Break-even on run costs: the first pass. Break-even on the build: depends on volume, so we measure it in a pilot.</p>
-    <aside class="notes">Four things can sink this: trust, the model route, data governance, and one-off demand. Each has a fallback. Margin figures come from docs/costing/business_case.py (vote sampling: 10 runs of 1,000 findings at US$0.00113).</aside>
+    <aside class="notes">Five risks: accuracy, no token probabilities on the model route, model price, customer data leaving AWS, and one-off demand. Margins: vote sampling 89% (10 runs of 1,000 findings at US$0.00113 a finding); model price ten times higher 74%. The model route (DeepSeek Flash via Bedrock, served by Fireworks) is stated but not verified for token probabilities or price. Redaction before model calls is specified in PRD 0007 and not built.</aside>
   </section>
   <section class="slide s-title" id="s15" aria-label="Close">
     <span class="lot">LOT 15</span>
@@ -748,7 +748,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
         </svg>
       </div>
     </div>
-    <aside class="notes">Close on the model line, then the ask. Questions.</aside>
+    <aside class="notes">The same engine runs before, during and after a migration, on any approved model that returns token probabilities. Ask: a pilot on one real migration, with two engineers, next quarter. Authorization-token support for authenticated APIs is not built and is a release requirement.</aside>
   </section>
   <section class="slide" id="s16" aria-label="Before, during, after">
     <span class="lot">LOT 16</span>
@@ -772,7 +772,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
       </div>
     </div>
     <p class="callout push">Same engine, same report, at every stage of the migration.</p>
-    <aside class="notes">This is why the question is "will we", not "did we". The value comes from asking early and often, not once at the end.</aside>
+    <aside class="notes">The value comes from asking early and often, not once at the end: 'will we break anything?' is answered before, during and after a migration.</aside>
   </section>
   <section class="slide s-compact" id="s17" aria-label="Why it hurts">
     <span class="lot">LOT 17</span>
@@ -796,7 +796,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
       </div>
     </div>
     <p class="callout push">Petstore v2 to v3: <strong>39 differences</strong> to read. nParity took about <strong>20 seconds</strong>. By hand we estimate about <strong>2 hours</strong> <span class="todo">not yet timed</span>.</p>
-    <aside class="notes">39 differences and 20.4 s are measured (run 2026-11-26T105859-petstore: 20 endpoints, 25 regression, 13 unsure, 1 intended). The 2 hours is our estimate, not a stopwatch: 20 endpoints x 3 samples x 2 min per comparison, the same model as the problem definition. Say so. Step 3 is the part nobody automates.</aside>
+    <aside class="notes">Measured: 39 differences and 20.4 s, from the saved Petstore run (20 endpoints: 25 regression, 13 unsure, 1 intended). Estimated, not timed: about 2 hours by hand (20 endpoints x 3 samples x 2 minutes per comparison, the model used in the problem definition). A timed manual baseline is still to do. Step 3, judging intent, is the part no tool we found automates.</aside>
   </section>
   <section class="slide" id="s18" aria-label="Market">
     <span class="lot">LOT 18</span>
@@ -817,7 +817,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
         <p class="callout">Our wedge: the parity check, run from the first prototype through cutover.</p>
       </div>
     </div>
-    <aside class="notes">Don't oversell the big number. Our market is the verification step inside it. Stage 3 will size that slice.</aside>
+    <aside class="notes">The large figure is a broad market. nParity's market is the verification step inside it, which has not been sized yet. The business case counts labour saved per migration instead (about US$3,800).</aside>
   </section>
   <section class="slide s-compact" id="s19" aria-label="Cost to run">
     <span class="lot">LOT 19</span>
@@ -845,7 +845,7 @@ html:not(.is-present) .bar .val { font-size: var(--t1); }
       </div>
     </div>
     <p class="callout push">A 1,000-finding run costs about US$0.33 on Flash. Support and people cost more than the model.</p>
-    <aside class="notes">Don't say "cheap" and stop. Say what the cheap engines give up: Jev and OpenAI return no reason, Bedrock models return no logprobs. Tokens measured on 111 Flash calls; prices are public list prices, not quotes; the Fireworks -us router price is unverified. Model: docs/costing/nparity-costing.md</aside>
+    <aside class="notes">Engine choice affects trust more than cost. Jev and OpenAI Decisions return no reason; Bedrock serverless models do not return token probabilities. Tokens are measured on 111 Flash calls; prices are public list prices, not quotes; the Fireworks -us router price is unverified. Serverless hosting is about US$3 a month idle (assumed). Always-on containers cost US$50 to US$83 a month. Model: docs/costing/nparity-costing.md</aside>
   </section>
 </main>
 
