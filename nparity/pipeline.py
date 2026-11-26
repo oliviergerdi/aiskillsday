@@ -31,6 +31,8 @@ class RunConfig:
     answer_key: Path | None = Path("fixtures/answer_key.yaml")
     noise: Path = Path("config/noise.yaml")
     thresholds: Path = Path("config/thresholds.yaml")
+    old_spec: str | None = None        # URL or file; default <old>/openapi.json
+    new_spec: str | None = None
     backend: str = "fake"
     name: str = "toy"
     workers: int = 8
@@ -46,8 +48,8 @@ def run(cfg: RunConfig, client: httpx.Client, ev: Backend | None = None) -> Run:
         ev = build(cfg.backend, answer_key=cfg.answer_key or "fixtures/answer_key.yaml")
     th = load_thresholds(cfg.thresholds, ev.id)
 
-    v1 = endpoints(load_spec(client, cfg.old))
-    v2 = endpoints(load_spec(client, cfg.new))
+    v1 = endpoints(load_spec(client, cfg.old, cfg.old_spec))
+    v2 = endpoints(load_spec(client, cfg.new, cfg.new_spec))
 
     emap = map_endpoints(v1, v2, ev, th, tel)
     new_by_key = {e.key: e for e in v2}

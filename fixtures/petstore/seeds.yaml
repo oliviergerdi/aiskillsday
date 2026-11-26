@@ -1,0 +1,7 @@
+# Petstore: Swagger 2.0 server (v2) vs OpenAPI 3.0 server (v3). Public shared servers: GET only.
+methods: [GET]
+params:
+  petId: [1, 2, 10]
+  status: [available, sold]
+  orderId: [1, 2]
+  username: [user1]

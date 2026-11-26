@@ -16,7 +16,10 @@ def generate(eps: list[Endpoint], seeds: Seeds, cap: int = 5) -> list[Request]:
     Optional query params without seeds are simply left out.
     """
     out: list[Request] = []
+    allowed = {m.upper() for m in seeds.methods} if seeds.methods else None
     for ep in eps:
+        if allowed is not None and ep.method not in allowed:
+            continue
         names = [n for n in ep.params if n in seeds.params]
         if any(n not in seeds.params for n in ep.required):
             continue

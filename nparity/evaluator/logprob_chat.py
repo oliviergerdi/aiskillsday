@@ -21,27 +21,13 @@ import httpx
 from nparity.evaluator.base import Answer, Choice, TooManyOptions, confidence, uniform
 from nparity.evaluator.profiles import Profile, load_profile
 from nparity.retry import RetryExhausted, RetryPolicy, retry_call
+from nparity.tls import tls_verify
 
 TEMPLATE_VERSION = "v1"
 SYSTEM = ("You answer one multiple-choice question about the state below.\n"
           "Reply with only the code of the best option. No other text.")
 REASON_SYSTEM = "You explain a decision in one short sentence. No preamble."
 CENSORED_ABOVE = 0.05
-
-
-def tls_verify() -> object:
-    """Verify against the OS trust store (macOS keychain) when truststore is installed.
-
-    Corporate TLS inspection puts its root CA in the keychain, not in certifi's bundle,
-    so plain httpx fails with CERTIFICATE_VERIFY_FAILED. Verification is never disabled.
-    """
-    try:
-        import ssl
-
-        import truststore
-    except ImportError:
-        return True
-    return truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 
 
 def codes_for(k: int) -> list[str]:

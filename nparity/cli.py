@@ -9,6 +9,7 @@ import httpx
 import typer
 
 from nparity import pipeline, store
+from nparity.tls import tls_verify
 from nparity.models import Run
 
 app = typer.Typer(add_completion=False, no_args_is_help=True, help="Did we break anything?")
@@ -51,16 +52,19 @@ def summary(r: Run) -> str:
 def run(
     old: str = typer.Option(..., help="Old service base URL, e.g. http://localhost:8000/v1"),
     new: str = typer.Option(..., help="New service base URL"),
+    old_spec: str | None = typer.Option(None, help="Old OpenAPI/Swagger spec: URL or file (default <old>/openapi.json)"),
+    new_spec: str | None = typer.Option(None, help="New spec: URL or file (default <new>/openapi.json)"),
     intent: Path = typer.Option(Path("fixtures/intent.md")),
     seeds: Path = typer.Option(Path("fixtures/seeds.yaml")),
     answer_key: Path | None = typer.Option(Path("fixtures/answer_key.yaml")),
     backend: str = typer.Option(os.environ.get("NPARITY_LLM", "fake"), help="fake | flash"),
     name: str = typer.Option("toy"),
+    score: bool = typer.Option(True, "--score/--no-score", help="Score against --answer-key"),
     runs_dir: Path = typer.Option(store.DEFAULT_DIR),
 ) -> None:
-    cfg = pipeline.RunConfig(old=old, new=new, intent=intent, seeds=seeds, answer_key=answer_key,
-                             backend=backend, name=name)
-    with httpx.Client(timeout=30) as client:
+    cfg = pipeline.RunConfig(old=old, new=new, old_spec=old_spec, new_spec=new_spec, intent=intent, seeds=seeds,
+                             answer_key=answer_key if score else None, backend=backend, name=name)
+    with httpx.Client(timeout=30, verify=tls_verify(), follow_redirects=True) as client:
         r = pipeline.run(cfg, client)
     path = store.save(r, runs_dir)
     typer.echo(summary(r))

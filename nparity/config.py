@@ -16,6 +16,7 @@ def load_yaml(path: str | Path) -> Any:
 class Seeds(BaseModel):
     params: dict[str, list[Any]] = Field(default_factory=dict)
     bodies: dict[str, list[Any]] = Field(default_factory=dict)
+    methods: list[str] | None = None     # e.g. [GET] for public servers: never mutate data you don't own
 
 
 def load_seeds(path: str | Path) -> Seeds:

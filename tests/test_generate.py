@@ -71,3 +71,26 @@ def test_missing_required_seed_skips_endpoint(v1):
 def test_optional_query_without_seed_is_left_out(v1):
     reqs = generate(v1, Seeds(params={"id": [1]}))
     assert [r.params for r in reqs if r.endpoint == "GET /orders"] == [{}]
+
+
+def test_spec_from_file_and_swagger2(tmp_path):
+    import yaml
+    from nparity.openapi import load_spec
+    swagger = {"swagger": "2.0", "paths": {"/pets/{petId}": {"get": {
+        "parameters": [{"name": "petId", "in": "path", "required": True, "type": "integer"}],
+        "responses": {"200": {"schema": {"$ref": "#/definitions/Pet"}}}}},
+        "/pets": {"post": {"parameters": [{"name": "body", "in": "body", "schema": {"$ref": "#/definitions/Pet"}}],
+                           "responses": {"200": {"description": "ok"}}}}},
+        "definitions": {"Pet": {"type": "object", "properties": {"id": {"type": "integer"}, "name": {"type": "string"}}}}}
+    path = tmp_path / "spec.yaml"
+    path.write_text(yaml.safe_dump(swagger))
+    eps = {e.key: e for e in endpoints(load_spec(None, "http://unused", str(path)))}
+    assert eps["GET /pets/{petId}"].path_params == ["petId"]
+    assert set(eps["GET /pets/{petId}"].response_schema["properties"]) == {"id", "name"}
+    assert eps["POST /pets"].has_body
+
+
+def test_methods_filter(v1):
+    reqs = generate(v1, Seeds(params={"id": [1], "page": [1]},
+                              bodies={"POST /orders": [{"customerId": 1, "items": []}]}, methods=["get"]))
+    assert {r.method for r in reqs} == {"GET"}

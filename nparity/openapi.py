@@ -29,10 +29,22 @@ class Endpoint:
         return self.path_params + self.query_params
 
 
-def load_spec(client: httpx.Client, base_url: str) -> dict[str, Any]:
-    resp = client.get(f"{base_url.rstrip('/')}/openapi.json")
+def load_spec(client: httpx.Client, base_url: str, spec: str | None = None) -> dict[str, Any]:
+    """Spec from `spec` (URL or local JSON/YAML file), else <base_url>/openapi.json."""
+    import json
+    from pathlib import Path
+
+    import yaml
+
+    if spec and not spec.startswith(("http://", "https://")):
+        text = Path(spec).read_text(encoding="utf-8")
+        return json.loads(text) if spec.endswith(".json") else yaml.safe_load(text)
+    resp = client.get(spec or f"{base_url.rstrip('/')}/openapi.json")
     resp.raise_for_status()
-    return resp.json()
+    try:
+        return resp.json()
+    except ValueError:
+        return yaml.safe_load(resp.text)
 
 
 def resolve(node: Any, spec: dict[str, Any], _seen: frozenset[str] = frozenset()) -> Any:
@@ -56,7 +68,11 @@ def _response_schema(op: dict[str, Any], spec: dict[str, Any]) -> dict[str, Any]
     for status, resp in sorted(op.get("responses", {}).items()):
         if not str(status).startswith("2"):
             continue
-        schema = resp.get("content", {}).get("application/json", {}).get("schema")
+        resp = resolve(resp, spec)
+        content = resp.get("content", {})
+        media = content.get("application/json") or next(
+            (v for k, v in content.items() if "json" in k), {})
+        schema = media.get("schema") or resp.get("schema")       # OpenAPI 3, else Swagger 2.0
         if schema:
             return resolve(schema, spec)
     return None
@@ -78,7 +94,8 @@ def endpoints(spec: dict[str, Any]) -> list[Endpoint]:
                     ep.query_params.append(p["name"])
                 if p.get("required") or p["in"] == "path":
                     ep.required.add(p["name"])
-            ep.has_body = "requestBody" in op
+            ep.has_body = "requestBody" in op or any(
+                resolve(p, spec).get("in") == "body" for p in op.get("parameters", []))
             ep.response_schema = _response_schema(op, spec)
             out.append(ep)
     return sorted(out, key=lambda e: (e.path, e.method))
