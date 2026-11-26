@@ -38,7 +38,11 @@ The hits are no longer in the create response. The engineer now handles a token 
 Targets are set per run (PRD 0006 #9). Suggested starting values: **[TO FILL]** after the engineer reviews the key.
 
 ## Open questions for the engineer
-1. Do the monitor `differences` and `acknowledge` calls map to the `CASE_ALERT_LIST_UPDATED` and `CASE_TRANSITIONED` webhooks, or to nothing?
-2. Is `GET /searches` used for anything we lose?
-3. Does `PATCH .../search-profile` really map to the monitor configuration call?
-4. Which variant do you use, sync or async? Add a doc URL or quote for each row.
+Answered from how an existing integration calls both APIs (evidence, not engineer confirmation):
+- Variant in use: sync create-and-screen, `last_sync_step=ALERTING`.
+- `GET /searches`: defined but never called. Nothing is lost.
+- Search profile: CSOM sent it on search creation. Mesh sets a configuration id through the monitor PATCH, chosen from the configurations list.
+
+Still open:
+1. Do the monitor `differences` and `acknowledge` calls map to the `CASE_ALERT_LIST_UPDATED` and `CASE_TRANSITIONED` webhooks, or to nothing? The integration does not call them.
+2. Add a doc URL or quote for each row, and confirm the key.

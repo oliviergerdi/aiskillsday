@@ -141,3 +141,6 @@ Targets 1 to 5 are what the Friday demo shows. Target 6 is the real-need proof a
 
 - Repo: https://github.com/oliviergerdi/aiskillsday
 - Build spec: `docs/nparity-build-spec.md` · Design: `docs/nparity-design.md` · Measurements: `docs/logprobs_report.md`
+
+## Release requirements not in the demo
+- **Authorization token for authenticated API calls.** The demo replays unauthenticated public APIs only. We would have liked to support a token option (for example a bearer or API key supplied per run) but did not build it. A release needs it, because real migrations call authenticated APIs. Hosted use must keep the token run-time only and never store it (PRD 0007).
