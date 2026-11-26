@@ -1,0 +1,1143 @@
+id: demo
+started_at: '2026-11-26T08:41:59.686857Z'
+config:
+  old: http://localhost:8000/v1
+  new: http://localhost:8000/v2
+  intent: fixtures/intent.md
+  seeds: fixtures/seeds.yaml
+  backend: logprob_chat:fireworks/deepseek-v4p1-flash-1017-us@1
+  requests: 10
+  endpoints: 4
+endpoints:
+- old: GET /customers/{id}
+  new: GET /clients/{clientId}
+  source: llm
+  p: 0.9998616195754543
+  status: accepted
+  top3:
+  - - GET /clients/{clientId}
+    - 0.9999014938581777
+  - - none
+    - 7.484446475562071e-05
+  - - GET /orders/{id}
+    - 1.6700057407145162e-05
+  error: null
+- old: GET /orders
+  new: GET /orders
+  source: rule
+  p: null
+  status: accepted
+  top3: []
+  error: null
+- old: POST /orders
+  new: POST /orders
+  source: rule
+  p: null
+  status: accepted
+  top3: []
+  error: null
+- old: GET /orders/{id}
+  new: GET /orders/{id}
+  source: rule
+  p: null
+  status: accepted
+  top3: []
+  error: null
+fields:
+- endpoint: GET /customers/{id}
+  old: id
+  new: id
+  source: rule
+  p: null
+  status: accepted
+  error: null
+- endpoint: GET /customers/{id}
+  old: email
+  new: email
+  source: rule
+  p: null
+  status: accepted
+  error: null
+- endpoint: GET /customers/{id}
+  old: type
+  new: type
+  source: rule
+  p: null
+  status: accepted
+  error: null
+- endpoint: GET /customers/{id}
+  old: currency
+  new: currency
+  source: rule
+  p: null
+  status: accepted
+  error: null
+- endpoint: GET /customers/{id}
+  old: fullName
+  new: name
+  source: llm
+  p: 0.9999487413137713
+  status: accepted
+  error: null
+- endpoint: GET /customers/{id}
+  old: legacyCode
+  new: null
+  source: llm
+  p: 0.9998823569204899
+  status: accepted
+  error: null
+- endpoint: GET /orders
+  old: page
+  new: page
+  source: rule
+  p: null
+  status: accepted
+  error: null
+- endpoint: GET /orders
+  old: items
+  new: items
+  source: rule
+  p: null
+  status: accepted
+  error: null
+- endpoint: POST /orders
+  old: id
+  new: id
+  source: rule
+  p: null
+  status: accepted
+  error: null
+- endpoint: POST /orders
+  old: createdAt
+  new: createdAt
+  source: rule
+  p: null
+  status: accepted
+  error: null
+- endpoint: POST /orders
+  old: customerId
+  new: customerId
+  source: rule
+  p: null
+  status: accepted
+  error: null
+- endpoint: POST /orders
+  old: items
+  new: items
+  source: rule
+  p: null
+  status: accepted
+  error: null
+- endpoint: POST /orders
+  old: total
+  new: total
+  source: rule
+  p: null
+  status: accepted
+  error: null
+- endpoint: POST /orders
+  old: currency
+  new: currency
+  source: rule
+  p: null
+  status: accepted
+  error: null
+- endpoint: POST /orders
+  old: status
+  new: status
+  source: rule
+  p: null
+  status: accepted
+  error: null
+- endpoint: GET /orders/{id}
+  old: id
+  new: id
+  source: rule
+  p: null
+  status: accepted
+  error: null
+- endpoint: GET /orders/{id}
+  old: customerId
+  new: customerId
+  source: rule
+  p: null
+  status: accepted
+  error: null
+- endpoint: GET /orders/{id}
+  old: items
+  new: items
+  source: rule
+  p: null
+  status: accepted
+  error: null
+- endpoint: GET /orders/{id}
+  old: total
+  new: total
+  source: rule
+  p: null
+  status: accepted
+  error: null
+- endpoint: GET /orders/{id}
+  old: currency
+  new: currency
+  source: rule
+  p: null
+  status: accepted
+  error: null
+- endpoint: GET /orders/{id}
+  old: status
+  new: status
+  source: rule
+  p: null
+  status: accepted
+  error: null
+findings:
+- id: f-001
+  endpoint: GET /customers/{id}
+  new_endpoint: GET /clients/{clientId}
+  path: $.currency
+  kind: missing_in_new
+  source: diff
+  samples:
+  - old_request:
+      method: GET
+      path: /customers/{id}
+      params:
+        id: 1
+      body: null
+    new_request:
+      method: GET
+      path: /clients/{clientId}
+      params:
+        clientId: 1
+      body: null
+    old:
+      status: 200
+      body:
+        id: 1
+        fullName: Ada Mokoena
+        email: ada@example.com
+        type: person
+        currency: ZAR
+        legacyCode: L-001
+      error: null
+    new:
+      status: 200
+      body:
+        id: 1
+        name: Ada Mokoena
+        email: ada@example.com
+        type: person
+        currency: ZAR
+      error: null
+  - old_request:
+      method: GET
+      path: /customers/{id}
+      params:
+        id: 2
+      body: null
+    new_request:
+      method: GET
+      path: /clients/{clientId}
+      params:
+        clientId: 2
+      body: null
+    old:
+      status: 200
+      body:
+        id: 2
+        fullName: Brightwater Holdings
+        email: ops@brightwater.example
+        type: business
+        currency: ZAR
+        legacyCode: L-002
+      error: null
+    new:
+      status: 200
+      body:
+        id: 2
+        name: Brightwater Holdings
+        email: ops@brightwater.example
+        type: business
+      error: null
+  - old_request:
+      method: GET
+      path: /customers/{id}
+      params:
+        id: 999
+      body: null
+    new_request:
+      method: GET
+      path: /clients/{clientId}
+      params:
+        clientId: 999
+      body: null
+    old:
+      status: 404
+      body:
+        detail: Customer not found
+      error: null
+    new:
+      status: 404
+      body:
+        detail: Customer not found
+      error: null
+  differing: 1
+  differs_in:
+  - 1
+  type_info:
+    observed: string → string
+    declared: string, required → string | null, optional
+  label: regression
+  p: 0.9999964200064082
+  probabilities:
+    intended: 2.5612797421483938e-06
+    regression: 0.9999967049013255
+    unsure: 7.338189322263458e-07
+  status: shown
+  reason: The intent note only covers the endpoint move, `fullName`→`name`, dropping
+    `legacyCode`, the 201 status, and error tidying—not the removal of the `currency`
+    field.
+- id: f-002
+  endpoint: GET /customers/{id}
+  new_endpoint: GET /clients/{clientId}
+  path: $.fullName
+  kind: renamed
+  source: mapping
+  samples:
+  - old_request:
+      method: GET
+      path: /customers/{id}
+      params:
+        id: 1
+      body: null
+    new_request:
+      method: GET
+      path: /clients/{clientId}
+      params:
+        clientId: 1
+      body: null
+    old:
+      status: 200
+      body:
+        id: 1
+        fullName: Ada Mokoena
+        email: ada@example.com
+        type: person
+        currency: ZAR
+        legacyCode: L-001
+      error: null
+    new:
+      status: 200
+      body:
+        id: 1
+        name: Ada Mokoena
+        email: ada@example.com
+        type: person
+        currency: ZAR
+      error: null
+  - old_request:
+      method: GET
+      path: /customers/{id}
+      params:
+        id: 2
+      body: null
+    new_request:
+      method: GET
+      path: /clients/{clientId}
+      params:
+        clientId: 2
+      body: null
+    old:
+      status: 200
+      body:
+        id: 2
+        fullName: Brightwater Holdings
+        email: ops@brightwater.example
+        type: business
+        currency: ZAR
+        legacyCode: L-002
+      error: null
+    new:
+      status: 200
+      body:
+        id: 2
+        name: Brightwater Holdings
+        email: ops@brightwater.example
+        type: business
+      error: null
+  - old_request:
+      method: GET
+      path: /customers/{id}
+      params:
+        id: 999
+      body: null
+    new_request:
+      method: GET
+      path: /clients/{clientId}
+      params:
+        clientId: 999
+      body: null
+    old:
+      status: 404
+      body:
+        detail: Customer not found
+      error: null
+    new:
+      status: 404
+      body:
+        detail: Customer not found
+      error: null
+  differing: 0
+  differs_in: []
+  type_info:
+    mapping: fullName → name (llm)
+    new_field: name
+  label: intended
+  p: 0.9998643592000452
+  probabilities:
+    intended: 0.999875664260938
+    regression: 6.604831003504882e-05
+    unsure: 5.828742902687763e-05
+  status: accepted
+  reason: null
+- id: f-003
+  endpoint: GET /customers/{id}
+  new_endpoint: GET /clients/{clientId}
+  path: $.legacyCode
+  kind: dropped
+  source: mapping
+  samples:
+  - old_request:
+      method: GET
+      path: /customers/{id}
+      params:
+        id: 1
+      body: null
+    new_request:
+      method: GET
+      path: /clients/{clientId}
+      params:
+        clientId: 1
+      body: null
+    old:
+      status: 200
+      body:
+        id: 1
+        fullName: Ada Mokoena
+        email: ada@example.com
+        type: person
+        currency: ZAR
+        legacyCode: L-001
+      error: null
+    new:
+      status: 200
+      body:
+        id: 1
+        name: Ada Mokoena
+        email: ada@example.com
+        type: person
+        currency: ZAR
+      error: null
+  - old_request:
+      method: GET
+      path: /customers/{id}
+      params:
+        id: 2
+      body: null
+    new_request:
+      method: GET
+      path: /clients/{clientId}
+      params:
+        clientId: 2
+      body: null
+    old:
+      status: 200
+      body:
+        id: 2
+        fullName: Brightwater Holdings
+        email: ops@brightwater.example
+        type: business
+        currency: ZAR
+        legacyCode: L-002
+      error: null
+    new:
+      status: 200
+      body:
+        id: 2
+        name: Brightwater Holdings
+        email: ops@brightwater.example
+        type: business
+      error: null
+  - old_request:
+      method: GET
+      path: /customers/{id}
+      params:
+        id: 999
+      body: null
+    new_request:
+      method: GET
+      path: /clients/{clientId}
+      params:
+        clientId: 999
+      body: null
+    old:
+      status: 404
+      body:
+        detail: Customer not found
+      error: null
+    new:
+      status: 404
+      body:
+        detail: Customer not found
+      error: null
+  differing: 0
+  differs_in: []
+  type_info:
+    mapping: legacyCode → dropped (llm)
+  label: intended
+  p: 0.9999468314134994
+  probabilities:
+    intended: 0.9999643740705983
+    regression: 1.892482763333729e-05
+    unsure: 1.6701101768367518e-05
+  status: accepted
+  reason: null
+- id: f-004
+  endpoint: GET /customers/{id}
+  new_endpoint: GET /clients/{clientId}
+  path: endpoint
+  kind: moved
+  source: mapping
+  samples:
+  - old_request:
+      method: GET
+      path: /customers/{id}
+      params:
+        id: 1
+      body: null
+    new_request:
+      method: GET
+      path: /clients/{clientId}
+      params:
+        clientId: 1
+      body: null
+    old:
+      status: 200
+      body:
+        id: 1
+        fullName: Ada Mokoena
+        email: ada@example.com
+        type: person
+        currency: ZAR
+        legacyCode: L-001
+      error: null
+    new:
+      status: 200
+      body:
+        id: 1
+        name: Ada Mokoena
+        email: ada@example.com
+        type: person
+        currency: ZAR
+      error: null
+  - old_request:
+      method: GET
+      path: /customers/{id}
+      params:
+        id: 2
+      body: null
+    new_request:
+      method: GET
+      path: /clients/{clientId}
+      params:
+        clientId: 2
+      body: null
+    old:
+      status: 200
+      body:
+        id: 2
+        fullName: Brightwater Holdings
+        email: ops@brightwater.example
+        type: business
+        currency: ZAR
+        legacyCode: L-002
+      error: null
+    new:
+      status: 200
+      body:
+        id: 2
+        name: Brightwater Holdings
+        email: ops@brightwater.example
+        type: business
+      error: null
+  - old_request:
+      method: GET
+      path: /customers/{id}
+      params:
+        id: 999
+      body: null
+    new_request:
+      method: GET
+      path: /clients/{clientId}
+      params:
+        clientId: 999
+      body: null
+    old:
+      status: 404
+      body:
+        detail: Customer not found
+      error: null
+    new:
+      status: 404
+      body:
+        detail: Customer not found
+      error: null
+  differing: 0
+  differs_in: []
+  type_info:
+    mapping: GET /customers/{id} → GET /clients/{clientId} (llm)
+  label: intended
+  p: 0.9999934400215168
+  probabilities:
+    intended: 0.9999969081518045
+    regression: 8.315260483598662e-07
+    unsure: 2.2603221471469816e-06
+  status: accepted
+  reason: null
+- id: f-005
+  endpoint: GET /orders
+  new_endpoint: GET /orders
+  path: $.items
+  kind: list_length_changed
+  source: diff
+  samples:
+  - old_request:
+      method: GET
+      path: /orders
+      params:
+        page: 1
+      body: null
+    new_request:
+      method: GET
+      path: /orders
+      params:
+        page: 1
+      body: null
+    old:
+      status: 200
+      body:
+        page: 1
+        items:
+        - id: 1
+          customerId: 1
+          status: paid
+        - id: 2
+          customerId: 2
+          status: paid
+        - id: 3
+          customerId: 1
+          status: shipped
+      error: null
+    new:
+      status: 200
+      body:
+        page: 1
+        items:
+        - id: 3
+          customerId: 1
+          status: shipped
+        - id: 2
+          customerId: 2
+          status: paid
+        - id: 1
+          customerId: 1
+          status: paid
+      error: null
+  - old_request:
+      method: GET
+      path: /orders
+      params:
+        page: 2
+      body: null
+    new_request:
+      method: GET
+      path: /orders
+      params:
+        page: 2
+      body: null
+    old:
+      status: 200
+      body:
+        page: 2
+        items:
+        - id: 4
+          customerId: 2
+          status: pending
+        - id: 5
+          customerId: 1
+          status: paid
+      error: null
+    new:
+      status: 200
+      body:
+        page: 2
+        items: []
+      error: null
+  differing: 1
+  differs_in:
+  - 1
+  type_info:
+    observed: array → array
+  label: regression
+  p: 0.9999990500004512
+  probabilities:
+    intended: 5.715002927528219e-07
+    regression: 0.999999158542084
+    unsure: 2.6995762317813116e-07
+  status: shown
+  reason: The intent note only covers customer endpoint/field changes, the POST /orders
+    status code, and error responses—not the item count in GET /orders responses.
+- id: f-006
+  endpoint: GET /orders/{id}
+  new_endpoint: GET /orders/{id}
+  path: $.detail
+  kind: changed
+  source: diff
+  samples:
+  - old_request:
+      method: GET
+      path: /orders/{id}
+      params:
+        id: 1
+      body: null
+    new_request:
+      method: GET
+      path: /orders/{id}
+      params:
+        id: 1
+      body: null
+    old:
+      status: 200
+      body:
+        id: 1
+        customerId: 1
+        items:
+        - sku: A1
+          qty: 2
+          unit: 5.0
+        total: 10.0
+        currency: ZAR
+        status: paid
+      error: null
+    new:
+      status: 200
+      body:
+        id: 1
+        customerId: 1
+        items:
+        - sku: A1
+          qty: 2
+          unit: 5.0
+        total: 10.0
+        currency: ZAR
+        status: paid
+      error: null
+  - old_request:
+      method: GET
+      path: /orders/{id}
+      params:
+        id: 2
+      body: null
+    new_request:
+      method: GET
+      path: /orders/{id}
+      params:
+        id: 2
+      body: null
+    old:
+      status: 200
+      body:
+        id: 2
+        customerId: 2
+        items:
+        - sku: B2
+          qty: 3
+          unit: 3.335
+        total: 10.01
+        currency: ZAR
+        status: paid
+      error: null
+    new:
+      status: 200
+      body:
+        id: 2
+        customerId: 2
+        items:
+        - sku: B2
+          qty: 3
+          unit: 3.335
+        total: 10.0
+        currency: ZAR
+        status: paid
+      error: null
+  - old_request:
+      method: GET
+      path: /orders/{id}
+      params:
+        id: 999
+      body: null
+    new_request:
+      method: GET
+      path: /orders/{id}
+      params:
+        id: 999
+      body: null
+    old:
+      status: 404
+      body:
+        detail: Order not found
+      error: null
+    new:
+      status: 404
+      body:
+        detail: No order with id 999
+      error: null
+  differing: 1
+  differs_in:
+  - 2
+  type_info:
+    observed: string → string
+    leans: regression
+  label: unsure
+  p: 0.9672977208442689
+  probabilities:
+    intended: 0.0292099725323627
+    regression: 0.9673013937451079
+    unsure: 0.0034886337225294244
+  status: unsure
+  reason: The intent note only mentions tidying error responses generally, not the
+    specific change to the `detail` message for `GET /orders/{id}`, so this specific
+    wording change is not described.
+- id: f-007
+  endpoint: GET /orders/{id}
+  new_endpoint: GET /orders/{id}
+  path: $.total
+  kind: changed
+  source: diff
+  samples:
+  - old_request:
+      method: GET
+      path: /orders/{id}
+      params:
+        id: 1
+      body: null
+    new_request:
+      method: GET
+      path: /orders/{id}
+      params:
+        id: 1
+      body: null
+    old:
+      status: 200
+      body:
+        id: 1
+        customerId: 1
+        items:
+        - sku: A1
+          qty: 2
+          unit: 5.0
+        total: 10.0
+        currency: ZAR
+        status: paid
+      error: null
+    new:
+      status: 200
+      body:
+        id: 1
+        customerId: 1
+        items:
+        - sku: A1
+          qty: 2
+          unit: 5.0
+        total: 10.0
+        currency: ZAR
+        status: paid
+      error: null
+  - old_request:
+      method: GET
+      path: /orders/{id}
+      params:
+        id: 2
+      body: null
+    new_request:
+      method: GET
+      path: /orders/{id}
+      params:
+        id: 2
+      body: null
+    old:
+      status: 200
+      body:
+        id: 2
+        customerId: 2
+        items:
+        - sku: B2
+          qty: 3
+          unit: 3.335
+        total: 10.01
+        currency: ZAR
+        status: paid
+      error: null
+    new:
+      status: 200
+      body:
+        id: 2
+        customerId: 2
+        items:
+        - sku: B2
+          qty: 3
+          unit: 3.335
+        total: 10.0
+        currency: ZAR
+        status: paid
+      error: null
+  - old_request:
+      method: GET
+      path: /orders/{id}
+      params:
+        id: 999
+      body: null
+    new_request:
+      method: GET
+      path: /orders/{id}
+      params:
+        id: 999
+      body: null
+    old:
+      status: 404
+      body:
+        detail: Order not found
+      error: null
+    new:
+      status: 404
+      body:
+        detail: No order with id 999
+      error: null
+  differing: 1
+  differs_in:
+  - 1
+  type_info:
+    observed: decimal(0) | decimal(2) → decimal(0)
+  label: regression
+  p: 0.9999990500004512
+  probabilities:
+    intended: 3.9278600216641975e-07
+    regression: 0.9999991028667877
+    unsure: 5.043472101008493e-07
+  status: shown
+  reason: The intent note only covers customer endpoint/field changes, the order creation
+    status code, and error responses—not the `total` value on `GET /orders/{id}`.
+- id: f-008
+  endpoint: POST /orders
+  new_endpoint: POST /orders
+  path: status
+  kind: status_changed
+  source: diff
+  samples:
+  - old_request:
+      method: POST
+      path: /orders
+      params: {}
+      body:
+        customerId: 1
+        items:
+        - sku: A1
+          qty: 2
+          unit: 5.0
+    new_request:
+      method: POST
+      path: /orders
+      params: {}
+      body:
+        customerId: 1
+        items:
+        - sku: A1
+          qty: 2
+          unit: 5.0
+    old:
+      status: 200
+      body:
+        id: ord_5add6bdb-f8b5-4d93-b229-3d78a811ec8c
+        createdAt: '2026-11-26T08:41:59.707352+00:00'
+        customerId: 1
+        items:
+        - sku: A1
+          qty: 2
+          unit: 5.0
+        total: 10.0
+        currency: ZAR
+        status: pending
+      error: null
+    new:
+      status: 201
+      body:
+        id: ord_3d2d9e81-056f-4a8a-93c8-a1835b959bdb
+        createdAt: '2026-11-26T08:41:59.710165+00:00'
+        customerId: 1
+        items:
+        - sku: A1
+          qty: 2
+          unit: 5.0
+        total: 10.0
+        currency: ZAR
+        status: pending
+      error: null
+  - old_request:
+      method: POST
+      path: /orders
+      params: {}
+      body:
+        customerId: 2
+        items:
+        - sku: B2
+          qty: 1
+          unit: 3.0
+    new_request:
+      method: POST
+      path: /orders
+      params: {}
+      body:
+        customerId: 2
+        items:
+        - sku: B2
+          qty: 1
+          unit: 3.0
+    old:
+      status: 200
+      body:
+        id: ord_cd3223c7-115c-4514-b072-e4d2fdf6234f
+        createdAt: '2026-11-26T08:41:59.707775+00:00'
+        customerId: 2
+        items:
+        - sku: B2
+          qty: 1
+          unit: 3.0
+        total: 3.0
+        currency: ZAR
+        status: pending
+      error: null
+    new:
+      status: 201
+      body:
+        id: ord_e01d5bbb-8e07-4d0d-b8f6-5fca583d4bcc
+        createdAt: '2026-11-26T08:41:59.710805+00:00'
+        customerId: 2
+        items:
+        - sku: B2
+          qty: 1
+          unit: 3.0
+        total: 3.0
+        currency: ZAR
+        status: pending
+      error: null
+  differing: 2
+  differs_in:
+  - 0
+  - 1
+  type_info: {}
+  label: intended
+  p: 0.9999704404368925
+  probabilities:
+    intended: 0.9999937824536805
+    regression: 1.9947212981324786e-06
+    unsure: 4.222825021284112e-06
+  status: accepted
+  reason: null
+noise:
+- endpoint: GET /orders
+  path: $.items
+  rule: unordered by id
+- endpoint: POST /orders
+  path: $.createdAt
+  rule: mask
+- endpoint: POST /orders
+  path: $.id
+  rule: mask
+errors: []
+score:
+  correct: 10
+  total: 10
+  unsure: 1
+  false_regressions: 0
+  details:
+  - n: 1
+    endpoint: GET /orders
+    path: $.items
+    expect: noise
+    got: noise
+    ok: true
+  - n: 2
+    endpoint: POST /orders
+    path: $.id
+    expect: noise
+    got: noise
+    ok: true
+  - n: 3
+    endpoint: POST /orders
+    path: status
+    expect: intended
+    got: intended
+    ok: true
+  - n: 4
+    endpoint: GET /customers/{id}
+    path: $.fullName
+    expect: intended
+    got: intended
+    ok: true
+  - n: 5
+    endpoint: GET /customers/{id}
+    path: $.legacyCode
+    expect: intended
+    got: intended
+    ok: true
+  - n: 6
+    endpoint: GET /orders/{id}
+    path: $.total
+    expect: regression
+    got: regression
+    ok: true
+  - n: 7
+    endpoint: GET /orders
+    path: $.items
+    expect: regression
+    got: regression
+    ok: true
+  - n: 8
+    endpoint: GET /customers/{id}
+    path: $.currency
+    expect: regression
+    got: regression
+    ok: true
+  - n: 9
+    endpoint: GET /orders/{id}
+    path: $.detail
+    expect: unsure
+    got: unsure
+    ok: true
+  - n: 10
+    endpoint: GET /customers/{id}
+    path: endpoint
+    expect: intended
+    got: intended
+    ok: true
+telemetry:
+  llm_calls: 15
+  rule_decisions: 22
+  reasons: 8
+  retries: 0
+  seconds: 0.04
+  prompt_tokens: 5146
+  cached_tokens: 2680
+  completion_tokens: 169
+  cost_usd: 0.0
