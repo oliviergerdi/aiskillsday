@@ -14,6 +14,9 @@ poetry.toml
 .env
 .env.*
 
+# Workflow scratchpads (/issue, /tdd, /bug-fix)
+scratch/
+
 # macOS
 .DS_Store
 
